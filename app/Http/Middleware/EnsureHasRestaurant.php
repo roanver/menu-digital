@@ -11,7 +11,7 @@ class EnsureHasRestaurant
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user() || ! $request->user()->restaurant_id) {
-            return redirect()->route('dashboard')
+            return redirect()->route('login')
                 ->with('error', 'No tienes un restaurante asociado a tu cuenta.');
         }
 
