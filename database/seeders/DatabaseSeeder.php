@@ -18,12 +18,21 @@ class DatabaseSeeder extends Seeder
 
         $restaurant = Restaurant::where('slug', 'la-buena-mesa')->first();
 
+        // Dueño del restaurante de prueba
         User::create([
-            'name'          => 'Admin',
-            'email'         => 'admin@menudigital.cl',
+            'name'          => 'Dueño Demo',
+            'email'         => 'dueno@labuenamesa.cl',
             'password'      => Hash::make('password'),
             'restaurant_id' => $restaurant->id,
             'role'          => 'owner',
+        ]);
+
+        // Super admin del sistema (sin restaurant_id)
+        // El email debe coincidir con SUPER_ADMIN_EMAIL en .env
+        User::create([
+            'name'     => 'Super Admin',
+            'email'    => config('app.super_admin_email') ?: 'superadmin@menudigital.cl',
+            'password' => Hash::make('password'),
         ]);
     }
 }
