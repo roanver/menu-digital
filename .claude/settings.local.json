@@ -25,7 +25,11 @@
       "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/DashboardController.php)",
       "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/RestaurantController.php)",
       "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/CategoryController.php)",
-      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/MenuItemController.php)"
+      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/MenuItemController.php)",
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
     ]
   }
 }
