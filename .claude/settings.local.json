@@ -29,7 +29,12 @@
       "Bash(npm run:*)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(php -l C:/laragon/www/menu-digital/app/Http/Controllers/Auth/AuthenticatedSessionController.php)",
+      "Bash(php -l C:/laragon/www/menu-digital/app/Http/Controllers/Auth/RegisteredUserController.php)",
+      "Bash(php -l C:/laragon/www/menu-digital/app/Http/Middleware/EnsureHasRestaurant.php)",
+      "Bash(find:*)",
+      "Bash(php -r \"echo sha1\\('Illuminate\\\\\\\\\\\\Auth\\\\\\\\\\\\SessionGuard'\\);\")"
     ]
   }
 }
