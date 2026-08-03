@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(composer *)",
+      "Bash(Get-Content \"C:\\\\Users\\\\Botan\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--laragon-www-menu-digital\\\\22ebb679-0cfd-4cda-bccb-742a732f4acf\\\\tasks\\\\bvrs5k02j.output\" -Wait -Tail 5)",
+      "Bash(Select-String -Pattern \"Writing lock|Application key|error|Error\" --SimpleMatch)",
+      "PowerShell(Copy-Item *)",
+      "PowerShell(php \"C:\\\\laragon\\\\www\\\\menu-digital\\\\artisan\" key:generate 2>&1)",
+      "PowerShell(cmd /c \"dir C:\\\\laragon\\\\www\\\\menu-digital\\\\vendor\")",
+      "PowerShell(Get-Content *)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\laragon\\\\www\\\\menu-digital\\\\resources\\\\views\\\\layouts\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\laragon\\\\www\\\\menu-digital\\\\resources\\\\views\\\\menu\")",
+      "Bash(Write-Output \"dirs ok\")",
+      "PowerShell(New-Item *)",
+      "Bash(php artisan *)",
+      "Bash(findstr vite *)",
+      "Bash(composer show:*)",
+      "Bash(ls:*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('exports',{}\\), indent=2\\)\\)\")",
+      "Bash(node:*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k:v for k,v in d.items\\(\\) if k in ['version','exports','main','module']}, indent=2\\)\\)\")",
+      "Bash(php -r ':*)",
+      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/AdminController.php)",
+      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/DashboardController.php)",
+      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/RestaurantController.php)",
+      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/CategoryController.php)",
+      "Bash(php -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/MenuItemController.php)"
+    ]
+  }
+}
