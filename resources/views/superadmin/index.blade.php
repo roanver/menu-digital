@@ -26,7 +26,7 @@
         </div>
         <div class="flex items-center gap-3">
             <span class="text-[12.5px] text-[#6B7280]">{{ auth()->user()->email }}</span>
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="/logout">
                 @csrf
                 <button type="submit"
                         class="text-[12.5px] font-semibold text-[#374151] hover:text-[#111827] transition-colors cursor-pointer">
