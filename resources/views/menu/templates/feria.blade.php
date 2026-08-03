@@ -61,15 +61,6 @@
         @endif
     </div>
 
-    {{-- Marquee banner --}}
-    <div style="margin:16px 0 0;background:#191410;color:#FFF6DE;padding:7px 0;overflow:hidden;">
-        <div class="marquee-inner">
-            <span style="font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">
-                &nbsp;✶ Pedidos al tiro por WhatsApp ✶ Sin comisiones ✶ {{ $restaurant->name }} ✶ Pedidos al tiro por WhatsApp ✶ Sin comisiones ✶ {{ $restaurant->name }} ✶&nbsp;
-            </span>
-        </div>
-    </div>
-
     {{-- Sticky category chips --}}
     @if($categories->count() > 0)
         <div style="display:flex;gap:8px;padding:14px 18px 12px;overflow-x:auto;position:sticky;top:0;background:#FFF6DE;z-index:3;" class="hsc">
