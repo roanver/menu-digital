@@ -1,102 +1,187 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $restaurant->name }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family={{ urlencode($restaurant->font ?? 'Inter') }}:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: '{{ $restaurant->font ?? 'Inter' }}', sans-serif; background-color: {{ $restaurant->bg_color ?? '#f9fafb' }}; } :root { --primary: {{ $restaurant->primary_color ?? '#16a34a' }}; }</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        html,body{margin:0;padding:0;background:#F7F8FA;-webkit-font-smoothing:antialiased}
+        *{box-sizing:border-box}
+        a{text-decoration:none;color:inherit}
+        .hsc::-webkit-scrollbar{height:0}
+    </style>
 </head>
-<body class="antialiased">
+<body style="font-family:Inter,system-ui,sans-serif;color:#111827;background:#F7F8FA;min-height:100vh;">
 
-    <div class="max-w-xl mx-auto pb-28">
+@php
+    $whatsappNum = $restaurant->whatsapp ? preg_replace('/\D/', '', $restaurant->whatsapp) : null;
+    $words = preg_split('/\s+/', trim($restaurant->name));
+    $initials = mb_strtoupper(mb_substr($words[0], 0, 1) . (isset($words[1]) ? mb_substr($words[1], 0, 1) : ''));
+    $ph = [
+        'linear-gradient(140deg,#F3E7D8,#E4C9A8)',
+        'linear-gradient(140deg,#F0E0DA,#DCB4A6)',
+        'linear-gradient(140deg,#E9EBDD,#C8D0AC)',
+        'linear-gradient(140deg,#EFE6D4,#D8C89E)',
+        'linear-gradient(140deg,#EAE3DF,#CCB9B0)',
+        'linear-gradient(140deg,#E7E9E4,#BFC8C0)',
+    ];
+    $itemIdx = 0;
+@endphp
 
-        {{-- Cabecera con color primario --}}
-        <header class="px-4 py-8 text-center text-white" style="background-color: {{ $restaurant->primary_color }}">
+<div style="max-width:440px;margin:0 auto;padding-bottom:120px;">
+
+    {{-- Hero --}}
+    <div style="height:148px;background:linear-gradient(130deg,#4F46E5 0%,#4338CA 46%,#312E81 100%);position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:radial-gradient(90% 90% at 85% -10%,rgba(255,255,255,.2),transparent 58%);"></div>
+        <div style="position:absolute;left:18px;bottom:14px;right:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;">
+            @if($restaurant->welcome_message)
+                <div style="font-family:'Instrument Serif',Georgia,serif;font-size:15px;font-style:italic;color:rgba(255,255,255,.85);">{{ $restaurant->welcome_message }}</div>
+            @else
+                <div style="font-family:'Instrument Serif',Georgia,serif;font-size:15px;font-style:italic;color:rgba(255,255,255,.85);">{{ $restaurant->name }}</div>
+            @endif
+        </div>
+    </div>
+
+    {{-- Restaurant info bar --}}
+    <div style="background:#fff;padding:0 18px 15px;border-bottom:1px solid #EEF0F4;position:relative;">
+        <div style="display:flex;align-items:flex-end;gap:12px;transform:translateY(-22px);margin-bottom:-10px;">
             @if($restaurant->logo)
-                <img src="{{ Storage::url($restaurant->logo) }}"
-                     alt="{{ $restaurant->name }}"
-                     class="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-white border-opacity-50">
+                <img src="{{ Storage::url($restaurant->logo) }}" alt="{{ $restaurant->name }}"
+                     style="width:64px;height:64px;border-radius:18px;object-fit:cover;border:1px solid #E0E7FF;box-shadow:0 6px 18px rgba(16,24,40,.14);flex:0 0 auto;background:#fff;">
+            @else
+                <div style="width:64px;height:64px;border-radius:18px;background:#fff;padding:5px;box-shadow:0 6px 18px rgba(16,24,40,.14);flex:0 0 auto;">
+                    <div style="width:100%;height:100%;border-radius:13px;background:#EEF2FF;border:1px solid #E0E7FF;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#4F46E5;">{{ $initials }}</div>
+                </div>
             @endif
-            <h1 class="text-2xl font-bold text-white">{{ $restaurant->name }}</h1>
-            @if($restaurant->address)
-                <p class="text-sm text-white text-opacity-80 mt-1">{{ $restaurant->address }}</p>
-            @endif
+            <div style="flex:1;min-width:0;padding-bottom:6px;">
+                <h1 style="margin:0;font-size:21px;font-weight:700;letter-spacing:-.025em;">{{ $restaurant->name }}</h1>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#047857;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:999px;padding:4px 9px;">
+                <span style="width:5px;height:5px;border-radius:50%;background:#10B981;display:block;"></span>
+                Abierto
+            </span>
             @if($restaurant->phone)
-                <p class="text-sm text-white text-opacity-80">{{ $restaurant->phone }}</p>
+                <span style="font-size:11px;font-weight:600;color:#4B5563;background:#F3F4F6;border-radius:999px;padding:4px 9px;">{{ $restaurant->phone }}</span>
             @endif
-        </header>
+            @if($restaurant->address)
+                <span style="font-size:11px;font-weight:600;color:#4B5563;background:#F3F4F6;border-radius:999px;padding:4px 9px;">{{ $restaurant->address }}</span>
+            @endif
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;border:1px solid #E5E7EB;border-radius:12px;padding:9px 12px;background:#F9FAFB;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <span style="font-size:12.5px;color:#9CA3AF;">Buscar en el menú…</span>
+        </div>
+    </div>
 
-        @if($restaurant->welcome_message)
-            <p class="text-center italic text-gray-600 px-4 py-4">{{ $restaurant->welcome_message }}</p>
-        @endif
+    {{-- Sticky category chips --}}
+    @if($categories->count() > 0)
+        <div style="display:flex;gap:7px;padding:12px 18px;overflow-x:auto;position:sticky;top:0;background:rgba(247,248,250,.92);backdrop-filter:blur(10px);z-index:3;" class="hsc">
+            <a href="#" class="chip-all"
+               style="white-space:nowrap;font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid #4338CA;color:#fff;background:#4F46E5;box-shadow:0 1px 2px rgba(16,24,40,.04);cursor:pointer;">
+                Todo
+            </a>
+            @foreach($categories as $category)
+                <a href="#cat-{{ $category->id }}" class="cat-chip" data-cat="{{ $category->id }}"
+                   style="white-space:nowrap;font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid #E5E7EB;color:#4B5563;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.04);cursor:pointer;">
+                    {{ $category->name }}
+                </a>
+            @endforeach
+        </div>
+    @endif
 
-        {{-- Categorías e items --}}
-        <main class="px-4 py-6 space-y-8">
-            @forelse($categories as $category)
-                <section>
-                    <h2 class="text-base font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                        {{ $category->name }}
-                    </h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        @foreach($category->menuItems as $item)
-                            <div class="bg-white rounded-xl shadow overflow-hidden flex flex-col">
-                                @if($item->image)
-                                    <img src="{{ Storage::url($item->image) }}"
-                                         alt="{{ $item->name }}"
-                                         class="w-full h-32 object-cover rounded-t-xl">
-                                @else
-                                    <div class="w-full h-32 bg-gray-100 rounded-t-xl flex items-center justify-center">
-                                        <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                    </div>
+    {{-- Sections --}}
+    <div style="padding:0 18px;">
+        @foreach($categories as $category)
+            <div id="cat-{{ $category->id }}" style="padding-top:16px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;">
+                    <span style="font-size:15px;font-weight:700;letter-spacing:-.015em;">{{ $category->name }}</span>
+                    <span style="font-size:10.5px;font-weight:700;color:#6B7280;background:#EDEEF2;border-radius:999px;padding:2px 8px;">{{ $category->menuItems->count() }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;">
+                    @foreach($category->menuItems as $item)
+                        @php
+                            $grad = $ph[$itemIdx % count($ph)];
+                            $initial = mb_strtoupper(mb_substr($item->name, 0, 1));
+                            $itemIdx++;
+                        @endphp
+                        <div style="background:#fff;border:1px solid #EAECF0;border-radius:17px;overflow:hidden;box-shadow:0 2px 8px rgba(16,24,40,.05);display:flex;flex-direction:column;">
+                            @if($item->image)
+                                <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
+                                     style="height:96px;width:100%;object-fit:cover;">
+                            @else
+                                <div style="height:96px;background:{{ $grad }};display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-family:'Instrument Serif',Georgia,serif;font-size:34px;color:rgba(70,50,30,.18);">{{ $initial }}</span>
+                                </div>
+                            @endif
+                            <div style="padding:10px 11px 11px;display:flex;flex-direction:column;gap:4px;flex:1;">
+                                <div style="font-size:12.5px;font-weight:600;line-height:1.3;letter-spacing:-.01em;">{{ $item->name }}</div>
+                                @if($restaurant->show_description && $item->description)
+                                    <div style="font-size:10.5px;color:#9CA3AF;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $item->description }}</div>
                                 @endif
-                                <div class="p-3 flex flex-col flex-1">
-                                    <h3 class="font-semibold text-gray-900 text-sm leading-snug">{{ $item->name }}</h3>
-                                    @if($restaurant->show_description && $item->description)
-                                        <p class="text-xs text-gray-500 mt-1 truncate">{{ $item->description }}</p>
-                                    @endif
+                                <div style="flex:1;"></div>
+                                <div style="display:flex;align-items:center;gap:8px;margin-top:5px;">
                                     @if($restaurant->show_price)
-                                    <p class="font-bold text-sm mt-2" style="color: {{ $restaurant->primary_color }}">
-                                        ${{ number_format($item->price, 0, ',', '.') }}
-                                    </p>
+                                        <span style="flex:1;min-width:0;font-size:13.5px;font-weight:700;color:#111827;font-variant-numeric:tabular-nums;">${{ number_format($item->price, 0, ',', '.') }}</span>
                                     @endif
-                                    @if($item->variants->isNotEmpty())
-                                        <div class="mt-2 flex flex-wrap gap-1">
-                                            @foreach($item->variants as $variant)
-                                                <span class="inline-block text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">
-                                                    {{ $variant->name }}
-                                                </span>
-                                            @endforeach
-                                        </div>
+                                    @if($whatsappNum)
+                                        <a href="https://wa.me/{{ $whatsappNum }}?text={{ urlencode('Hola, quiero pedir: ' . $item->name) }}" target="_blank" rel="noopener"
+                                           style="width:27px;height:27px;border-radius:9px;background:#4F46E5;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 2px 6px rgba(79,70,229,.4);">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                                        </a>
                                     @endif
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                </section>
-            @empty
-                <p class="text-center text-gray-400 py-16">El menú está siendo preparado.</p>
-            @endforelse
-        </main>
-
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+        <div style="text-align:center;font-size:10.5px;color:#C3C8D2;padding-top:26px;letter-spacing:.06em;">Menú creado con MenuDigital</div>
     </div>
+</div>
 
-    {{-- Botón flotante WhatsApp --}}
-    @if($restaurant->whatsapp)
-        <a href="https://wa.me/{{ preg_replace('/\D/', '', $restaurant->whatsapp) }}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="fixed bottom-6 right-4 left-4 max-w-xl mx-auto text-white rounded-full py-4 px-6 shadow-lg flex items-center justify-center gap-3 transition-colors font-semibold"
-           style="background-color: {{ $restaurant->primary_color }}">
-            <svg class="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+{{-- WhatsApp FAB --}}
+@if($whatsappNum)
+    <div style="position:fixed;bottom:0;right:0;padding:0 18px 20px;pointer-events:none;z-index:10;">
+        <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
+           style="width:50px;height:50px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(37,211,102,.42);pointer-events:auto;">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/>
+                <path d="M8.6 9.2c.4 2.4 2.4 4.4 4.8 4.9l1-1.4 2 1c-.4 1.4-2 1.9-3.3 1.5a8 8 0 0 1-5.2-5.2c-.4-1.3.1-2.9 1.5-3.3l1 2-1.8.5Z"/>
             </svg>
-            Pedir por WhatsApp
         </a>
-    @endif
+    </div>
+@endif
 
+<script>
+const allChips = document.querySelectorAll('.cat-chip');
+const chipAll = document.querySelector('.chip-all');
+
+function setActive(el) {
+    chipAll && Object.assign(chipAll.style, { background: '#fff', color: '#4B5563', borderColor: '#E5E7EB' });
+    allChips.forEach(c => Object.assign(c.style, { background: '#fff', color: '#4B5563', borderColor: '#E5E7EB' }));
+    Object.assign(el.style, { background: '#4F46E5', color: '#fff', borderColor: '#4338CA' });
+}
+
+allChips.forEach(chip => {
+    chip.addEventListener('click', function(e) {
+        e.preventDefault();
+        const anchor = document.getElementById('cat-' + this.getAttribute('data-cat'));
+        if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActive(this);
+    });
+});
+
+chipAll && chipAll.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActive(this);
+});
+</script>
 </body>
 </html>

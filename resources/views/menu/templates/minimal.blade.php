@@ -1,101 +1,138 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $restaurant->name }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family={{ urlencode($restaurant->font ?? 'Inter') }}:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: '{{ $restaurant->font ?? 'Inter' }}', sans-serif; background-color: {{ $restaurant->bg_color ?? '#f9fafb' }}; } :root { --primary: {{ $restaurant->primary_color ?? '#16a34a' }}; }</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        html,body{margin:0;padding:0;background:#FBFAF7;-webkit-font-smoothing:antialiased}
+        *{box-sizing:border-box}
+        a{text-decoration:none;color:inherit}
+    </style>
 </head>
-<body class="antialiased">
+<body style="font-family:Inter,system-ui,sans-serif;color:#1C1917;background:#FBFAF7;min-height:100vh;">
 
-    <div class="max-w-xl mx-auto pb-28">
+@php
+    $whatsappNum = $restaurant->whatsapp ? preg_replace('/\D/', '', $restaurant->whatsapp) : null;
+@endphp
 
-        {{-- Cabecera --}}
-        <header class="bg-white shadow-sm px-4 py-6 text-center">
-            @if($restaurant->logo)
-                <img src="{{ Storage::url($restaurant->logo) }}"
-                     alt="{{ $restaurant->name }}"
-                     class="w-20 h-20 rounded-full mx-auto mb-3 object-cover">
-            @endif
-            <h1 class="text-2xl font-bold text-gray-900">{{ $restaurant->name }}</h1>
-            @if($restaurant->address)
-                <p class="text-sm text-gray-500 mt-1">{{ $restaurant->address }}</p>
-            @endif
-            @if($restaurant->phone)
-                <p class="text-sm text-gray-500">{{ $restaurant->phone }}</p>
-            @endif
-        </header>
+<div style="max-width:440px;margin:0 auto;padding-bottom:120px;">
 
-        @if($restaurant->welcome_message)
-            <p class="text-center italic text-gray-600 px-4 py-4">{{ $restaurant->welcome_message }}</p>
+    {{-- Header --}}
+    <div style="padding:34px 26px 26px;text-align:center;">
+        @if($restaurant->address)
+            <div style="font-size:10px;font-weight:600;letter-spacing:.28em;color:#A8A29E;text-transform:uppercase;">{{ $restaurant->address }}</div>
         @endif
-
-        {{-- Categorías e items --}}
-        <main class="px-4 py-6 space-y-8">
-            @forelse($categories as $category)
-                <section>
-                    <h2 class="text-base font-semibold text-gray-700 uppercase tracking-wide mb-3 pb-2 border-b border-gray-300">
-                        {{ $category->name }}
-                    </h2>
-                    <div class="space-y-3">
-                        @foreach($category->menuItems as $item)
-                            <div class="bg-white rounded-xl shadow-sm flex items-start gap-3 p-4">
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-start gap-2">
-                                        <h3 class="font-semibold text-gray-900 leading-snug">{{ $item->name }}</h3>
-                                        @if($restaurant->show_price)
-                                        <span class="font-bold text-gray-900 whitespace-nowrap text-sm">
-                                            ${{ number_format($item->price, 0, ',', '.') }}
-                                        </span>
-                                        @endif
-                                    </div>
-                                    @if($restaurant->show_description && $item->description)
-                                        <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $item->description }}</p>
-                                    @endif
-                                    @if($item->variants->isNotEmpty())
-                                        <ul class="mt-2 space-y-1">
-                                            @foreach($item->variants as $variant)
-                                                <li class="flex justify-between text-xs text-gray-400">
-                                                    <span>{{ $variant->name }}</span>
-                                                    @if($variant->price_delta !== 0)
-                                                        <span>{{ $variant->price_delta > 0 ? '+' : '' }}${{ number_format($variant->price_delta, 0, ',', '.') }}</span>
-                                                    @endif
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @endif
-                                </div>
-                                @if($item->image)
-                                    <img src="{{ Storage::url($item->image) }}"
-                                         alt="{{ $item->name }}"
-                                         class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
-            @empty
-                <p class="text-center text-gray-400 py-16">El menú está siendo preparado.</p>
-            @endforelse
-        </main>
-
+        @if($restaurant->logo)
+            <img src="{{ Storage::url($restaurant->logo) }}" alt="{{ $restaurant->name }}"
+                 style="width:72px;height:72px;border-radius:50%;object-fit:cover;margin:14px auto 0;display:block;border:1px solid #E7E5E4;">
+        @endif
+        <h1 style="margin:14px 0 0;font-family:'Instrument Serif',Georgia,serif;font-size:44px;font-weight:400;letter-spacing:-.01em;line-height:1;">{{ $restaurant->name }}</h1>
+        @if($restaurant->welcome_message)
+            <p style="margin:13px 0 0;font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:15.5px;color:#78716C;line-height:1.5;">{{ $restaurant->welcome_message }}</p>
+        @endif
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px;">
+            <span style="width:34px;height:1px;background:#D6D3D1;display:block;"></span>
+            <span style="width:5px;height:5px;background:#1C1917;transform:rotate(45deg);display:block;"></span>
+            <span style="width:34px;height:1px;background:#D6D3D1;display:block;"></span>
+        </div>
+        @if($restaurant->phone)
+            <div style="margin-top:14px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#A8A29E;">{{ $restaurant->phone }}</div>
+        @endif
     </div>
 
-    {{-- Botón flotante WhatsApp --}}
-    @if($restaurant->whatsapp)
-        <a href="https://wa.me/{{ preg_replace('/\D/', '', $restaurant->whatsapp) }}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="fixed bottom-6 right-4 left-4 max-w-xl mx-auto text-white rounded-full py-4 px-6 shadow-lg flex items-center justify-center gap-3 transition-colors font-semibold"
-           style="background-color: var(--primary)">
-            <svg class="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
-            Pedir por WhatsApp
-        </a>
+    {{-- Category nav --}}
+    @if($categories->count() > 0)
+        <div style="border-top:1px solid #1C1917;border-bottom:1px solid #1C1917;margin:0 26px;padding:10px 0;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+            @foreach($categories as $i => $category)
+                <a href="#cat-{{ $category->id }}" class="cat-link" data-cat="{{ $category->id }}"
+                   style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:{{ $i === 0 ? '#1C1917' : '#A8A29E' }};border-bottom:1px solid {{ $i === 0 ? '#1C1917' : 'transparent' }};padding-bottom:2px;">
+                    {{ $category->name }}
+                </a>
+            @endforeach
+        </div>
     @endif
 
+    {{-- Sections --}}
+    <div style="padding:8px 26px;">
+        @foreach($categories as $si => $category)
+            <div id="cat-{{ $category->id }}" style="padding-top:32px;">
+                <div style="display:flex;align-items:baseline;gap:12px;">
+                    <span style="font-family:'Instrument Serif',Georgia,serif;font-size:15px;color:#D6D3D1;">0{{ $si + 1 }}</span>
+                    <span style="font-family:'Instrument Serif',Georgia,serif;font-size:24px;letter-spacing:-.01em;">{{ $category->name }}</span>
+                </div>
+                <div style="margin-top:16px;display:flex;flex-direction:column;gap:17px;">
+                    @foreach($category->menuItems as $item)
+                        <div>
+                            <div style="display:flex;align-items:baseline;gap:10px;">
+                                <span style="font-family:'Instrument Serif',Georgia,serif;font-size:17.5px;letter-spacing:-.005em;min-width:0;flex-shrink:1;">{{ $item->name }}</span>
+                                <span style="flex:1;border-bottom:1px dotted #D6D3D1;transform:translateY(-4px);min-width:14px;display:block;"></span>
+                                @if($restaurant->show_price)
+                                    <span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.02em;white-space:nowrap;flex-shrink:0;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                @endif
+                            </div>
+                            @if($restaurant->show_description && $item->description)
+                                <div style="margin-top:4px;">
+                                    <span style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:13.5px;color:#A8A29E;line-height:1.5;">{{ $item->description }}</span>
+                                </div>
+                            @endif
+                            @if($item->variants->isNotEmpty())
+                                <ul style="margin:5px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px;">
+                                    @foreach($item->variants as $variant)
+                                        <li style="display:flex;justify-content:space-between;font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:12px;color:#A8A29E;">
+                                            <span>{{ $variant->name }}</span>
+                                            @if($variant->price_delta != 0)
+                                                <span>{{ $variant->price_delta > 0 ? '+' : '' }}${{ number_format($variant->price_delta, 0, ',', '.') }}</span>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:36px;">
+            <span style="width:26px;height:1px;background:#D6D3D1;display:block;"></span>
+            <span style="width:4px;height:4px;background:#A8A29E;transform:rotate(45deg);display:block;"></span>
+            <span style="width:26px;height:1px;background:#D6D3D1;display:block;"></span>
+        </div>
+        <div style="text-align:center;margin-top:14px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#D6D3D1;">Menú creado con MenuDigital</div>
+    </div>
+</div>
+
+{{-- WhatsApp pill --}}
+@if($whatsappNum)
+    <div style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;padding:0 20px 20px;pointer-events:none;z-index:10;">
+        <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;background:#1C1917;color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;box-shadow:0 10px 26px rgba(28,25,23,.35);pointer-events:auto;">
+            <span style="width:22px;height:22px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+            </span>
+            Reservar o pedir por WhatsApp
+        </a>
+    </div>
+@endif
+
+<script>
+document.querySelectorAll('.cat-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.cat-link').forEach(l => {
+            l.style.color = '#A8A29E';
+            l.style.borderBottom = '1px solid transparent';
+        });
+        this.style.color = '#1C1917';
+        this.style.borderBottom = '1px solid #1C1917';
+    });
+});
+</script>
 </body>
 </html>
