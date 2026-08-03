@@ -1,63 +1,64 @@
 <x-guest-layout>
 
     @if(session('status'))
-    <div style="margin-bottom:16px;padding:11px 14px;border-radius:10px;background:#ECFDF5;border:1px solid #6EE7B7;font-size:13px;font-weight:600;color:#065F46">
+    <div style="margin-bottom:16px;padding:11px 14px;border-radius:12px;background:#FFF3CD;border:1.5px solid #201914;font-size:13px;font-weight:600;color:#201914">
         {{ session('status') }}
     </div>
     @endif
 
     @if(session('error'))
-    <div style="margin-bottom:16px;padding:11px 14px;border-radius:10px;background:#FEF2F2;border:1px solid #FECACA;font-size:13px;font-weight:600;color:#991B1B">
+    <div style="margin-bottom:16px;padding:11px 14px;border-radius:12px;background:#FEE2E2;border:1.5px solid #C2410C;font-size:13px;font-weight:600;color:#7F1D1D">
         {{ session('error') }}
     </div>
     @endif
 
-    <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.028em">Hola de nuevo</h1>
-    <p style="margin:9px 0 0;font-size:13.5px;line-height:1.6;color:#6B7280">Ingresa para administrar la carta de tu restaurante.</p>
+    <h1 style="margin:0 0 6px;font-family:'Bricolage Grotesque',Inter,sans-serif;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1.05">Hola de nuevo</h1>
+    <p style="margin:0 0 24px;font-size:14px;color:#5C5245;line-height:1.5">Ingresa para administrar la carta de tu restaurante.</p>
 
-    <form method="POST" action="{{ route('login') }}" style="display:flex;flex-direction:column;gap:13px;margin-top:24px">
+    <form method="POST" action="{{ route('login') }}" style="display:flex;flex-direction:column;gap:14px">
         @csrf
 
-        <label style="display:flex;flex-direction:column;gap:6px">
-            <span style="font-size:12px;font-weight:600;color:#374151">Correo</span>
-            <input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
-                placeholder="hola@elfogon.cl"
-                style="width:100%;padding:10px 12px;border:1px solid {{ $errors->has('email') ? '#EF4444' : '#E5E7EB' }};border-radius:10px;font-size:13.5px;font-family:Inter,system-ui,sans-serif;color:#111827;outline:none;box-shadow:0 1px 2px rgba(16,24,40,.03)"
-                onfocus="this.style.borderColor='#4F46E5';this.style.boxShadow='0 0 0 3px rgba(79,70,229,.14)'"
-                onblur="this.style.borderColor='{{ $errors->has('email') ? '#EF4444' : '#E5E7EB' }}';this.style.boxShadow='none'">
-            @error('email')<span style="font-size:12px;font-weight:600;color:#EF4444">{{ $message }}</span>@enderror
-        </label>
+        <div>
+            <label for="email" style="display:block;font-size:12px;font-weight:700;color:#201914;letter-spacing:.02em;margin-bottom:5px">Correo electrónico</label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
+                placeholder="hola@mirestaurante.cl"
+                style="width:100%;padding:11px 14px;border:1.5px solid {{ $errors->has('email') ? '#E85D2F' : '#201914' }};border-radius:12px;font-size:14px;font-family:Inter,system-ui,sans-serif;color:#201914;background:#fff;outline:none"
+                onfocus="this.style.borderColor='#E85D2F';this.style.boxShadow='0 0 0 3px rgba(232,93,47,.12)'"
+                onblur="this.style.borderColor='{{ $errors->has('email') ? '#E85D2F' : '#201914' }}';this.style.boxShadow='none'">
+            @error('email')<p style="margin-top:5px;font-size:12px;font-weight:600;color:#E85D2F">{{ $message }}</p>@enderror
+        </div>
 
-        <label style="display:flex;flex-direction:column;gap:6px">
-            <span style="display:flex;align-items:center;gap:8px">
-                <span style="flex:1;font-size:12px;font-weight:600;color:#374151">Contraseña</span>
+        <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+                <label for="password" style="font-size:12px;font-weight:700;color:#201914;letter-spacing:.02em">Contraseña</label>
                 @if(Route::has('password.request'))
-                <a href="{{ route('password.request') }}" style="font-size:11.5px;font-weight:600;color:#4F46E5">¿La olvidaste?</a>
+                <a href="{{ route('password.request') }}" style="font-size:12px;font-weight:600;color:#E85D2F">¿La olvidaste?</a>
                 @endif
-            </span>
-            <input type="password" name="password" required autocomplete="current-password"
-                placeholder="Mínimo 8 caracteres"
-                style="width:100%;padding:10px 12px;border:1px solid {{ $errors->has('password') ? '#EF4444' : '#E5E7EB' }};border-radius:10px;font-size:13.5px;font-family:Inter,system-ui,sans-serif;color:#111827;outline:none;box-shadow:0 1px 2px rgba(16,24,40,.03)"
-                onfocus="this.style.borderColor='#4F46E5';this.style.boxShadow='0 0 0 3px rgba(79,70,229,.14)'"
-                onblur="this.style.borderColor='{{ $errors->has('password') ? '#EF4444' : '#E5E7EB' }}';this.style.boxShadow='none'">
-            @error('password')<span style="font-size:12px;font-weight:600;color:#EF4444">{{ $message }}</span>@enderror
-        </label>
+            </div>
+            <input id="password" type="password" name="password" required autocomplete="current-password"
+                placeholder="Tu contraseña"
+                style="width:100%;padding:11px 14px;border:1.5px solid {{ $errors->has('password') ? '#E85D2F' : '#201914' }};border-radius:12px;font-size:14px;font-family:Inter,system-ui,sans-serif;color:#201914;background:#fff;outline:none"
+                onfocus="this.style.borderColor='#E85D2F';this.style.boxShadow='0 0 0 3px rgba(232,93,47,.12)'"
+                onblur="this.style.borderColor='{{ $errors->has('password') ? '#E85D2F' : '#201914' }}';this.style.boxShadow='none'">
+            @error('password')<p style="margin-top:5px;font-size:12px;font-weight:600;color:#E85D2F">{{ $message }}</p>@enderror
+        </div>
 
-        <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
-            <input type="checkbox" name="remember" style="width:16px;height:16px;border-radius:4px;accent-color:#4F46E5;cursor:pointer">
-            <span style="font-size:12.5px;color:#4B5563">Mantener la sesión iniciada</span>
+        <label style="display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;font-weight:600;color:#5C5245">
+            <input type="checkbox" name="remember" style="width:17px;height:17px;border-radius:5px;border:1.5px solid #201914;accent-color:#E85D2F;cursor:pointer">
+            Mantener la sesión iniciada
         </label>
 
         <button type="submit"
-            style="width:100%;padding:11px 16px;border-radius:11px;background:#4F46E5;color:#fff;border:1px solid #4338CA;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35);margin-top:4px"
-            onmouseover="this.style.background='#4338CA'" onmouseout="this.style.background='#4F46E5'">
+            style="width:100%;margin-top:4px;padding:13px;border-radius:999px;background:#E85D2F;color:#FFF6DE;border:1.5px solid #201914;box-shadow:4px 4px 0 #201914;font-family:'Bricolage Grotesque',Inter,sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:box-shadow .1s,transform .1s"
+            onmouseover="this.style.boxShadow='1px 1px 0 #201914';this.style.transform='translate(3px,3px)'"
+            onmouseout="this.style.boxShadow='4px 4px 0 #201914';this.style.transform='none'">
             Ingresar
         </button>
-    </form>
 
-    <p style="margin:20px 0 0;font-size:13px;color:#6B7280;text-align:center">
-        ¿Aún no tienes cuenta?
-        <a href="{{ route('register') }}" style="font-weight:600;color:#4F46E5">Crear una gratis</a>
-    </p>
+        <p style="text-align:center;font-size:13px;color:#5C5245;margin:4px 0 0">
+            ¿Aún no tienes cuenta?
+            <a href="{{ route('register') }}" style="font-weight:700;color:#E85D2F">Crear una gratis</a>
+        </p>
+    </form>
 
 </x-guest-layout>
