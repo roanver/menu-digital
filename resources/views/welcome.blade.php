@@ -11,6 +11,12 @@
 </head>
 <body class="bg-white text-[#111827] antialiased">
 
+@if(session('status'))
+<div style="position:fixed;top:16px;right:16px;z-index:9999;background:#201914;color:#FFF6DE;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.25);">
+    {{ session('status') }}
+</div>
+@endif
+
 <!-- ===== STICKY HEADER ===== -->
 <header style="position:sticky;top:0;z-index:30;background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);border-bottom:1px solid #F3F4F6;">
     <div style="max-width:1160px;margin:0 auto;padding:13px clamp(18px,3vw,28px);display:flex;align-items:center;gap:14px;">
