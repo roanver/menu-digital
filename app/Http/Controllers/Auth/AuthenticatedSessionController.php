@@ -40,12 +40,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $recallerName = Auth::guard('web')->getRecallerName();
+
         Auth::guard('web')->logout();
 
+        $request->session()->flush();
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('status', 'Sesión cerrada correctamente.');
+        return redirect('/')->with('status', 'Sesión cerrada correctamente.')
+            ->withoutCookie($recallerName);
     }
 }
