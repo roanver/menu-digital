@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -40,13 +41,23 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        Log::info('LOGOUT: iniciando', [
+            'user'       => Auth::id(),
+            'session_id' => session()->getId(),
+            'has_cookie' => $request->hasCookie(Auth::guard('web')->getRecallerName()),
+        ]);
+
         $recallerName = Auth::guard('web')->getRecallerName();
 
         Auth::guard('web')->logout();
-
         $request->session()->flush();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        Log::info('LOGOUT: completado', [
+            'authenticated_after' => Auth::check(),
+            'new_session_id'      => session()->getId(),
+        ]);
 
         return redirect('/')->with('status', 'Sesión cerrada correctamente.')
             ->withoutCookie($recallerName);
