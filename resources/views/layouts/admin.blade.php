@@ -60,6 +60,7 @@
                 Dashboard
             </a>
 
+            @if(auth()->user()->isOwner())
             {{-- Mi Restaurante --}}
             @php $__active = request()->routeIs('admin.restaurant.*'); @endphp
             <a href="{{ route('admin.restaurant.edit') }}"
@@ -70,6 +71,7 @@
                 </svg>
                 Mi Restaurante
             </a>
+            @endif
 
             {{-- Categorías --}}
             @php $__active = request()->routeIs('admin.categories.*'); @endphp
@@ -96,6 +98,7 @@
                 <span class="text-[10.5px] font-semibold text-[#6B7280] bg-white border border-[#E5E7EB] rounded-[6px] px-[5px] py-[1px]">{{ $_itemCount }}</span>
             </a>
 
+            @if(auth()->user()->isOwner())
             {{-- Apariencia --}}
             @php $__active = request()->routeIs('admin.appearance.*'); @endphp
             <a href="{{ route('admin.appearance.edit') }}"
@@ -129,6 +132,18 @@
                 </svg>
                 Billing
             </a>
+
+            {{-- Equipo --}}
+            @php $__active = request()->routeIs('admin.staff.*'); @endphp
+            <a href="{{ route('admin.staff.index') }}"
+               class="flex items-center gap-[10px] w-full px-[10px] py-2 rounded-[9px] border text-[13px] transition-colors no-underline
+                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-semibold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
+                <svg class="w-[17px] h-[17px] flex-none {{ $__active ? 'opacity-100' : 'opacity-75' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Equipo
+            </a>
+            @endif
 
         </nav>
 
@@ -281,6 +296,7 @@
             <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Items</span>
         </a>
 
+        @if(auth()->user()->isOwner())
         {{-- Diseño --}}
         @php $__t = request()->routeIs('admin.appearance.*'); @endphp
         <a href="{{ route('admin.appearance.edit') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
@@ -298,6 +314,16 @@
             </svg>
             <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Cuenta</span>
         </a>
+
+        {{-- Equipo --}}
+        @php $__t = request()->routeIs('admin.staff.*'); @endphp
+        <a href="{{ route('admin.staff.index') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Equipo</span>
+        </a>
+        @endif
 
     </div>
 </nav>
