@@ -43,7 +43,10 @@ class SuperAdminController extends AdminController
             'plan'                 => ['required', 'in:trial,basic,pro,expired'],
             'trial_ends_at'        => ['nullable', 'date'],
             'subscription_ends_at' => ['nullable', 'date'],
-            'is_active'            => ['boolean'],
+            'is_active'            => ['nullable', 'boolean'],
+        ], [
+            'plan.required' => 'El plan es requerido.',
+            'plan.in'       => 'Plan no válido. Opciones: trial, basic, pro, expired.',
         ]);
 
         $restaurant->update($validated);

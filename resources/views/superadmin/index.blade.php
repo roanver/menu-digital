@@ -39,6 +39,12 @@
 
 <div class="max-w-[1200px] mx-auto px-6 py-8">
 
+    @if($errors->any())
+    <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-[12px] p-4 flex items-center gap-3 mb-6">
+        <p class="text-[13px] font-semibold text-[#DC2626]">{{ $errors->first() }}</p>
+    </div>
+    @endif
+
     @if(session('success'))
     <div class="bg-[#ECFDF5] border border-[#6EE7B7] rounded-[12px] p-4 flex items-center gap-3 mb-6">
         <svg class="flex-none" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
