@@ -6,17 +6,16 @@
     <title>{{ $restaurant->name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         html,body{margin:0;padding:0;background:#FFF6DE;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
         a{text-decoration:none;color:inherit}
         .hsc::-webkit-scrollbar{height:0}
-        @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-        .marquee-inner{display:inline-block;white-space:nowrap;animation:marquee 18s linear infinite;}
+        @keyframes md-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     </style>
 </head>
-<body style="font-family:'Bricolage Grotesque',Inter,sans-serif;color:#191410;background:#FFF6DE;min-height:100vh;">
+<body style="font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410;background:#FFF6DE;min-height:100vh;">
 
 @php
     $whatsappNum = $restaurant->whatsapp ? preg_replace('/\D/', '', $restaurant->whatsapp) : null;
@@ -36,34 +35,47 @@
 <div style="max-width:440px;margin:0 auto;padding-bottom:120px;">
 
     {{-- Header --}}
-    <div style="padding:20px 18px 0;">
+    <div style="padding:18px 18px 0;">
         <div style="display:flex;align-items:center;gap:12px;">
             @if($restaurant->logo)
                 <img src="{{ Storage::url($restaurant->logo) }}" alt="{{ $restaurant->name }}"
-                     style="width:58px;height:58px;border-radius:16px;object-fit:cover;border:2px solid #191410;box-shadow:3px 3px 0 #191410;transform:rotate(-4deg);flex:0 0 auto;">
+                     style="width:58px;height:58px;border-radius:16px;object-fit:cover;border:2px solid #191410;box-shadow:3px 3px 0 #191410;flex:0 0 auto;transform:rotate(-4deg);">
             @else
-                <div style="width:58px;height:58px;border-radius:16px;background:#4F46E5;border:2px solid #191410;box-shadow:3px 3px 0 #191410;display:flex;align-items:center;justify-content:center;transform:rotate(-4deg);flex:0 0 auto;">
+                <div style="width:58px;height:58px;border-radius:16px;background:#E85D2F;border:2px solid #191410;box-shadow:3px 3px 0 #191410;display:flex;align-items:center;justify-content:center;transform:rotate(-4deg);flex:0 0 auto;">
                     <span style="font-size:19px;font-weight:800;color:#fff;letter-spacing:-.02em;">{{ $initials }}</span>
                 </div>
             @endif
             <div style="flex:1;min-width:0;">
-                <h1 style="margin:0;font-size:29px;font-weight:800;letter-spacing:-.03em;line-height:1;">{{ $restaurant->name }}</h1>
+                <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1;">{{ $restaurant->name }}</h1>
                 <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
-                    <span style="font-size:10.5px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">Abierto</span>
+                    @if($restaurant->welcome_message)
+                        <span style="font-size:10.5px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->welcome_message }}</span>
+                    @else
+                        <span style="font-size:10.5px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">Abierto</span>
+                    @endif
                     @if($restaurant->phone)
                         <span style="font-size:10.5px;font-weight:700;color:#191410;background:#fff;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->phone }}</span>
                     @endif
                 </div>
             </div>
         </div>
-        @if($restaurant->welcome_message)
-            <p style="margin:12px 0 0;font-size:12.5px;font-weight:500;color:#8A8073;line-height:1.5;">{{ $restaurant->welcome_message }}</p>
-        @endif
     </div>
 
-    {{-- Sticky category chips --}}
+    {{-- Marquee --}}
+    <div style="margin:16px 0 0;background:#191410;color:#FFF6DE;padding:8px 0;overflow:hidden;white-space:nowrap;">
+        <div style="display:inline-block;animation:md-marquee 18s linear infinite;">
+            @php
+                $marqueeText = '&nbsp;✶ Pedidos por WhatsApp ✶ Sin comisiones ✶ ';
+                if ($restaurant->address) $marqueeText .= htmlspecialchars($restaurant->address) . ' ✶ ';
+                $marqueeText = str_repeat($marqueeText, 6);
+            @endphp
+            <span style="font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">{!! $marqueeText !!}</span>
+        </div>
+    </div>
+
+    {{-- Category chips --}}
     @if($categories->count() > 0)
-        <div style="display:flex;gap:8px;padding:14px 18px 12px;overflow-x:auto;position:sticky;top:0;background:#FFF6DE;z-index:3;" class="hsc">
+        <div class="hsc" style="display:flex;gap:8px;padding:14px 18px 12px;overflow-x:auto;position:sticky;top:0;background:#FFF6DE;z-index:3;">
             <a href="#" class="chip-all"
                style="white-space:nowrap;font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:999px;border:1.5px solid #191410;color:#FFD84D;background:#191410;box-shadow:2px 2px 0 rgba(25,20,16,.3);cursor:pointer;">
                 Todo
@@ -78,40 +90,33 @@
     @endif
 
     {{-- Sections --}}
-    <div style="padding:0 18px;">
+    <div style="padding:0 18px 40px;">
         @foreach($categories as $category)
-            <div id="cat-{{ $category->id }}" style="padding-top:16px;">
-                <div style="display:inline-block;margin-bottom:12px;position:relative;">
+            <div id="cat-{{ $category->id }}" style="padding-top:18px;">
+                <div style="display:inline-block;margin-bottom:13px;position:relative;">
                     <span style="position:relative;z-index:1;font-size:17px;font-weight:800;letter-spacing:-.02em;">{{ $category->name }}</span>
                     <span style="position:absolute;left:-3px;right:-6px;bottom:0;height:9px;background:#FFD84D;z-index:0;transform:rotate(-.6deg);display:block;"></span>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     @foreach($category->menuItems as $item)
                         @php
-                            $grad = $phFeria[$itemIdx % count($phFeria)];
+                            $ph = $phFeria[$itemIdx % count($phFeria)];
                             $initial = mb_strtoupper(mb_substr($item->name, 0, 1));
                             $itemIdx++;
                         @endphp
                         <div style="background:#fff;border:1.5px solid #191410;border-radius:16px;overflow:hidden;box-shadow:3px 3px 0 #191410;display:flex;flex-direction:column;">
                             @if($item->image)
                                 <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
-                                     style="height:92px;width:100%;object-fit:cover;border-bottom:1.5px solid #191410;">
+                                     style="height:92px;width:100%;object-fit:cover;border-bottom:1.5px solid #191410;display:block;">
                             @else
-                                <div style="height:92px;background:{{ $grad }};border-bottom:1.5px solid #191410;display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-family:'Instrument Serif',Georgia,serif;font-size:36px;color:rgba(25,20,16,.22);">{{ $initial }}</span>
+                                <div style="height:92px;background:{{ $ph }};border-bottom:1.5px solid #191410;display:flex;align-items:center;justify-content:center;position:relative;">
+                                    <span style="font-family:'Instrument Serif',Georgia,serif;font-size:36px;color:rgba(25,20,16,.18);">{{ $initial }}</span>
                                 </div>
                             @endif
                             <div style="padding:10px 11px 11px;display:flex;flex-direction:column;gap:4px;flex:1;">
                                 <div style="font-size:12.5px;font-weight:800;line-height:1.25;letter-spacing:-.015em;">{{ $item->name }}</div>
                                 @if($restaurant->show_description && $item->description)
                                     <div style="font-size:10.5px;font-weight:500;color:#8A8073;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $item->description }}</div>
-                                @endif
-                                @if($item->variants->isNotEmpty())
-                                    <div style="font-size:10px;font-weight:600;color:#A89880;margin-top:2px;">
-                                        @foreach($item->variants as $variant)
-                                            {{ $variant->name }}@if(!$loop->last) · @endif
-                                        @endforeach
-                                    </div>
                                 @endif
                                 <div style="flex:1;"></div>
                                 <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -137,26 +142,29 @@
     </div>
 </div>
 
-{{-- WhatsApp FAB + cart bar --}}
-<div style="position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:0 16px 18px;pointer-events:none;z-index:10;max-width:440px;margin:0 auto;">
-    @if($whatsappNum)
+{{-- WhatsApp FAB --}}
+@if($whatsappNum)
+    <div style="position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:0 16px 18px;pointer-events:none;z-index:10;">
         <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
            style="flex:1;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:14px;background:#191410;color:#FFF6DE;border:1.5px solid #191410;box-shadow:3px 3px 0 rgba(25,20,16,.25);pointer-events:auto;">
-            <span style="width:22px;height:22px;border-radius:7px;background:#FFD84D;color:#191410;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex:0 0 auto;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#191410" stroke-width="2.4" stroke-linecap="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+            <span style="width:32px;height:32px;border-radius:10px;background:#25D366;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/>
+                    <path d="M8.6 9.2c.4 2.4 2.4 4.4 4.8 4.9l1-1.4 2 1c-.4 1.4-2 1.9-3.3 1.5a8 8 0 0 1-5.2-5.2c-.4-1.3.1-2.9 1.5-3.3l1 2-1.8.5Z"/>
+                </svg>
             </span>
             <span style="flex:1;min-width:0;font-size:13px;font-weight:800;">Pedir por WhatsApp</span>
         </a>
-    @endif
-</div>
+    </div>
+@endif
 
 <script>
 const allChips = document.querySelectorAll('.cat-chip');
 const chipAll = document.querySelector('.chip-all');
 
-function setActive(el) {
-    chipAll && Object.assign(chipAll.style, { background: '#fff', color: '#191410' });
-    allChips.forEach(c => Object.assign(c.style, { background: '#fff', color: '#191410' }));
+function setActiveChip(el) {
+    chipAll && Object.assign(chipAll.style, { background: '#fff', color: '#191410', boxShadow: 'none' });
+    allChips.forEach(c => Object.assign(c.style, { background: '#fff', color: '#191410', boxShadow: 'none' }));
     Object.assign(el.style, { background: '#191410', color: '#FFD84D', boxShadow: '2px 2px 0 rgba(25,20,16,.3)' });
 }
 
@@ -165,14 +173,14 @@ allChips.forEach(chip => {
         e.preventDefault();
         const anchor = document.getElementById('cat-' + this.getAttribute('data-cat'));
         if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setActive(this);
+        setActiveChip(this);
     });
 });
 
 chipAll && chipAll.addEventListener('click', function(e) {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setActive(this);
+    setActiveChip(this);
 });
 </script>
 </body>

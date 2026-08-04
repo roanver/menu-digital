@@ -36,7 +36,7 @@
     {{-- Hero --}}
     <div style="height:148px;background:linear-gradient(130deg,#4F46E5 0%,#4338CA 46%,#312E81 100%);position:relative;overflow:hidden;">
         <div style="position:absolute;inset:0;background:radial-gradient(90% 90% at 85% -10%,rgba(255,255,255,.2),transparent 58%);"></div>
-        <div style="position:absolute;left:18px;bottom:14px;right:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;">
+        <div style="position:absolute;left:18px;bottom:14px;right:18px;">
             @if($restaurant->welcome_message)
                 <div style="font-family:'Instrument Serif',Georgia,serif;font-size:15px;font-style:italic;color:rgba(255,255,255,.85);">{{ $restaurant->welcome_message }}</div>
             @else
@@ -71,10 +71,6 @@
             @if($restaurant->address)
                 <span style="font-size:11px;font-weight:600;color:#4B5563;background:#F3F4F6;border-radius:999px;padding:4px 9px;">{{ $restaurant->address }}</span>
             @endif
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;border:1px solid #E5E7EB;border-radius:12px;padding:9px 12px;background:#F9FAFB;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-            <span style="font-size:12.5px;color:#9CA3AF;">Buscar en el menú…</span>
         </div>
     </div>
 

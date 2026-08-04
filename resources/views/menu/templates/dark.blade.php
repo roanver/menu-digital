@@ -56,6 +56,39 @@
                 </div>
             </div>
         </div>
+
+        {{-- Featured carousel --}}
+        @php $featuredItems = $categories->flatMap(fn($c) => $c->menuItems)->take(4); @endphp
+        @if($featuredItems->isNotEmpty())
+        <div style="margin-top:18px;">
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;">
+                <span style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#A5B4FC;">Destacados</span>
+                <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(165,180,252,.3),transparent);display:block;"></span>
+            </div>
+            <div class="hsc" style="display:flex;gap:11px;overflow-x:auto;margin:0 -20px;padding:0 20px 6px;">
+                @foreach($featuredItems as $fi => $feat)
+                    @php $phF = $phDark[$fi % count($phDark)]; $finitial = mb_strtoupper(mb_substr($feat->name, 0, 1)); @endphp
+                    <div style="flex:0 0 218px;border-radius:18px;overflow:hidden;position:relative;border:1px solid #26262F;">
+                        @if($feat->image)
+                            <img src="{{ Storage::url($feat->image) }}" alt="{{ $feat->name }}"
+                                 style="width:100%;height:128px;object-fit:cover;display:block;">
+                        @else
+                            <div style="height:128px;background:{{ $phF }};display:flex;align-items:center;justify-content:center;">
+                                <span style="font-family:'Instrument Serif',Georgia,serif;font-size:40px;color:rgba(255,255,255,.22);">{{ $finitial }}</span>
+                            </div>
+                        @endif
+                        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(5,5,10,.88) 82%);"></div>
+                        <div style="position:absolute;left:13px;right:13px;bottom:11px;">
+                            <div style="font-size:13.5px;font-weight:700;letter-spacing:-.01em;text-shadow:0 1px 8px rgba(0,0,0,.5);">{{ $feat->name }}</div>
+                            @if($restaurant->show_price)
+                                <div style="font-size:13px;font-weight:700;color:#C7D2FE;margin-top:4px;">${{ number_format($feat->price, 0, ',', '.') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
 
     {{-- Sticky category chips --}}
@@ -160,7 +193,6 @@ function setActiveChip(el) {
 allChips.forEach(chip => {
     chip.addEventListener('click', function(e) {
         e.preventDefault();
-        const target = document.querySelector('#' + this.getAttribute('data-cat').split('-').map((p,i) => i===0 ? 'cat' : p).join('-'));
         const anchor = document.getElementById('cat-' + this.getAttribute('data-cat'));
         if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setActiveChip(this);

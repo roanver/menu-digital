@@ -14,31 +14,31 @@
         <div class="bg-white border border-[#E5E7EB] rounded-[14px] shadow-[0_1px_2px_rgba(16,24,40,.04)] p-4 mb-4">
             <div class="text-[13px] font-bold text-[#111827] mb-3">Plantilla</div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
 
                 {{-- Minimal --}}
                 <label class="relative cursor-pointer">
                     <input type="radio" name="template" value="minimal" class="sr-only peer"
                            {{ old('template', $restaurant->template ?? 'minimal') === 'minimal' ? 'checked' : '' }}>
                     <div class="border-2 border-[#E5E7EB] rounded-[12px] p-3 transition-colors hover:border-[#C7D2FE] peer-checked:border-[#4F46E5] peer-checked:bg-[#EEF2FF]">
-                        <div class="w-full h-[80px] bg-[#F9FAFB] rounded-[8px] mb-2.5 overflow-hidden border border-[#E5E7EB]">
-                            <div class="bg-white h-7 flex items-center px-2 border-b border-[#F3F4F6]">
-                                <div class="w-4 h-4 rounded-full bg-[#E5E7EB] mr-1.5"></div>
-                                <div class="h-1.5 bg-[#D1D5DB] rounded w-14"></div>
+                        <div class="w-full h-[80px] bg-[#FBFAF7] rounded-[8px] mb-2.5 overflow-hidden border border-[#E5E7EB] flex flex-col items-center justify-center gap-1 p-2">
+                            <div class="h-2 bg-[#1C1917] rounded-sm w-16" style="font-family:serif"></div>
+                            <div class="flex items-center gap-1 w-full justify-center">
+                                <div class="h-px bg-[#D6D3D1] w-6"></div>
+                                <div class="w-1 h-1 bg-[#A8A29E] rotate-45"></div>
+                                <div class="h-px bg-[#D6D3D1] w-6"></div>
                             </div>
-                            <div class="p-1.5 space-y-1">
-                                <div class="flex justify-between items-center">
-                                    <div class="h-1.5 bg-[#D1D5DB] rounded w-12"></div>
-                                    <div class="h-1.5 bg-[#9CA3AF] rounded w-8"></div>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <div class="h-1.5 bg-[#E5E7EB] rounded w-16"></div>
-                                    <div class="h-1.5 bg-[#D1D5DB] rounded w-6"></div>
-                                </div>
+                            <div class="flex justify-between items-center w-full px-1">
+                                <div class="h-1 bg-[#D6D3D1] rounded w-14"></div>
+                                <div class="h-1 bg-[#9CA3AF] rounded w-6"></div>
+                            </div>
+                            <div class="flex justify-between items-center w-full px-1">
+                                <div class="h-1 bg-[#E7E5E4] rounded w-16"></div>
+                                <div class="h-1 bg-[#D6D3D1] rounded w-5"></div>
                             </div>
                         </div>
                         <p class="text-[13px] font-semibold text-[#111827]">Minimal</p>
-                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Blanco y limpio, foco en el contenido</p>
+                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Editorial serif, crema y limpio</p>
                     </div>
                     <div class="hidden peer-checked:flex absolute top-2.5 right-2.5 w-[18px] h-[18px] bg-[#4F46E5] rounded-full items-center justify-center">
                         <svg width="10" height="10" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -50,22 +50,23 @@
                     <input type="radio" name="template" value="dark" class="sr-only peer"
                            {{ old('template', $restaurant->template ?? 'minimal') === 'dark' ? 'checked' : '' }}>
                     <div class="border-2 border-[#E5E7EB] rounded-[12px] p-3 transition-colors hover:border-[#C7D2FE] peer-checked:border-[#4F46E5] peer-checked:bg-[#EEF2FF]">
-                        <div class="w-full h-[80px] bg-gray-900 rounded-[8px] mb-2.5 overflow-hidden border border-gray-700">
-                            <div class="bg-gray-800 h-7 flex items-center justify-center border-b border-gray-700">
-                                <div class="h-1.5 bg-gray-400 rounded w-14"></div>
-                            </div>
-                            <div class="p-1.5 space-y-1">
-                                <div class="h-1.5 bg-green-500 rounded w-10 mb-1.5"></div>
-                                <div class="bg-gray-800 rounded p-1">
-                                    <div class="flex justify-between">
-                                        <div class="h-1.5 bg-gray-400 rounded w-12"></div>
-                                        <div class="h-1.5 bg-green-400 rounded w-6"></div>
+                        <div class="w-full h-[80px] bg-[#09090E] rounded-[8px] mb-2.5 overflow-hidden border border-[#26262F]">
+                            <div class="p-1.5">
+                                <div class="flex items-center gap-1.5 mb-1.5">
+                                    <div class="w-5 h-5 rounded-md bg-[#312E81]"></div>
+                                    <div class="h-1.5 bg-[#F4F4F5] rounded w-14"></div>
+                                </div>
+                                <div class="bg-[#15151C] border border-[#23232D] rounded-lg p-1 flex gap-1">
+                                    <div class="w-8 h-8 rounded bg-[#2E2620] flex-shrink-0"></div>
+                                    <div class="flex flex-col gap-0.5 justify-center">
+                                        <div class="h-1 bg-[#F4F4F5] rounded w-12"></div>
+                                        <div class="h-1 bg-[#C7D2FE] rounded w-8"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <p class="text-[13px] font-semibold text-[#111827]">Dark</p>
-                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Modo oscuro elegante</p>
+                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Modo oscuro, acentos índigo</p>
                     </div>
                     <div class="hidden peer-checked:flex absolute top-2.5 right-2.5 w-[18px] h-[18px] bg-[#4F46E5] rounded-full items-center justify-center">
                         <svg width="10" height="10" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -77,29 +78,114 @@
                     <input type="radio" name="template" value="cards" class="sr-only peer"
                            {{ old('template', $restaurant->template ?? 'minimal') === 'cards' ? 'checked' : '' }}>
                     <div class="border-2 border-[#E5E7EB] rounded-[12px] p-3 transition-colors hover:border-[#C7D2FE] peer-checked:border-[#4F46E5] peer-checked:bg-[#EEF2FF]">
-                        <div class="w-full h-[80px] bg-[#F3F4F6] rounded-[8px] mb-2.5 overflow-hidden border border-[#E5E7EB]">
-                            <div class="bg-green-600 h-7 flex items-center justify-center">
+                        <div class="w-full h-[80px] bg-[#F7F8FA] rounded-[8px] mb-2.5 overflow-hidden border border-[#E5E7EB]">
+                            <div class="h-[28px] bg-gradient-to-r from-[#4F46E5] to-[#312E81] flex items-center px-2">
                                 <div class="h-1.5 bg-white/80 rounded w-14"></div>
                             </div>
                             <div class="p-1.5 grid grid-cols-2 gap-1">
-                                <div class="bg-white rounded shadow-sm overflow-hidden">
-                                    <div class="h-4 bg-[#E5E7EB]"></div>
+                                <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-[#EAECF0]">
+                                    <div class="h-4 bg-[#EFE6D4]"></div>
                                     <div class="p-0.5">
                                         <div class="h-1 bg-[#D1D5DB] rounded w-full mb-0.5"></div>
-                                        <div class="h-1 bg-green-400 rounded w-8"></div>
+                                        <div class="h-1 bg-[#4F46E5] rounded w-5"></div>
                                     </div>
                                 </div>
-                                <div class="bg-white rounded shadow-sm overflow-hidden">
-                                    <div class="h-4 bg-[#E5E7EB]"></div>
+                                <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-[#EAECF0]">
+                                    <div class="h-4 bg-[#E9EBDD]"></div>
                                     <div class="p-0.5">
                                         <div class="h-1 bg-[#D1D5DB] rounded w-full mb-0.5"></div>
-                                        <div class="h-1 bg-green-400 rounded w-8"></div>
+                                        <div class="h-1 bg-[#4F46E5] rounded w-5"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <p class="text-[13px] font-semibold text-[#111827]">Cards</p>
-                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Estilo app de delivery, cuadrícula</p>
+                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Cuadrícula, hero índigo</p>
+                    </div>
+                    <div class="hidden peer-checked:flex absolute top-2.5 right-2.5 w-[18px] h-[18px] bg-[#4F46E5] rounded-full items-center justify-center">
+                        <svg width="10" height="10" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                </label>
+
+                {{-- Carta --}}
+                <label class="relative cursor-pointer">
+                    <input type="radio" name="template" value="carta" class="sr-only peer"
+                           {{ old('template', $restaurant->template ?? 'minimal') === 'carta' ? 'checked' : '' }}>
+                    <div class="border-2 border-[#E5E7EB] rounded-[12px] p-3 transition-colors hover:border-[#C7D2FE] peer-checked:border-[#4F46E5] peer-checked:bg-[#EEF2FF]">
+                        <div class="w-full h-[80px] bg-[#F6F1E7] rounded-[8px] mb-2.5 overflow-hidden border border-[#211A12]">
+                            <div style="border:1px solid rgba(33,26,18,.2);margin:5px;height:calc(100% - 10px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;">
+                                <div class="h-1.5 bg-[#8A7B66] rounded-sm w-12"></div>
+                                <div class="h-3 bg-[#211A12] rounded-sm w-20" style="font-family:serif"></div>
+                                <div class="flex items-center gap-1">
+                                    <div class="h-px bg-[#211A12] w-5"></div>
+                                    <div class="text-[8px] text-[#211A12]">❦</div>
+                                    <div class="h-px bg-[#211A12] w-5"></div>
+                                </div>
+                                <div class="flex justify-between w-full px-2">
+                                    <div class="h-1 bg-[#D6D3D1] rounded w-12"></div>
+                                    <div class="h-1 bg-[#8A7B66] rounded w-6"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[13px] font-semibold text-[#111827]">Carta</p>
+                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Papel e imprenta, marco doble</p>
+                    </div>
+                    <div class="hidden peer-checked:flex absolute top-2.5 right-2.5 w-[18px] h-[18px] bg-[#4F46E5] rounded-full items-center justify-center">
+                        <svg width="10" height="10" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                </label>
+
+                {{-- Brasa --}}
+                <label class="relative cursor-pointer">
+                    <input type="radio" name="template" value="brasa" class="sr-only peer"
+                           {{ old('template', $restaurant->template ?? 'minimal') === 'brasa' ? 'checked' : '' }}>
+                    <div class="border-2 border-[#E5E7EB] rounded-[12px] p-3 transition-colors hover:border-[#C7D2FE] peer-checked:border-[#4F46E5] peer-checked:bg-[#EEF2FF]">
+                        <div class="w-full h-[80px] bg-[#0C0A09] rounded-[8px] mb-2.5 overflow-hidden border border-[#292524]">
+                            <div class="p-2">
+                                <div class="h-3 w-24 rounded-sm mb-2" style="background:linear-gradient(90deg,#FAFAF9,#F59E0B)"></div>
+                                <div class="rounded-lg overflow-hidden border border-[#292524] flex gap-1.5 p-1">
+                                    <div class="w-8 h-8 rounded-md flex-shrink-0" style="background:radial-gradient(circle at 30% 20%,rgba(245,158,11,.3),transparent 60%),#2E2018"></div>
+                                    <div class="flex flex-col gap-0.5 justify-center">
+                                        <div class="h-1 bg-[#FAFAF9] rounded w-12"></div>
+                                        <div class="h-1 bg-[#F59E0B] rounded w-8"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[13px] font-semibold text-[#111827]">Brasa</p>
+                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Parrilla nocturna, amber y rojo</p>
+                    </div>
+                    <div class="hidden peer-checked:flex absolute top-2.5 right-2.5 w-[18px] h-[18px] bg-[#4F46E5] rounded-full items-center justify-center">
+                        <svg width="10" height="10" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                </label>
+
+                {{-- Feria --}}
+                <label class="relative cursor-pointer">
+                    <input type="radio" name="template" value="feria" class="sr-only peer"
+                           {{ old('template', $restaurant->template ?? 'minimal') === 'feria' ? 'checked' : '' }}>
+                    <div class="border-2 border-[#E5E7EB] rounded-[12px] p-3 transition-colors hover:border-[#C7D2FE] peer-checked:border-[#4F46E5] peer-checked:bg-[#EEF2FF]">
+                        <div class="w-full h-[80px] bg-[#FFF6DE] rounded-[8px] mb-2.5 overflow-hidden border-[1.5px] border-[#191410]">
+                            <div class="bg-[#191410] h-[10px] w-full"></div>
+                            <div class="p-1.5 grid grid-cols-2 gap-1">
+                                <div class="bg-white rounded-lg overflow-hidden" style="border:1.5px solid #191410;box-shadow:2px 2px 0 #191410">
+                                    <div class="h-4 bg-[#FFE08A]"></div>
+                                    <div class="p-0.5">
+                                        <div class="h-1 bg-[#191410] rounded w-full mb-0.5"></div>
+                                        <div class="inline-block h-1.5 bg-[#FFD84D] rounded w-5" style="border:1px solid #191410"></div>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded-lg overflow-hidden" style="border:1.5px solid #191410;box-shadow:2px 2px 0 #191410">
+                                    <div class="h-4 bg-[#FFC7B3]"></div>
+                                    <div class="p-0.5">
+                                        <div class="h-1 bg-[#191410] rounded w-full mb-0.5"></div>
+                                        <div class="inline-block h-1.5 bg-[#FFD84D] rounded w-5" style="border:1px solid #191410"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[13px] font-semibold text-[#111827]">Feria</p>
+                        <p class="text-[11px] text-[#9CA3AF] mt-0.5">Pop, stickers y delivery</p>
                     </div>
                     <div class="hidden peer-checked:flex absolute top-2.5 right-2.5 w-[18px] h-[18px] bg-[#4F46E5] rounded-full items-center justify-center">
                         <svg width="10" height="10" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>

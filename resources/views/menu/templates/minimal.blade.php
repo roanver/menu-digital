@@ -123,7 +123,7 @@
 document.querySelectorAll('.cat-link').forEach(link => {
     link.addEventListener('click', function(e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const target = document.getElementById('cat-' + this.getAttribute('data-cat'));
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.querySelectorAll('.cat-link').forEach(l => {
             l.style.color = '#A8A29E';
