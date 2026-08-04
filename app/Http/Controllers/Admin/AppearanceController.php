@@ -19,7 +19,7 @@ class AppearanceController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'template'          => ['required', 'in:minimal,dark,cards'],
+            'template'          => ['required', 'in:minimal,dark,cards,carta,brasa,feria'],
             'primary_color'     => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'font'              => ['required', 'in:Inter,Poppins,Playfair Display,Pacifico,Oswald'],
             'bg_color'          => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
