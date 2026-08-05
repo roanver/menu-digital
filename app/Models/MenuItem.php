@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['restaurant_id', 'category_id', 'name', 'description', 'price', 'image', 'is_available', 'sort_order'])]
+#[Fillable([
+    'restaurant_id', 'category_id', 'name', 'description', 'price',
+    'image', 'is_available', 'sort_order', 'is_promo', 'promo_price',
+])]
 class MenuItem extends Model
 {
     use SoftDeletes;
@@ -16,8 +19,10 @@ class MenuItem extends Model
     protected function casts(): array
     {
         return [
-            'price' => 'integer',
+            'price'        => 'integer',
             'is_available' => 'boolean',
+            'is_promo'     => 'boolean',
+            'promo_price'  => 'integer',
         ];
     }
 

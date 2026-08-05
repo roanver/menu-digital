@@ -143,6 +143,30 @@
                 </svg>
                 Equipo
             </a>
+
+            {{-- Importar menú --}}
+            @php $__active = request()->routeIs('admin.import.*'); @endphp
+            <a href="{{ route('admin.import.upload') }}"
+               class="flex items-center gap-[10px] w-full px-[10px] py-2 rounded-[9px] border text-[13px] transition-colors no-underline
+                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-semibold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
+                <svg class="w-[17px] h-[17px] flex-none {{ $__active ? 'opacity-100' : 'opacity-75' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 16l4-4 4 4M12 12V3"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/>
+                    <circle cx="12" cy="20" r=".5" fill="currentColor"/>
+                </svg>
+                Importar menú
+            </a>
+
+            {{-- Posts --}}
+            @php $__active = request()->routeIs('admin.posts.*'); @endphp
+            <a href="{{ route('admin.posts.index') }}"
+               class="flex items-center gap-[10px] w-full px-[10px] py-2 rounded-[9px] border text-[13px] transition-colors no-underline
+                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-semibold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
+                <svg class="w-[17px] h-[17px] flex-none {{ $__active ? 'opacity-100' : 'opacity-75' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Posts
+            </a>
             @endif
 
         </nav>

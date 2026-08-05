@@ -103,6 +103,67 @@
             </div>
         </div>
 
+        {{-- Card: Pedidos --}}
+        <div class="bg-white border border-[#E5E7EB] rounded-[14px] p-[18px] shadow-[0_1px_2px_rgba(16,24,40,.04)]">
+            <div class="text-[13px] font-bold mb-[14px]">Pedidos por WhatsApp</div>
+
+            <div class="flex flex-col gap-[14px]">
+
+                {{-- Toggle: Aceptar pedidos --}}
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-[13px] font-semibold text-[#111827]">Aceptar pedidos</div>
+                        <div class="text-[11.5px] text-[#6B7280] mt-0.5">Activa el carrito de compras en el menú público</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="accepts_orders" value="0">
+                        <input type="checkbox" name="accepts_orders" value="1" id="accepts_orders"
+                               {{ old('accepts_orders', $restaurant->accepts_orders) ? 'checked' : '' }}
+                               class="sr-only peer">
+                        <div class="w-[42px] h-[24px] bg-[#D1D5DB] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[18px] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all peer-checked:bg-[#4F46E5]"></div>
+                    </label>
+                </div>
+
+                {{-- Toggle: Aceptar delivery --}}
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-[13px] font-semibold text-[#111827]">Ofrecer delivery</div>
+                        <div class="text-[11.5px] text-[#6B7280] mt-0.5">Incluye opción de delivery en el mensaje de pedido</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="accepts_delivery" value="0">
+                        <input type="checkbox" name="accepts_delivery" value="1" id="accepts_delivery"
+                               {{ old('accepts_delivery', $restaurant->accepts_delivery) ? 'checked' : '' }}
+                               class="sr-only peer">
+                        <div class="w-[42px] h-[24px] bg-[#D1D5DB] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[18px] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[20px] after:w-[20px] after:transition-all peer-checked:bg-[#4F46E5]"></div>
+                    </label>
+                </div>
+
+                {{-- Campo: Pedido mínimo --}}
+                <label class="flex flex-col gap-[6px]">
+                    <span class="text-[12px] font-semibold text-[#374151]">Pedido mínimo (CLP)</span>
+                    <input type="number" name="min_order" value="{{ old('min_order', $restaurant->min_order) }}"
+                           placeholder="Ej. 5000" min="0" step="100"
+                           class="w-full px-3 py-[9px] border border-[#E5E7EB] rounded-[10px] text-[13.5px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]">
+                    @error('min_order')
+                    <span class="text-[11.5px] text-[#DC2626]">{{ $message }}</span>
+                    @enderror
+                </label>
+
+                {{-- Campo: Zona de delivery --}}
+                <label class="flex flex-col gap-[6px]">
+                    <span class="text-[12px] font-semibold text-[#374151]">Zona de delivery</span>
+                    <textarea name="delivery_zone" rows="2"
+                              placeholder="Ej. Providencia, Ñuñoa, Santiago Centro (radio 5 km)"
+                              class="w-full px-3 py-[9px] border border-[#E5E7EB] rounded-[10px] text-[13.5px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF] resize-none">{{ old('delivery_zone', $restaurant->delivery_zone) }}</textarea>
+                    @error('delivery_zone')
+                    <span class="text-[11.5px] text-[#DC2626]">{{ $message }}</span>
+                    @enderror
+                </label>
+
+            </div>
+        </div>
+
         {{-- Sticky save bar --}}
         <div class="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB] py-3 -mx-[clamp(16px,2.4vw,28px)] px-[clamp(16px,2.4vw,28px)] flex justify-end gap-2">
             <a href="{{ route('admin.dashboard') }}"

@@ -25,6 +25,7 @@
             <span class="text-[13px] font-semibold text-[#6B7280]">Super Admin</span>
         </div>
         <div class="flex items-center gap-3">
+            <a href="{{ route('superadmin.nfc.index') }}" class="bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] text-[12.5px] font-semibold px-3 py-1.5 rounded-[8px] no-underline">Tags NFC</a>
             <span class="text-[12.5px] text-[#6B7280]">{{ auth()->user()->email }}</span>
             <form method="POST" action="/logout">
                 @csrf
@@ -87,9 +88,10 @@
                     @php
                         $owner = $restaurant->users->first();
                         $planMeta = [
-                            'trial'   => ['label' => 'Trial',   'class' => 'bg-[#EEF2FF] text-[#4F46E5]'],
-                            'basic'   => ['label' => 'Basic',   'class' => 'bg-[#ECFDF5] text-[#059669]'],
-                            'pro'     => ['label' => 'Pro',     'class' => 'bg-[#F5F3FF] text-[#7C3AED]'],
+                            'carta'   => ['label' => 'Carta',   'class' => 'bg-[#EEF2FF] text-[#4F46E5]'],
+                            'pedidos' => ['label' => 'Pedidos', 'class' => 'bg-[#ECFDF5] text-[#059669]'],
+                            'full'    => ['label' => 'Full',    'class' => 'bg-[#F5F3FF] text-[#7C3AED]'],
+                            'trial'   => ['label' => 'Trial',   'class' => 'bg-[#FEF3C7] text-[#B45309]'],
                             'expired' => ['label' => 'Expirado','class' => 'bg-[#FEF2F2] text-[#DC2626]'],
                         ][$restaurant->plan] ?? ['label' => $restaurant->plan, 'class' => 'bg-[#F3F4F6] text-[#374151]'];
                     @endphp
@@ -157,10 +159,9 @@
                 <label class="block text-[12px] font-semibold text-[#374151] mb-1">Plan</label>
                 <select id="modal-plan" name="plan"
                     class="w-full px-3 py-[9px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-[10px] text-[13px] text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent">
-                    <option value="trial">Trial</option>
-                    <option value="basic">Basic</option>
-                    <option value="pro">Pro</option>
-                    <option value="expired">Expirado</option>
+                    <option value="carta">Carta ($8.000/mes)</option>
+                    <option value="pedidos">Pedidos ($15.000/mes)</option>
+                    <option value="full">Full ($25.000/mes)</option>
                 </select>
             </div>
 

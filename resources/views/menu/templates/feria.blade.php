@@ -4,14 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $restaurant->name }}</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $restaurant->name }}">
+    <meta property="og:description" content="{{ $restaurant->description ?? 'Menú digital de ' . $restaurant->name . ' en Chile.' }}">
+    @if($restaurant->logo)
+    <meta property="og:image" content="{{ Storage::url($restaurant->logo) }}">
+    @endif
+    <meta property="og:url" content="{{ url('/' . $restaurant->slug) }}">
+    <meta property="og:site_name" content="MenuDigital">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         html,body{margin:0;padding:0;background:#FFF6DE;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
         a{text-decoration:none;color:inherit}
         .hsc::-webkit-scrollbar{height:0}
+        [x-cloak]{display:none!important}
         @keyframes md-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     </style>
 </head>
@@ -31,6 +42,9 @@
     ];
     $itemIdx = 0;
 @endphp
+
+<div x-data="menuCart('{{ $restaurant->slug }}', {{ $restaurant->accepts_orders ? 'true' : 'false' }}, '{{ $whatsappNum }}', {{ $restaurant->accepts_delivery ? 'true' : 'false' }})"
+     style="min-height:100vh;">
 
 <div style="max-width:440px;margin:0 auto;padding-bottom:120px;">
 
@@ -104,15 +118,23 @@
                             $initial = mb_strtoupper(mb_substr($item->name, 0, 1));
                             $itemIdx++;
                         @endphp
-                        <div style="background:#fff;border:1.5px solid #191410;border-radius:16px;overflow:hidden;box-shadow:3px 3px 0 #191410;display:flex;flex-direction:column;">
-                            @if($item->image)
-                                <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
-                                     style="height:92px;width:100%;object-fit:cover;border-bottom:1.5px solid #191410;display:block;">
-                            @else
-                                <div style="height:92px;background:{{ $ph }};border-bottom:1.5px solid #191410;display:flex;align-items:center;justify-content:center;position:relative;">
-                                    <span style="font-family:'Instrument Serif',Georgia,serif;font-size:36px;color:rgba(25,20,16,.18);">{{ $initial }}</span>
-                                </div>
-                            @endif
+                        <div style="background:#fff;border:1.5px solid #191410;border-radius:16px;overflow:hidden;box-shadow:3px 3px 0 #191410;display:flex;flex-direction:column;{{ !$item->is_available ? 'opacity:.6;' : '' }}">
+                            <div style="position:relative;">
+                                @if($item->image)
+                                    <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
+                                         style="height:92px;width:100%;object-fit:cover;border-bottom:1.5px solid #191410;display:block;">
+                                @else
+                                    <div style="height:92px;background:{{ $ph }};border-bottom:1.5px solid #191410;display:flex;align-items:center;justify-content:center;position:relative;">
+                                        <span style="font-family:'Instrument Serif',Georgia,serif;font-size:36px;color:rgba(25,20,16,.18);">{{ $initial }}</span>
+                                    </div>
+                                @endif
+                                @if(!$item->is_available)
+                                    <div style="position:absolute;top:6px;left:6px;background:#191410;color:#FFF6DE;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;">Agotado</div>
+                                @endif
+                                @if($item->is_promo && $item->promo_price)
+                                    <div style="position:absolute;top:6px;right:6px;background:#E85D2F;color:#fff;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;">Promo</div>
+                                @endif
+                            </div>
                             <div style="padding:10px 11px 11px;display:flex;flex-direction:column;gap:4px;flex:1;">
                                 <div style="font-size:12.5px;font-weight:800;line-height:1.25;letter-spacing:-.015em;">{{ $item->name }}</div>
                                 @if($restaurant->show_description && $item->description)
@@ -122,10 +144,25 @@
                                 <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
                                     @if($restaurant->show_price)
                                         <span style="flex:1;min-width:0;">
-                                            <span style="display:inline-block;font-size:11.5px;font-weight:800;background:#FFD84D;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                            @if($item->is_promo && $item->promo_price)
+                                                <span style="display:block;font-size:9px;font-weight:700;color:#8A8073;text-decoration:line-through;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                                <span style="display:inline-block;font-size:11.5px;font-weight:800;background:#E85D2F;color:#fff;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
+                                            @else
+                                                <span style="display:inline-block;font-size:11.5px;font-weight:800;background:#FFD84D;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                            @endif
                                         </span>
                                     @endif
-                                    @if($whatsappNum)
+                                    @if($item->is_available && $restaurant->accepts_orders)
+                                        @if($item->variants->isNotEmpty())
+                                            <button @click="openVariantModal({{ json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]) }})"
+                                                    style="width:27px;height:27px;border-radius:9px;background:#191410;display:flex;align-items:center;justify-content:center;flex:0 0 auto;border:none;cursor:pointer;color:#FFD84D;font-size:18px;font-weight:800;line-height:1;">+</button>
+                                        @else
+                                            <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }})"
+                                                    style="width:27px;height:27px;border-radius:9px;background:#191410;display:flex;align-items:center;justify-content:center;flex:0 0 auto;border:none;cursor:pointer;color:#FFD84D;font-size:18px;font-weight:800;line-height:1;">+</button>
+                                        @endif
+                                    @elseif(!$item->is_available)
+                                        {{-- no button --}}
+                                    @elseif($whatsappNum)
                                         <a href="https://wa.me/{{ $whatsappNum }}?text={{ urlencode('Hola, quiero pedir: ' . $item->name) }}" target="_blank" rel="noopener"
                                            style="width:27px;height:27px;border-radius:9px;background:#191410;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD84D" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -142,21 +179,25 @@
     </div>
 </div>
 
-{{-- WhatsApp FAB --}}
-@if($whatsappNum)
+{{-- WhatsApp FAB (solo si NO acepta pedidos por carrito) --}}
+@if($whatsappNum && !$restaurant->accepts_orders)
     <div style="position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:0 16px 18px;pointer-events:none;z-index:10;">
         <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
            style="flex:1;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:14px;background:#191410;color:#FFF6DE;border:1.5px solid #191410;box-shadow:3px 3px 0 rgba(25,20,16,.25);pointer-events:auto;">
             <span style="width:32px;height:32px;border-radius:10px;background:#25D366;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/>
-                    <path d="M8.6 9.2c.4 2.4 2.4 4.4 4.8 4.9l1-1.4 2 1c-.4 1.4-2 1.9-3.3 1.5a8 8 0 0 1-5.2-5.2c-.4-1.3.1-2.9 1.5-3.3l1 2-1.8.5Z"/>
+                    <path d="M8.6 9.2c.4 2.4 2.4 4.8 4.9l1-1.4 2 1c-.4 1.4-2 1.9-3.3 1.5a8 8 0 0 1-5.2-5.2c-.4-1.3.1-2.9 1.5-3.3l1 2-1.8.5Z"/>
                 </svg>
             </span>
             <span style="flex:1;min-width:0;font-size:13px;font-weight:800;">Pedir por WhatsApp</span>
         </a>
     </div>
 @endif
+
+@include('components.menu-cart', ['restaurant' => $restaurant])
+
+</div>{{-- end alpine x-data --}}
 
 <script>
 const allChips = document.querySelectorAll('.cat-chip');

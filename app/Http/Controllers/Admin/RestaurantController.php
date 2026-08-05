@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Services\MenuCacheService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -20,11 +21,15 @@ class RestaurantController extends AdminController
         $restaurant = auth()->user()->restaurant;
 
         $validated = $request->validate([
-            'name'      => ['required', 'string', 'max:255'],
-            'address'   => ['nullable', 'string', 'max:500'],
-            'phone'     => ['nullable', 'string', 'max:50'],
-            'whatsapp'  => ['nullable', 'string', 'max:50'],
-            'logo'      => ['nullable', 'image', 'max:2048'],
+            'name'             => ['required', 'string', 'max:255'],
+            'address'          => ['nullable', 'string', 'max:500'],
+            'phone'            => ['nullable', 'string', 'max:50'],
+            'whatsapp'         => ['nullable', 'string', 'max:50'],
+            'logo'             => ['nullable', 'image', 'max:2048'],
+            'accepts_orders'   => ['boolean'],
+            'accepts_delivery' => ['boolean'],
+            'delivery_zone'    => ['nullable', 'string', 'max:1000'],
+            'min_order'        => ['nullable', 'integer', 'min:0'],
         ], [
             'logo.max'   => 'El logo no debe superar los 2 MB.',
             'logo.image' => 'El logo debe ser una imagen (jpg, png, webp).',
@@ -38,7 +43,12 @@ class RestaurantController extends AdminController
             unset($validated['logo']);
         }
 
+        $validated['accepts_orders']   = $request->boolean('accepts_orders');
+        $validated['accepts_delivery'] = $request->boolean('accepts_delivery');
+
         $restaurant->update($validated);
+
+        MenuCacheService::forget($restaurant);
 
         return redirect()->route('admin.restaurant.edit')
             ->with('success', 'Restaurante actualizado correctamente.');

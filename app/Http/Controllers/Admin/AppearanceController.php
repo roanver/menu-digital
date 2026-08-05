@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\MenuCacheService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -31,7 +32,10 @@ class AppearanceController extends Controller
         $validated['show_price']       = $request->boolean('show_price');
         $validated['show_description'] = $request->boolean('show_description');
 
-        auth()->user()->restaurant->update($validated);
+        $restaurant = auth()->user()->restaurant;
+        $restaurant->update($validated);
+
+        MenuCacheService::forget($restaurant);
 
         return redirect()->route('admin.appearance.edit')
             ->with('success', 'Apariencia guardada correctamente.');

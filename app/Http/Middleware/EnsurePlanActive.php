@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Carbon\Carbon;
 
 class EnsurePlanActive
 {
@@ -15,24 +14,14 @@ class EnsurePlanActive
 
         if ($user && $user->restaurant) {
             $restaurant = $user->restaurant;
-            $plan = $restaurant->plan;
-            $active = false;
 
-            if ($plan === 'trial') {
-                $active = $restaurant->trial_ends_at && Carbon::now()->lt($restaurant->trial_ends_at);
-            } elseif ($plan === 'basic' || $plan === 'pro') {
-                $active = $restaurant->subscription_ends_at && Carbon::now()->lt($restaurant->subscription_ends_at);
-            } elseif ($plan === 'expired') {
-                $active = false;
-            }
+            if (!$restaurant->planIsActive()) {
+                $message = 'Tu plan ha vencido. Renueva para continuar usando MenuDigital.';
 
-            if (! $active) {
-                if ($plan === 'trial') {
-                    $message = 'Tu período de prueba ha vencido. Contáctanos para activar tu plan y seguir usando MenuDigital.';
-                } elseif ($plan === 'expired') {
-                    $message = 'Tu plan ha vencido. Contáctanos para renovar tu suscripción.';
-                } else {
-                    $message = 'Tu suscripción ha vencido. Contáctanos para renovar y seguir usando MenuDigital.';
+                // Permitir acceso solo a billing y logout
+                if (!$request->routeIs('admin.billing.*', 'logout', 'profile.*')) {
+                    return redirect()->route('admin.billing.show')
+                        ->with('billing_warning', $message);
                 }
 
                 session()->flash('billing_warning', $message);

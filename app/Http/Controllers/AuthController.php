@@ -66,7 +66,7 @@ class AuthController extends Controller
         $restaurant = Restaurant::create([
             'name'          => $request->restaurant_name,
             'slug'          => $slug,
-            'plan'          => 'trial',
+            'plan'          => 'carta',
             'trial_ends_at' => now()->addDays(14),
             'is_active'     => true,
         ]);

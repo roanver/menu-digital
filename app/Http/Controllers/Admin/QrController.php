@@ -27,4 +27,13 @@ class QrController extends Controller
             ->header('Content-Type', 'image/png')
             ->header('Content-Disposition', 'attachment; filename="qr-' . $restaurant->slug . '.png"');
     }
+
+    public function print()
+    {
+        $restaurant = auth()->user()->restaurant;
+        $url = url('/' . $restaurant->slug);
+        $qr = QrCode::format('svg')->size(280)->margin(1)->generate($url);
+
+        return view('admin.qr.print', compact('restaurant', 'url', 'qr'));
+    }
 }

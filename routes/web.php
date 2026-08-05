@@ -4,12 +4,16 @@ use App\Http\Controllers\Admin\AppearanceController;
 use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MenuImportController;
 use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\NfcController;
+use App\Http\Controllers\Admin\PostGeneratorController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\NfcRedirectController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +35,19 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('/', [SuperAdminController::class, 'index'])->name('index');
     Route::patch('/restaurants/{restaurant}/plan', [SuperAdminController::class, 'updatePlan'])->name('plan.update');
+
+    // NFC management
+    Route::prefix('nfc')->name('nfc.')->group(function () {
+        Route::get('/', [NfcController::class, 'index'])->name('index');
+        Route::get('/create', [NfcController::class, 'create'])->name('create');
+        Route::post('/', [NfcController::class, 'store'])->name('store');
+        Route::get('/bulk', fn() => view('superadmin.nfc.bulk-create', ['restaurants' => \App\Models\Restaurant::orderBy('name')->get()]))->name('bulk-create');
+        Route::post('/bulk-create', [NfcController::class, 'bulkCreate'])->name('bulk-create.store');
+        Route::get('/print', [NfcController::class, 'printLabels'])->name('print');
+        Route::get('/{tag}/edit', [NfcController::class, 'edit'])->name('edit');
+        Route::patch('/{tag}', [NfcController::class, 'update'])->name('update');
+        Route::delete('/{tag}', [NfcController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Admin routes
@@ -56,15 +73,31 @@ Route::middleware(['auth', 'has.restaurant', 'billing.check'])
 
             Route::get('/qr', [QrController::class, 'show'])->name('qr.show');
             Route::get('/qr/download', [QrController::class, 'download'])->name('qr.download');
+            Route::get('/qr/print', [QrController::class, 'print'])->name('qr.print');
 
             Route::get('/billing', [BillingController::class, 'show'])->name('billing.show');
 
             Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
             Route::post('/staff', [StaffController::class, 'store'])->name('staff.store');
             Route::delete('/staff/{user}', [StaffController::class, 'destroy'])->name('staff.destroy');
+
+            // Menu import with AI
+            Route::get('/import-menu', [MenuImportController::class, 'showUpload'])->name('import.upload');
+            Route::post('/import-menu', [MenuImportController::class, 'upload'])->name('import.process');
+            Route::get('/import-menu/review', [MenuImportController::class, 'showReview'])->name('import.review');
+            Route::post('/import-menu/confirm', [MenuImportController::class, 'confirm'])->name('import.confirm');
+
+            // Post generator
+            Route::get('/posts', [PostGeneratorController::class, 'index'])->name('posts.index');
+            Route::post('/posts/generate', [PostGeneratorController::class, 'generate'])->name('posts.generate');
+            Route::post('/posts/download', [PostGeneratorController::class, 'downloadImage'])->name('posts.download');
         });
     });
 
 require __DIR__.'/auth.php';
+
+// NFC public redirects (before the wildcard /{slug})
+Route::get('/r/{code}', [NfcRedirectController::class, 'review'])->name('nfc.review');
+Route::get('/m/{code}', [NfcRedirectController::class, 'menu'])->name('nfc.menu');
 
 Route::get('/{slug}', [MenuController::class, 'show'])->name('menu.show');

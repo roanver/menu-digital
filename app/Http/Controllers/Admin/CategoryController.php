@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
+use App\Services\MenuCacheService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,6 +45,8 @@ class CategoryController extends AdminController
             'sort_order'    => $maxSort + 1,
         ]);
 
+        MenuCacheService::forget($restaurant);
+
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría creada correctamente.');
     }
@@ -69,6 +72,8 @@ class CategoryController extends AdminController
             'is_active' => isset($validated['is_active']) ? (bool) $validated['is_active'] : false,
         ]);
 
+        MenuCacheService::forget(auth()->user()->restaurant);
+
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría actualizada correctamente.');
     }
@@ -78,6 +83,8 @@ class CategoryController extends AdminController
         $this->authorizeCategory($category);
 
         $category->delete();
+
+        MenuCacheService::forget(auth()->user()->restaurant);
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría eliminada correctamente.');

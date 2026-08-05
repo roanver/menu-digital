@@ -27,9 +27,15 @@ class SuperAdminController extends AdminController
 
         $stats = [
             'total'   => Restaurant::withTrashed()->count(),
-            'trial'   => Restaurant::where('plan', 'trial')->count(),
-            'paid'    => Restaurant::whereIn('plan', ['basic', 'pro'])->count(),
-            'expired' => Restaurant::where('plan', 'expired')->count(),
+            'trial'   => Restaurant::where(function ($q) {
+                $q->whereNotNull('trial_ends_at')->where('trial_ends_at', '>', now());
+            })->count(),
+            'paid'    => Restaurant::whereIn('plan', ['pedidos', 'full'])->count(),
+            'expired' => Restaurant::where(function ($q) {
+                $q->whereNull('subscription_ends_at')->whereNull('trial_ends_at');
+            })->orWhere(function ($q) {
+                $q->whereNotNull('subscription_ends_at')->where('subscription_ends_at', '<', now());
+            })->count(),
         ];
 
         return view('superadmin.index', compact('restaurants', 'stats'));
@@ -40,13 +46,13 @@ class SuperAdminController extends AdminController
         $this->authorize();
 
         $validated = $request->validate([
-            'plan'                 => ['required', 'in:trial,basic,pro,expired'],
+            'plan'                 => ['required', 'in:carta,pedidos,full'],
             'trial_ends_at'        => ['nullable', 'date'],
             'subscription_ends_at' => ['nullable', 'date'],
             'is_active'            => ['nullable', 'boolean'],
         ], [
             'plan.required' => 'El plan es requerido.',
-            'plan.in'       => 'Plan no válido. Opciones: trial, basic, pro, expired.',
+            'plan.in'       => 'Plan no válido. Opciones: carta, pedidos, full.',
         ]);
 
         $restaurant->update($validated);

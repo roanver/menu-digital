@@ -4,14 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $restaurant->name }}</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $restaurant->name }}">
+    <meta property="og:description" content="{{ $restaurant->description ?? 'Menú digital de ' . $restaurant->name . ' en Chile.' }}">
+    @if($restaurant->logo)
+    <meta property="og:image" content="{{ Storage::url($restaurant->logo) }}">
+    @endif
+    <meta property="og:url" content="{{ url('/' . $restaurant->slug) }}">
+    <meta property="og:site_name" content="MenuDigital">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         html,body{margin:0;padding:0;background:#F6F1E7;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
         a{text-decoration:none;color:inherit}
         .hsc::-webkit-scrollbar{height:0}
+        [x-cloak]{display:none!important}
     </style>
 </head>
 <body style="font-family:Inter,system-ui,sans-serif;color:#211A12;background:#F6F1E7;min-height:100vh;">
@@ -20,6 +31,9 @@
     $whatsappNum = $restaurant->whatsapp ? preg_replace('/\D/', '', $restaurant->whatsapp) : null;
     $roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 @endphp
+
+<div x-data="menuCart('{{ $restaurant->slug }}', {{ $restaurant->accepts_orders ? 'true' : 'false' }}, '{{ $whatsappNum }}', {{ $restaurant->accepts_delivery ? 'true' : 'false' }})"
+     style="min-height:100vh;">
 
 <div style="max-width:440px;margin:0 auto;padding-bottom:120px;">
 
@@ -78,19 +92,36 @@
                     </div>
                     <div style="margin-top:16px;display:flex;flex-direction:column;gap:18px;">
                         @foreach($category->menuItems as $item)
-                            <div style="text-align:center;">
+                            <div style="text-align:center;{{ !$item->is_available ? 'opacity:.55;' : '' }}">
                                 <div style="font-family:'Instrument Serif',Georgia,serif;font-size:18.5px;line-height:1.25;">{{ $item->name }}</div>
+                                @if(!$item->is_available)
+                                    <div style="display:inline-block;margin-top:3px;font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:#FEE2E2;color:#DC2626;border-radius:4px;padding:2px 7px;">Agotado</div>
+                                @endif
                                 @if($restaurant->show_description && $item->description)
                                     <div style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:13px;color:#8A7B66;line-height:1.5;margin-top:2px;">{{ $item->description }}</div>
                                 @endif
-                                @if($restaurant->show_price || $item->variants->isNotEmpty())
+                                @if($restaurant->show_price || $item->variants->isNotEmpty() || ($item->is_available && $restaurant->accepts_orders))
                                     <div style="display:inline-flex;align-items:center;gap:7px;margin-top:6px;flex-wrap:wrap;justify-content:center;">
                                         @if($restaurant->show_price)
-                                            <span style="font-size:11.5px;font-weight:600;letter-spacing:.14em;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                            @if($item->is_promo && $item->promo_price)
+                                                <span style="font-size:10px;color:#8A7B66;text-decoration:line-through;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                                <span style="font-size:11.5px;font-weight:600;letter-spacing:.14em;color:#DC2626;">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
+                                            @else
+                                                <span style="font-size:11.5px;font-weight:600;letter-spacing:.14em;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                            @endif
                                         @endif
                                         @foreach($item->variants as $variant)
                                             <span style="font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#F6F1E7;background:#211A12;padding:2.5px 7px;">{{ $variant->name }}@if($variant->price_delta != 0) +${{ number_format($variant->price_delta, 0, ',', '.') }}@endif</span>
                                         @endforeach
+                                        @if($item->is_available && $restaurant->accepts_orders)
+                                            @if($item->variants->isNotEmpty())
+                                                <button @click="openVariantModal({{ json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]) }})"
+                                                        style="width:24px;height:24px;border-radius:6px;background:#211A12;color:#F6F1E7;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;">+</button>
+                                            @else
+                                                <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }})"
+                                                        style="width:24px;height:24px;border-radius:6px;background:#211A12;color:#F6F1E7;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;">+</button>
+                                            @endif
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -111,8 +142,8 @@
     <div style="text-align:center;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#C9BCA6;padding:18px 0;">Menú creado con MenuDigital</div>
 </div>
 
-{{-- WhatsApp pill --}}
-@if($whatsappNum)
+{{-- WhatsApp pill (solo si NO acepta pedidos por carrito) --}}
+@if($whatsappNum && !$restaurant->accepts_orders)
     <div style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;padding:0 20px 20px;pointer-events:none;z-index:10;">
         <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
            style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;background:#211A12;color:#F6F1E7;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 10px 26px rgba(33,26,18,.4);pointer-events:auto;">
@@ -123,6 +154,10 @@
         </a>
     </div>
 @endif
+
+@include('components.menu-cart', ['restaurant' => $restaurant])
+
+</div>{{-- end alpine x-data --}}
 
 <script>
 document.querySelectorAll('.cat-link').forEach(link => {

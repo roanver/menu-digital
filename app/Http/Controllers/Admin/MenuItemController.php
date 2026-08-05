@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
 use App\Models\MenuItem;
+use App\Services\MenuCacheService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -76,6 +77,8 @@ class MenuItemController extends AdminController
 
         $this->syncVariants($item, $request->input('variants', []));
 
+        MenuCacheService::forget($restaurant);
+
         return redirect()->route('admin.items.index')
             ->with('success', 'Ítem creado correctamente.');
     }
@@ -133,6 +136,8 @@ class MenuItemController extends AdminController
 
         $this->syncVariants($item, $request->input('variants', []));
 
+        MenuCacheService::forget(auth()->user()->restaurant);
+
         return redirect()->route('admin.items.index')
             ->with('success', 'Ítem actualizado correctamente.');
     }
@@ -144,6 +149,8 @@ class MenuItemController extends AdminController
         $this->deleteImageFile($item->image);
         $item->variants()->delete();
         $item->delete();
+
+        MenuCacheService::forget(auth()->user()->restaurant);
 
         return redirect()->route('admin.items.index')
             ->with('success', 'Ítem eliminado correctamente.');
