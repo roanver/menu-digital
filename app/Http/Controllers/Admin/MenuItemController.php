@@ -48,6 +48,8 @@ class MenuItemController extends AdminController
             'price'       => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'is_available'=> ['nullable', 'boolean'],
+            'is_promo'    => ['nullable', 'boolean'],
+            'promo_price' => ['nullable', 'integer', 'min:0'],
             'image'       => ['nullable', 'image', 'max:2048'],
             'variants'    => ['nullable', 'array'],
             'variants.*.name'        => ['required_with:variants', 'string', 'max:255'],
@@ -63,6 +65,7 @@ class MenuItemController extends AdminController
         }
 
         $maxSort = MenuItem::where('restaurant_id', $restaurant->id)->max('sort_order') ?? 0;
+        $isPromo = isset($validated['is_promo']) ? (bool) $validated['is_promo'] : false;
 
         $item = MenuItem::create([
             'restaurant_id' => $restaurant->id,
@@ -72,6 +75,8 @@ class MenuItemController extends AdminController
             'price'         => $validated['price'],
             'image'         => $imagePath,
             'is_available'  => isset($validated['is_available']) ? (bool) $validated['is_available'] : true,
+            'is_promo'      => $isPromo,
+            'promo_price'   => $isPromo ? ($validated['promo_price'] ?? null) : null,
             'sort_order'    => $maxSort + 1,
         ]);
 
@@ -110,6 +115,8 @@ class MenuItemController extends AdminController
             'price'       => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'is_available'=> ['nullable', 'boolean'],
+            'is_promo'    => ['nullable', 'boolean'],
+            'promo_price' => ['nullable', 'integer', 'min:0'],
             'image'       => ['nullable', 'image', 'max:2048'],
             'variants'    => ['nullable', 'array'],
             'variants.*.name'        => ['required_with:variants', 'string', 'max:255'],
@@ -119,12 +126,16 @@ class MenuItemController extends AdminController
             'image.image' => 'El archivo debe ser una imagen (jpg, png, webp).',
         ]);
 
+        $isPromo = isset($validated['is_promo']) ? (bool) $validated['is_promo'] : false;
+
         $updateData = [
             'category_id'  => $validated['category_id'],
             'name'         => $validated['name'],
             'description'  => $validated['description'] ?? null,
             'price'        => $validated['price'],
             'is_available' => isset($validated['is_available']) ? (bool) $validated['is_available'] : false,
+            'is_promo'     => $isPromo,
+            'promo_price'  => $isPromo ? ($validated['promo_price'] ?? null) : null,
         ];
 
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
