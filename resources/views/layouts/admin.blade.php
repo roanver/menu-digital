@@ -177,7 +177,7 @@
         {{-- Plan card --}}
         <div class="mx-[6px] mb-[10px]">
             <div class="bg-[#EEF2FF] border border-[#E0E7FF] rounded-[12px] p-3">
-                <div class="text-[12px] font-bold text-[#3730A3] mb-[2px]">Plan {{ ucfirst($_plan) }}</div>
+                <div class="text-[12px] font-bold text-[#3730A3] mb-[2px]">Plan {{ ['carta' => 'Carta', 'pedidos' => 'Pedidos', 'full' => 'Full'][$_plan] ?? ucfirst($_plan) }}</div>
                 <div class="text-[11.5px] text-[#4F46E5] mb-[10px]">Gestiona tu suscripción</div>
                 <a href="{{ route('admin.billing.show') }}"
                    class="block w-full py-[7px] rounded-[8px] bg-[#4F46E5] text-white text-[12px] font-semibold text-center transition-colors hover:bg-[#4338CA]">

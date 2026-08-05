@@ -3,28 +3,40 @@
 @php
     $now = \Carbon\Carbon::now();
 
-    $badgeMap = [
-        'trial'   => ['label' => 'Prueba gratuita', 'bg' => 'bg-[#EFF6FF]', 'text' => 'text-[#1D4ED8]', 'border' => 'border-[#BFDBFE]'],
-        'basic'   => ['label' => 'Basic',            'bg' => 'bg-[#ECFDF5]', 'text' => 'text-[#065F46]', 'border' => 'border-[#A7F3D0]'],
-        'pro'     => ['label' => 'Pro',              'bg' => 'bg-[#EEF2FF]', 'text' => 'text-[#3730A3]', 'border' => 'border-[#C7D2FE]'],
-        'expired' => ['label' => 'Vencido',          'bg' => 'bg-[#FEF2F2]', 'text' => 'text-[#991B1B]', 'border' => 'border-[#FECACA]'],
-    ];
-    $badge = $badgeMap[$restaurant->plan] ?? ['label' => ucfirst($restaurant->plan), 'bg' => 'bg-[#F3F4F6]', 'text' => 'text-[#374151]', 'border' => 'border-[#E5E7EB]'];
+    // Estado real basado en fechas, no en el nombre del plan
+    $inTrial  = $restaurant->trial_ends_at && $now->lt($restaurant->trial_ends_at);
+    $inPaid   = $restaurant->subscription_ends_at && $now->lt($restaurant->subscription_ends_at);
+    $isActive = $inTrial || $inPaid;
 
-    if ($restaurant->plan === 'trial' && $restaurant->trial_ends_at) {
+    // Badge de plan (carta/pedidos/full)
+    $planBadgeMap = [
+        'carta'   => ['label' => 'Carta',   'bg' => 'bg-[#ECFDF5]', 'text' => 'text-[#065F46]', 'border' => 'border-[#A7F3D0]'],
+        'pedidos' => ['label' => 'Pedidos', 'bg' => 'bg-[#EEF2FF]', 'text' => 'text-[#3730A3]', 'border' => 'border-[#C7D2FE]'],
+        'full'    => ['label' => 'Full',    'bg' => 'bg-[#FDF4FF]', 'text' => 'text-[#7E22CE]', 'border' => 'border-[#E9D5FF]'],
+    ];
+    $badge = $planBadgeMap[$restaurant->plan] ?? ['label' => ucfirst($restaurant->plan), 'bg' => 'bg-[#F3F4F6]', 'text' => 'text-[#374151]', 'border' => 'border-[#E5E7EB]'];
+
+    if (!$isActive) {
+        $badge = ['label' => 'Vencido', 'bg' => 'bg-[#FEF2F2]', 'text' => 'text-[#991B1B]', 'border' => 'border-[#FECACA]'];
+    } elseif ($inTrial) {
+        $badge['label'] = $badge['label'] . ' (prueba)';
+    }
+
+    // Días restantes y barra de progreso
+    if ($inTrial) {
         $daysLeft  = (int) $now->diffInDays($restaurant->trial_ends_at, false);
         $totalDays = 14;
         $elapsed   = min((int) optional($restaurant->created_at)->diffInDays($now), $totalDays);
         $endLabel  = 'Fin del trial';
-        $endDate   = optional($restaurant->trial_ends_at)->format('d/m/Y');
+        $endDate   = $restaurant->trial_ends_at->format('d/m/Y');
         $barColor  = 'bg-blue-500';
-    } elseif (in_array($restaurant->plan, ['basic', 'pro']) && $restaurant->subscription_ends_at) {
+    } elseif ($inPaid) {
         $daysLeft  = (int) $now->diffInDays($restaurant->subscription_ends_at, false);
         $totalDays = 30;
         $elapsed   = max(0, $totalDays - $daysLeft);
         $endLabel  = 'Renovación';
-        $endDate   = optional($restaurant->subscription_ends_at)->format('d/m/Y');
-        $barColor  = $restaurant->plan === 'pro' ? 'bg-[#4F46E5]' : 'bg-emerald-500';
+        $endDate   = $restaurant->subscription_ends_at->format('d/m/Y');
+        $barColor  = 'bg-[#4F46E5]';
     } else {
         $daysLeft  = 0;
         $totalDays = 1;
@@ -51,21 +63,17 @@
                     {{ $badge['label'] }}
                 </span>
             </div>
-            @if($restaurant->plan !== 'expired')
+            @if($isActive)
             <div class="text-right">
-                @if($daysLeft > 0)
                 <div class="text-[28px] font-bold text-[#111827] leading-none">{{ $daysLeft }}</div>
                 <div class="text-[12px] text-[#6B7280] mt-0.5">días restantes</div>
-                @else
-                <div class="text-[13px] font-semibold text-[#DC2626]">Vencido</div>
-                @endif
             </div>
             @else
             <div class="text-[13px] font-semibold text-[#DC2626]">Plan vencido</div>
             @endif
         </div>
 
-        @if($restaurant->plan !== 'expired')
+        @if($isActive)
         <div>
             <div class="flex justify-between text-[11px] text-[#9CA3AF] mb-1.5">
                 <span>Inicio</span>
@@ -86,45 +94,26 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
-            <!-- Trial / Free -->
-            <div class="border rounded-[12px] p-4 relative {{ $restaurant->plan === 'trial' ? 'border-[#4F46E5] bg-[#EEF2FF]' : 'border-[#E5E7EB]' }}">
-                @if($restaurant->plan === 'trial')
+            <!-- Carta -->
+            @php $isCurrent = $restaurant->plan === 'carta'; @endphp
+            <div class="border rounded-[12px] p-4 relative {{ $isCurrent ? 'border-[#4F46E5] bg-[#EEF2FF]' : 'border-[#E5E7EB]' }}">
+                @if($isCurrent)
                 <div class="absolute top-3 right-3">
                     <span class="text-[10px] font-bold text-[#4F46E5] bg-[#E0E7FF] rounded-[5px] px-[5px] py-[2px]">Actual</span>
                 </div>
                 @endif
-                <div class="text-[11px] font-bold uppercase tracking-[.04em] text-[#6B7280] mb-2">Free</div>
-                <div class="text-[24px] font-bold text-[#111827] leading-none">Gratis</div>
-                <div class="text-[12px] text-[#9CA3AF] mt-0.5 mb-3">14 días de prueba</div>
-                <ul class="space-y-1.5">
-                    @foreach(['Menú digital', 'QR personalizado', 'Categorías e ítems ilimitados'] as $feat)
-                    <li class="flex items-center gap-2 text-[12px] text-[#374151]">
-                        <svg width="13" height="13" viewBox="0 0 20 20" fill="#10B981"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        {{ $feat }}
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <!-- Basic -->
-            <div class="border rounded-[12px] p-4 relative {{ $restaurant->plan === 'basic' ? 'border-[#4F46E5] bg-[#EEF2FF]' : 'border-[#E5E7EB]' }}">
-                @if($restaurant->plan === 'basic')
-                <div class="absolute top-3 right-3">
-                    <span class="text-[10px] font-bold text-[#4F46E5] bg-[#E0E7FF] rounded-[5px] px-[5px] py-[2px]">Actual</span>
-                </div>
-                @endif
-                <div class="text-[11px] font-bold uppercase tracking-[.04em] text-[#6B7280] mb-2">Basic</div>
-                <div class="text-[24px] font-bold text-[#111827] leading-none">$9.990</div>
+                <div class="text-[11px] font-bold uppercase tracking-[.04em] text-[#6B7280] mb-2">Carta</div>
+                <div class="text-[24px] font-bold text-[#111827] leading-none">$8.000</div>
                 <div class="text-[12px] text-[#9CA3AF] mt-0.5 mb-3">CLP / mes</div>
                 <ul class="space-y-1.5">
-                    @foreach(['Todo lo del Free', 'Apariencia personalizada', 'Sin límite de ítems', 'Soporte por email'] as $feat)
+                    @foreach(['Carta digital', 'Chip NFC y QR', 'Pedidos por WhatsApp'] as $feat)
                     <li class="flex items-center gap-2 text-[12px] text-[#374151]">
                         <svg width="13" height="13" viewBox="0 0 20 20" fill="#10B981"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                         {{ $feat }}
                     </li>
                     @endforeach
                 </ul>
-                @if($restaurant->plan !== 'basic')
+                @if(!$isCurrent)
                 <a href="{{ $waUrl }}" target="_blank"
                    class="mt-4 flex items-center justify-center gap-1.5 bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-[10px] px-3 py-2 text-[12px] font-semibold transition-colors">
                     Contratar
@@ -132,9 +121,37 @@
                 @endif
             </div>
 
-            <!-- Pro -->
-            <div class="border rounded-[12px] p-4 relative {{ $restaurant->plan === 'pro' ? 'border-[#4F46E5] bg-[#EEF2FF]' : 'border-[#4F46E5]' }}">
-                @if($restaurant->plan === 'pro')
+            <!-- Pedidos -->
+            @php $isCurrent = $restaurant->plan === 'pedidos'; @endphp
+            <div class="border rounded-[12px] p-4 relative {{ $isCurrent ? 'border-[#4F46E5] bg-[#EEF2FF]' : 'border-[#E5E7EB]' }}">
+                @if($isCurrent)
+                <div class="absolute top-3 right-3">
+                    <span class="text-[10px] font-bold text-[#4F46E5] bg-[#E0E7FF] rounded-[5px] px-[5px] py-[2px]">Actual</span>
+                </div>
+                @endif
+                <div class="text-[11px] font-bold uppercase tracking-[.04em] text-[#6B7280] mb-2">Pedidos</div>
+                <div class="text-[24px] font-bold text-[#111827] leading-none">$15.000</div>
+                <div class="text-[12px] text-[#9CA3AF] mt-0.5 mb-3">CLP / mes</div>
+                <ul class="space-y-1.5">
+                    @foreach(['Todo lo de Carta', 'Panel de pedidos', 'Generador de posts'] as $feat)
+                    <li class="flex items-center gap-2 text-[12px] text-[#374151]">
+                        <svg width="13" height="13" viewBox="0 0 20 20" fill="#10B981"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        {{ $feat }}
+                    </li>
+                    @endforeach
+                </ul>
+                @if(!$isCurrent)
+                <a href="{{ $waUrl }}" target="_blank"
+                   class="mt-4 flex items-center justify-center gap-1.5 bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-[10px] px-3 py-2 text-[12px] font-semibold transition-colors">
+                    Contratar
+                </a>
+                @endif
+            </div>
+
+            <!-- Full -->
+            @php $isCurrent = $restaurant->plan === 'full'; @endphp
+            <div class="border rounded-[12px] p-4 relative {{ $isCurrent ? 'border-[#4F46E5] bg-[#EEF2FF]' : 'border-[#4F46E5]' }}">
+                @if($isCurrent)
                 <div class="absolute top-3 right-3">
                     <span class="text-[10px] font-bold text-[#4F46E5] bg-[#E0E7FF] rounded-[5px] px-[5px] py-[2px]">Actual</span>
                 </div>
@@ -143,21 +160,21 @@
                     <span class="text-[10px] font-bold text-white bg-[#4F46E5] rounded-[5px] px-[5px] py-[2px]">Popular</span>
                 </div>
                 @endif
-                <div class="text-[11px] font-bold uppercase tracking-[.04em] text-[#4F46E5] mb-2">Pro</div>
-                <div class="text-[24px] font-bold text-[#111827] leading-none">$19.990</div>
+                <div class="text-[11px] font-bold uppercase tracking-[.04em] text-[#4F46E5] mb-2">Full</div>
+                <div class="text-[24px] font-bold text-[#111827] leading-none">$25.000</div>
                 <div class="text-[12px] text-[#9CA3AF] mt-0.5 mb-3">CLP / mes</div>
                 <ul class="space-y-1.5">
-                    @foreach(['Todo lo del Basic', 'Soporte prioritario WhatsApp', 'Actualizaciones anticipadas', 'Variantes de platos'] as $feat)
+                    @foreach(['Todo lo de Pedidos', 'Reportes de ventas', 'Soporte prioritario'] as $feat)
                     <li class="flex items-center gap-2 text-[12px] text-[#374151]">
                         <svg width="13" height="13" viewBox="0 0 20 20" fill="#4F46E5"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                         {{ $feat }}
                     </li>
                     @endforeach
                 </ul>
-                @if($restaurant->plan !== 'pro')
+                @if(!$isCurrent)
                 <a href="{{ $waUrl }}" target="_blank"
                    class="mt-4 flex items-center justify-center gap-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white border border-[#4338CA] rounded-[10px] px-3 py-2 text-[12px] font-semibold shadow-[0_1px_2px_rgba(79,70,229,.35)] transition-colors">
-                    Contratar Pro
+                    Contratar Full
                 </a>
                 @endif
             </div>
