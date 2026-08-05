@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Http;
 class AnthropicService
 {
     private string $apiKey;
-    private string $model = 'claude-sonnet-4-6';
+    private string $visionModel = 'claude-sonnet-4-6';
+    private string $copyModel   = 'claude-haiku-4-5-20251001';
 
     public function __construct()
     {
@@ -39,7 +40,7 @@ Los precios son enteros en pesos chilenos (CLP). Si no ves precio claro, usa 0. 
             'anthropic-version' => '2023-06-01',
             'content-type'      => 'application/json',
         ])->timeout(60)->post('https://api.anthropic.com/v1/messages', [
-            'model'      => $this->model,
+            'model'      => $this->visionModel,
             'max_tokens' => 4096,
             'messages'   => [
                 ['role' => 'user', 'content' => $content],
@@ -59,7 +60,7 @@ Los precios son enteros en pesos chilenos (CLP). Si no ves precio claro, usa 0. 
             'anthropic-version' => '2023-06-01',
             'content-type'      => 'application/json',
         ])->timeout(30)->post('https://api.anthropic.com/v1/messages', [
-            'model'      => $this->model,
+            'model'      => $this->copyModel,
             'max_tokens' => 256,
             'messages'   => [[
                 'role'    => 'user',
