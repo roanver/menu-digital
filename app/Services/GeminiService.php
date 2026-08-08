@@ -32,6 +32,10 @@ class GeminiService
 Los precios son enteros en pesos chilenos (CLP). Si no ves precio claro, usa 0. No incluyas $ ni puntos en los precios, solo el número entero.',
         ];
 
+        if (empty($this->apiKey)) {
+            throw new \RuntimeException('GEMINI_API_KEY no está configurada.');
+        }
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->timeout(60)->post("{$this->baseUrl}/{$this->model}:generateContent?key={$this->apiKey}", [
@@ -44,7 +48,22 @@ Los precios son enteros en pesos chilenos (CLP). Si no ves precio claro, usa 0. 
             ],
         ]);
 
-        $text = $response->json('candidates.0.content.parts.0.text', '{}');
+        // Error HTTP de la API
+        if ($response->failed()) {
+            $error = $response->json('error.message', 'Sin detalle');
+            throw new \RuntimeException("Error Gemini ({$response->status()}): {$error}");
+        }
+
+        $text = $response->json('candidates.0.content.parts.0.text', '');
+
+        if (empty($text)) {
+            // Puede que Gemini bloqueó la respuesta (safety filters)
+            $blockReason = $response->json('promptFeedback.blockReason', '');
+            if ($blockReason) {
+                throw new \RuntimeException("Gemini bloqueó la imagen: {$blockReason}");
+            }
+            throw new \RuntimeException('Gemini no devolvió texto. Respuesta: ' . $response->body());
+        }
 
         // Limpiar posibles bloques ```json ... ```
         $text = preg_replace('/^```json\s*/m', '', $text);
@@ -52,6 +71,10 @@ Los precios son enteros en pesos chilenos (CLP). Si no ves precio claro, usa 0. 
         $text = trim($text);
 
         $data = json_decode($text, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException('JSON inválido de Gemini: ' . mb_substr($text, 0, 200));
+        }
 
         return $data['categories'] ?? [];
     }
