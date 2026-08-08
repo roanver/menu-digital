@@ -13,16 +13,14 @@
     <meta property="og:url" content="{{ url('/' . $restaurant->slug) }}">
     <meta property="og:site_name" content="MenuDigital">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Anton&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite(['resources/css/menu.css', 'resources/js/menu.js'])
     <style>
         html,body{margin:0;padding:0;background:#0C0A09;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
         a{text-decoration:none;color:inherit}
         .hsc::-webkit-scrollbar{height:0}
         [x-cloak]{display:none!important}
+        body,body>div{min-height:100vh;min-height:100dvh}
     </style>
 </head>
 <body style="font-family:Inter,system-ui,sans-serif;color:#FAFAF9;background:#0C0A09;min-height:100vh;">
@@ -50,16 +48,16 @@
     <div style="padding:24px 20px 0;position:relative;">
         <div style="position:absolute;inset:0;background:radial-gradient(110% 70% at 50% -8%,rgba(220,90,20,.22),transparent 60%);pointer-events:none;"></div>
         <div style="position:relative;text-align:center;">
-            <div style="font-size:9.5px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#A8A29E;">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#A8A29E;">
                 @if($restaurant->address){{ $restaurant->address }}@else Parrilla · a · leña @endif
             </div>
             <div style="font-family:Anton,Inter,sans-serif;font-size:56px;line-height:.94;letter-spacing:.01em;margin-top:10px;background:linear-gradient(175deg,#FAFAF9 40%,#F59E0B 78%,#DC2626 105%);-webkit-background-clip:text;background-clip:text;color:transparent;">{{ mb_strtoupper($restaurant->name) }}</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;">
                 <span style="width:44px;height:1px;background:linear-gradient(90deg,transparent,#78350F);display:block;"></span>
                 @if($restaurant->phone)
-                    <span style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#D97706;">{{ $restaurant->phone }}</span>
+                    <span style="font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#D97706;">{{ $restaurant->phone }}</span>
                 @else
-                    <span style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#D97706;">Desde 1998</span>
+                    <span style="font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#D97706;">Desde 1998</span>
                 @endif
                 <span style="width:44px;height:1px;background:linear-gradient(90deg,#78350F,transparent);display:block;"></span>
             </div>
@@ -70,6 +68,7 @@
         <div style="position:relative;margin-top:20px;border-radius:20px;overflow:hidden;border:1px solid #292524;">
             @if($heroItem->image)
                 <img src="{{ Storage::url($heroItem->image) }}" alt="{{ $heroItem->name }}"
+                     loading="eager" decoding="async" width="440" height="172"
                      style="width:100%;height:172px;object-fit:cover;display:block;">
             @else
                 <div style="height:172px;background:radial-gradient(85% 85% at 30% 18%,rgba(245,158,11,.32),transparent 58%),linear-gradient(150deg,#2E2018,#150E09);display:flex;align-items:center;justify-content:center;">
@@ -79,7 +78,7 @@
             <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 26%,rgba(12,10,9,.94) 88%);"></div>
             <div style="position:absolute;left:16px;right:16px;bottom:13px;display:flex;align-items:flex-end;gap:10px;">
                 <div style="flex:1;min-width:0;">
-                    <div style="font-size:8.5px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#F59E0B;">El plato de la casa</div>
+                    <div style="font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#F59E0B;">El plato de la casa</div>
                     <div style="font-family:Anton,Inter,sans-serif;font-size:22px;letter-spacing:.015em;margin-top:4px;">{{ mb_strtoupper($heroItem->name) }}</div>
                 </div>
                 @if($restaurant->show_price)
@@ -125,6 +124,7 @@
                         <div style="display:flex;gap:13px;align-items:center;padding:13px 0;border-bottom:1px solid #1C1917;{{ !$item->is_available ? 'opacity:.55;' : '' }}">
                             @if($item->image)
                                 <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
+                                     loading="lazy" decoding="async" width="52" height="52"
                                      style="width:52px;height:52px;border-radius:12px;flex:0 0 auto;object-fit:cover;border:1px solid #292524;">
                             @else
                                 <div style="width:52px;height:52px;border-radius:12px;flex:0 0 auto;background:{{ $ph }};border:1px solid #292524;display:flex;align-items:center;justify-content:center;">
@@ -135,14 +135,14 @@
                                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                                     <span style="font-size:14px;font-weight:600;letter-spacing:-.01em;">{{ $item->name }}</span>
                                     @if(!$item->is_available)
-                                        <span style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#7F1D1D;color:#FCA5A5;border-radius:4px;padding:2px 6px;">Agotado</span>
+                                        <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#7F1D1D;color:#FCA5A5;border-radius:4px;padding:2px 6px;">Agotado</span>
                                     @endif
                                 </div>
                                 @if($restaurant->show_description && $item->description)
-                                    <div style="font-size:11.5px;color:#78716C;line-height:1.5;margin-top:3px;">{{ $item->description }}</div>
+                                    <div style="font-size:12px;color:#78716C;line-height:1.5;margin-top:3px;">{{ $item->description }}</div>
                                 @endif
                                 @if($item->variants->isNotEmpty())
-                                    <div style="font-size:10.5px;color:#44403C;margin-top:3px;">
+                                    <div style="font-size:12px;color:#44403C;margin-top:3px;">
                                         @foreach($item->variants as $variant){{ $variant->name }}@if(!$loop->last) · @endif@endforeach
                                     </div>
                                 @endif
@@ -150,7 +150,7 @@
                             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;">
                                 @if($restaurant->show_price)
                                     @if($item->is_promo && $item->promo_price)
-                                        <span style="font-size:11px;color:#78716C;text-decoration:line-through;font-family:Anton,Inter,sans-serif;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                        <span style="font-size:12px;color:#78716C;text-decoration:line-through;font-family:Anton,Inter,sans-serif;">${{ number_format($item->price, 0, ',', '.') }}</span>
                                         <span style="font-family:Anton,Inter,sans-serif;font-size:15px;letter-spacing:.03em;color:#FCA5A5;">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
                                     @else
                                         <span style="font-family:Anton,Inter,sans-serif;font-size:15px;letter-spacing:.03em;color:#F59E0B;">${{ number_format($item->price, 0, ',', '.') }}</span>
@@ -171,12 +171,13 @@
                 </div>
             </div>
         @endforeach
-        <div style="text-align:center;font-size:9.5px;color:#44403C;padding-top:28px;letter-spacing:.2em;text-transform:uppercase;">Menú creado con MenuDigital</div>
+        <div style="text-align:center;font-size:12px;color:#44403C;padding-top:28px;letter-spacing:.2em;text-transform:uppercase;">Menú creado con MenuDigital</div>
     </div>
 </div>
 
 {{-- WhatsApp FAB (solo si NO acepta pedidos por carrito) --}}
 @if($whatsappNum && !$restaurant->accepts_orders)
+    @if($isOpen ?? true)
     <div style="position:fixed;bottom:0;right:0;padding:0 18px 20px;pointer-events:none;z-index:10;">
         <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
            style="width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px rgba(37,211,102,.14),0 12px 28px rgba(37,211,102,.4);pointer-events:auto;">
@@ -186,6 +187,13 @@
             </svg>
         </a>
     </div>
+    @else
+    <div style="position:fixed;bottom:0;right:0;padding:0 18px 20px;z-index:10;">
+        <div style="padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.7);color:#fff;font-size:12px;font-weight:600;">
+            Cerrado{{ $nextOpening ? ' · ' . $nextOpening : '' }}
+        </div>
+    </div>
+    @endif
 @endif
 
 @include('components.menu-cart', ['restaurant' => $restaurant])

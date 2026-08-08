@@ -68,6 +68,8 @@ return [
     'timezone' => 'UTC',
 
     'super_admin_email' => env('SUPER_ADMIN_EMAIL', ''),
+    'sales_whatsapp' => env('SALES_WHATSAPP', '56900000000'),
+    'demo_slug'      => env('DEMO_SLUG', 'demo'),
 
     /*
     |--------------------------------------------------------------------------

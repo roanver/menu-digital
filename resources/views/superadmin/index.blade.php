@@ -25,6 +25,11 @@
             <span class="text-[13px] font-semibold text-[#4F46E5] bg-[#EEF2FF] rounded-[7px] px-[8px] py-[3px]">Super Admin</span>
         </div>
         <div class="flex items-center gap-3">
+            <a href="{{ route('superadmin.create') }}"
+               class="inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-[12.5px] font-semibold px-3 py-1.5 rounded-[8px] no-underline transition-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nuevo restaurante
+            </a>
             <a href="{{ route('superadmin.nfc.index') }}"
                class="inline-flex items-center gap-2 bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] text-[12.5px] font-semibold px-3 py-1.5 rounded-[8px] no-underline transition-colors">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.32a7.43 7.43 0 0 1 0 7.36M9.46 6.21a11.76 11.76 0 0 1 0 11.58M12.91 4.1a15.91 15.91 0 0 1 .01 15.8"/></svg>
@@ -80,6 +85,55 @@
             <p class="text-[12px] text-[#9CA3AF] mt-1">sin plan activo</p>
         </div>
     </div>
+
+    {{-- Cobranza --}}
+    @if($expiringSoon->isNotEmpty() || $expired->isNotEmpty())
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+        @if($expired->isNotEmpty())
+        <div class="bg-white border border-[#FEE2E2] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#FEE2E2] flex items-center justify-between bg-[#FEF2F2]">
+                <span class="text-[13px] font-bold text-[#DC2626]">Vencidos</span>
+                <span class="text-[11px] font-bold text-white bg-[#DC2626] rounded-full px-[9px] py-[2px]">{{ $expired->count() }}</span>
+            </div>
+            <div class="divide-y divide-[#F9FAFB]">
+                @foreach($expired as $r)
+                @php $owner = $r->users->first(); @endphp
+                <div class="px-4 py-3">
+                    <div class="text-[13px] font-semibold text-[#111827]">{{ $r->name }}</div>
+                    <div class="text-[11.5px] text-[#6B7280] mt-[1px]">{{ $owner?->email ?? '—' }}</div>
+                    <div class="text-[11px] text-[#DC2626] font-semibold mt-[2px]">
+                        Venció: {{ ($r->subscription_ends_at ?? $r->trial_ends_at)?->format('d/m/Y') ?? '—' }}
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        @if($expiringSoon->isNotEmpty())
+        <div class="bg-white border border-[#FDE68A] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#FDE68A] flex items-center justify-between bg-[#FFFBEB]">
+                <span class="text-[13px] font-bold text-[#B45309]">Vencen pronto (7 días)</span>
+                <span class="text-[11px] font-bold text-white bg-[#B45309] rounded-full px-[9px] py-[2px]">{{ $expiringSoon->count() }}</span>
+            </div>
+            <div class="divide-y divide-[#F9FAFB]">
+                @foreach($expiringSoon as $r)
+                @php $owner = $r->users->first(); @endphp
+                <div class="px-4 py-3">
+                    <div class="text-[13px] font-semibold text-[#111827]">{{ $r->name }}</div>
+                    <div class="text-[11.5px] text-[#6B7280] mt-[1px]">{{ $owner?->email ?? '—' }}</div>
+                    <div class="text-[11px] text-[#B45309] font-semibold mt-[2px]">
+                        Vence: {{ $r->subscription_ends_at?->format('d/m/Y') }}
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+    </div>
+    @endif
 
     <!-- Table card -->
     <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden">

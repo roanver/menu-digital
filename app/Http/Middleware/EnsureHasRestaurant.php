@@ -11,7 +11,7 @@ class EnsureHasRestaurant
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user() || ! $request->user()->restaurant_id) {
-            if ($request->user()?->email === config('app.super_admin_email')) {
+            if ($request->user()?->role === 'super_admin') {
                 return redirect()->route('superadmin.index');
             }
             return redirect('/')->with('error', 'No tienes un restaurante asociado a tu cuenta.');

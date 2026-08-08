@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'has.restaurant' => \App\Http\Middleware\EnsureHasRestaurant::class,
             'billing.check' => \App\Http\Middleware\EnsurePlanActive::class,
             'is.owner' => \App\Http\Middleware\EnsureIsOwner::class,
+            'superadmin' => \App\Http\Middleware\EnsureSuperAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

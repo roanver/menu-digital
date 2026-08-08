@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        if (auth()->user()->email === config('app.super_admin_email')) {
+        if (auth()->user()->role === 'super_admin') {
             return redirect()->route('superadmin.index');
         }
 

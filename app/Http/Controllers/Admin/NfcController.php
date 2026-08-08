@@ -43,7 +43,15 @@ class NfcController extends Controller
             'type'          => ['required', 'in:review,menu'],
             'restaurant_id' => ['nullable', 'exists:restaurants,id'],
             'label'         => ['nullable', 'string', 'max:255'],
-            'target_url'    => ['nullable', 'url', 'max:2048'],
+            'target_url'    => ['nullable', 'url', 'max:2048', function (string $attribute, mixed $value, \Closure $fail) {
+                if ($value) {
+                    $host = parse_url($value, PHP_URL_HOST);
+                    $allowed = ['google.com', 'www.google.com', 'g.page', 'search.google.com', 'maps.app.goo.gl'];
+                    if (! in_array($host, $allowed)) {
+                        $fail('La URL de destino debe ser de Google (Maps o reseñas). Host no permitido: ' . $host);
+                    }
+                }
+            }],
             'is_active'     => ['boolean'],
         ]);
 
@@ -68,7 +76,15 @@ class NfcController extends Controller
             'type'          => ['required', 'in:review,menu'],
             'restaurant_id' => ['nullable', 'exists:restaurants,id'],
             'label'         => ['nullable', 'string', 'max:255'],
-            'target_url'    => ['nullable', 'url', 'max:2048'],
+            'target_url'    => ['nullable', 'url', 'max:2048', function (string $attribute, mixed $value, \Closure $fail) {
+                if ($value) {
+                    $host = parse_url($value, PHP_URL_HOST);
+                    $allowed = ['google.com', 'www.google.com', 'g.page', 'search.google.com', 'maps.app.goo.gl'];
+                    if (! in_array($host, $allowed)) {
+                        $fail('La URL de destino debe ser de Google (Maps o reseñas). Host no permitido: ' . $host);
+                    }
+                }
+            }],
             'is_active'     => ['boolean'],
         ]);
 

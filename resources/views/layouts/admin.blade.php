@@ -98,6 +98,15 @@
                 <span class="text-[10.5px] font-semibold text-[#6B7280] bg-white border border-[#E5E7EB] rounded-[6px] px-[5px] py-[1px]">{{ $_itemCount }}</span>
             </a>
 
+            {{-- Horarios --}}
+            @php $__active = request()->routeIs('admin.hours.*'); @endphp
+            <a href="{{ route('admin.hours.index') }}"
+               class="flex items-center gap-[10px] w-full px-[10px] py-2 rounded-[9px] border text-[13px] transition-colors no-underline
+                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-semibold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
+                <svg class="w-[17px] h-[17px] flex-none {{ $__active ? 'opacity-100' : 'opacity-75' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Horarios
+            </a>
+
             @if(auth()->user()->isOwner())
             {{-- Apariencia --}}
             @php $__active = request()->routeIs('admin.appearance.*'); @endphp
@@ -289,68 +298,187 @@
 {{-- ============================================================
      MOBILE BOTTOM TAB BAR
 ============================================================ --}}
-<nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB]">
-    <div class="flex px-1 py-2">
+<div x-data="{ moreOpen: false }"
+     @keydown.escape.window="moreOpen = false"
+     class="lg:hidden">
 
-        {{-- Inicio --}}
-        @php $__t = request()->routeIs('admin.dashboard'); @endphp
-        <a href="{{ route('admin.dashboard') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Inicio</span>
-        </a>
+    {{-- Bottom nav --}}
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB]">
+        <div class="flex">
 
-        {{-- Carta --}}
-        @php $__t = request()->routeIs('admin.categories.*'); @endphp
-        <a href="{{ route('admin.categories.index') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
-            </svg>
-            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Carta</span>
-        </a>
+            {{-- Inicio --}}
+            @php $__t = request()->routeIs('admin.dashboard'); @endphp
+            <a href="{{ route('admin.dashboard') }}"
+               class="flex-1 flex flex-col items-center justify-center gap-[3px] min-h-[56px] {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span class="text-[10px] leading-none {{ $__t ? 'font-semibold' : 'font-medium' }}">Inicio</span>
+            </a>
 
-        {{-- Items --}}
-        @php $__t = request()->routeIs('admin.items.*'); @endphp
-        <a href="{{ route('admin.items.index') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-                <circle cx="3.5" cy="6" r=".5" fill="currentColor"/><circle cx="3.5" cy="12" r=".5" fill="currentColor"/><circle cx="3.5" cy="18" r=".5" fill="currentColor"/>
-            </svg>
-            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Items</span>
-        </a>
+            {{-- Ítems --}}
+            @php $__t = request()->routeIs('admin.items.*'); @endphp
+            <a href="{{ route('admin.items.index') }}"
+               class="flex-1 flex flex-col items-center justify-center gap-[3px] min-h-[56px] {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                    <circle cx="3.5" cy="6" r=".5" fill="currentColor"/><circle cx="3.5" cy="12" r=".5" fill="currentColor"/><circle cx="3.5" cy="18" r=".5" fill="currentColor"/>
+                </svg>
+                <span class="text-[10px] leading-none {{ $__t ? 'font-semibold' : 'font-medium' }}">Ítems</span>
+            </a>
 
-        @if(auth()->user()->isOwner())
-        {{-- Diseño --}}
-        @php $__t = request()->routeIs('admin.appearance.*'); @endphp
-        <a href="{{ route('admin.appearance.edit') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="4"/><path d="M12 3v1m0 16v1m8-9h1M3 12H2m14.5-6.5-.7.7m-9.6 9.6-.7.7m0-10.3-.7-.7m10.3 10.3-.7-.7"/>
-            </svg>
-            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Diseño</span>
-        </a>
+            {{-- Categorías --}}
+            @php $__t = request()->routeIs('admin.categories.*'); @endphp
+            <a href="{{ route('admin.categories.index') }}"
+               class="flex-1 flex flex-col items-center justify-center gap-[3px] min-h-[56px] {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                </svg>
+                <span class="text-[10px] leading-none {{ $__t ? 'font-semibold' : 'font-medium' }}">Categorías</span>
+            </a>
 
-        {{-- Cuenta --}}
-        @php $__t = request()->routeIs('admin.restaurant.*'); @endphp
-        <a href="{{ route('admin.restaurant.edit') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Cuenta</span>
-        </a>
+            {{-- Ver carta --}}
+            @php $__t = false; @endphp
+            @if(auth()->user()->restaurant?->slug)
+            <a href="{{ url('/' . auth()->user()->restaurant->slug) }}" target="_blank"
+               class="flex-1 flex flex-col items-center justify-center gap-[3px] min-h-[56px] text-[#9CA3AF]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/>
+                </svg>
+                <span class="text-[10px] leading-none font-medium">Ver carta</span>
+            </a>
+            @endif
 
-        {{-- Equipo --}}
-        @php $__t = request()->routeIs('admin.staff.*'); @endphp
-        <a href="{{ route('admin.staff.index') }}" class="flex-1 flex flex-col items-center gap-1 py-1 {{ $__t ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-            <span class="text-[10px] {{ $__t ? 'font-semibold' : 'font-medium' }}">Equipo</span>
-        </a>
-        @endif
+            {{-- Más --}}
+            @php
+                $__inMore = request()->routeIs('admin.import.*') || request()->routeIs('admin.posts.*') || request()->routeIs('admin.qr.*') || request()->routeIs('admin.appearance.*') || request()->routeIs('admin.restaurant.*') || request()->routeIs('admin.staff.*') || request()->routeIs('admin.billing.*') || request()->routeIs('admin.hours.*');
+            @endphp
+            <button @click="moreOpen = true"
+                    class="flex-1 flex flex-col items-center justify-center gap-[3px] min-h-[56px] {{ $__inMore ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+                </svg>
+                <span class="text-[10px] leading-none {{ $__inMore ? 'font-semibold' : 'font-medium' }}">Más</span>
+            </button>
 
+        </div>
+    </nav>
+
+    {{-- Bottom Sheet overlay --}}
+    <div x-show="moreOpen"
+         x-transition:enter="transition-opacity duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click.self="moreOpen = false"
+         class="fixed inset-0 z-40 bg-black/40"
+         style="display:none;">
     </div>
-</nav>
+
+    {{-- Bottom Sheet panel --}}
+    <div x-show="moreOpen"
+         x-transition:enter="transition-transform duration-250 ease-out"
+         x-transition:enter-start="translate-y-full"
+         x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-200 ease-in"
+         x-transition:leave-start="translate-y-0"
+         x-transition:leave-end="translate-y-full"
+         class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[20px] shadow-[0_-8px_32px_rgba(16,24,40,.14)]"
+         style="display:none;">
+
+        {{-- Handle + header --}}
+        <div class="flex items-center justify-between px-5 pt-4 pb-2">
+            <div class="w-[36px] h-[4px] rounded-full bg-[#E5E7EB] mx-auto absolute left-0 right-0 top-[10px]"></div>
+            <span class="text-[13px] font-bold text-[#111827] mt-2">Más opciones</span>
+            <button @click="moreOpen = false" class="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-[#F3F4F6] text-[#6B7280] mt-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <div class="px-4 pb-8 pt-2 space-y-1" style="padding-bottom: max(2rem, env(safe-area-inset-bottom, 2rem));">
+
+            @if(auth()->user()->isOwner())
+            {{-- Importar menú --}}
+            @php $__a = request()->routeIs('admin.import.*'); @endphp
+            <a href="{{ route('admin.import.upload') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4-4 4 4M12 12V3"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Importar menú</span>
+            </a>
+
+            {{-- Posts --}}
+            @php $__a = request()->routeIs('admin.posts.*'); @endphp
+            <a href="{{ route('admin.posts.index') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Posts</span>
+            </a>
+
+            {{-- Códigos QR --}}
+            @php $__a = request()->routeIs('admin.qr.*'); @endphp
+            <a href="{{ route('admin.qr.show') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Códigos QR</span>
+            </a>
+
+            {{-- Apariencia --}}
+            @php $__a = request()->routeIs('admin.appearance.*'); @endphp
+            <a href="{{ route('admin.appearance.edit') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1m0 16v1m8-9h1M3 12H2m14.5-6.5-.7.7m-9.6 9.6-.7.7m0-10.3-.7-.7m10.3 10.3-.7-.7"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Apariencia</span>
+            </a>
+
+            {{-- Horarios --}}
+            @php $__a = request()->routeIs('admin.hours.*'); @endphp
+            <a href="{{ route('admin.hours.index') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Horarios</span>
+            </a>
+
+            {{-- Restaurante --}}
+            @php $__a = request()->routeIs('admin.restaurant.*'); @endphp
+            <a href="{{ route('admin.restaurant.edit') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8z"/><path d="M9 22V12h6v10"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Restaurante</span>
+            </a>
+
+            {{-- Equipo --}}
+            @php $__a = request()->routeIs('admin.staff.*'); @endphp
+            <a href="{{ route('admin.staff.index') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Equipo</span>
+            </a>
+
+            {{-- Planes --}}
+            @php $__a = request()->routeIs('admin.billing.*'); @endphp
+            <a href="{{ route('admin.billing.show') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Planes</span>
+            </a>
+            @endif
+
+            {{-- Cerrar sesión --}}
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                        class="w-full flex items-center gap-3 px-3 py-[11px] rounded-[12px] text-[#DC2626] hover:bg-[#FEF2F2] min-h-[44px]">
+                    <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    <span class="text-[13px] font-medium">Cerrar sesión</span>
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>

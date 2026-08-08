@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\NfcController;
 use App\Http\Controllers\Admin\PostGeneratorController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\BillingController;
+use App\Http\Controllers\Admin\BusinessHoursController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MenuController;
@@ -32,9 +33,12 @@ Route::middleware('auth')->group(function () {
 });
 
 // Super-admin routes
-Route::middleware(['auth'])->prefix('superadmin')->name('superadmin.')->group(function () {
+Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('/', [SuperAdminController::class, 'index'])->name('index');
     Route::patch('/restaurants/{restaurant}/plan', [SuperAdminController::class, 'updatePlan'])->name('plan.update');
+    Route::get('/create', [SuperAdminController::class, 'createRestaurant'])->name('create');
+    Route::post('/create', [SuperAdminController::class, 'storeRestaurant'])->name('store');
+    Route::get('/credentials/{restaurant}', [SuperAdminController::class, 'credentials'])->name('credentials');
 
     // NFC management
     Route::prefix('nfc')->name('nfc.')->group(function () {
@@ -91,13 +95,17 @@ Route::middleware(['auth', 'has.restaurant', 'billing.check'])
             Route::get('/posts', [PostGeneratorController::class, 'index'])->name('posts.index');
             Route::post('/posts/generate', [PostGeneratorController::class, 'generate'])->name('posts.generate');
             Route::post('/posts/download', [PostGeneratorController::class, 'downloadImage'])->name('posts.download');
+
+            // Horarios de atención
+            Route::get('/hours', [BusinessHoursController::class, 'index'])->name('hours.index');
+            Route::post('/hours', [BusinessHoursController::class, 'update'])->name('hours.update');
         });
     });
 
 require __DIR__.'/auth.php';
 
 // NFC public redirects (before the wildcard /{slug})
-Route::get('/r/{code}', [NfcRedirectController::class, 'review'])->name('nfc.review');
-Route::get('/m/{code}', [NfcRedirectController::class, 'menu'])->name('nfc.menu');
+Route::get('/r/{code}', [NfcRedirectController::class, 'review'])->middleware('throttle:120,1')->name('nfc.review');
+Route::get('/m/{code}', [NfcRedirectController::class, 'menu'])->middleware('throttle:120,1')->name('nfc.menu');
 
-Route::get('/{slug}', [MenuController::class, 'show'])->name('menu.show');
+Route::get('/{slug}', [MenuController::class, 'show'])->middleware('throttle:60,1')->name('menu.show');

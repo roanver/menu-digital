@@ -12,7 +12,7 @@ abstract class AdminController extends Controller
      * Convert an uploaded image to WebP and save it to storage/app/public/images/.
      * Returns the relative path (images/uuid.webp).
      */
-    protected function saveImageAsWebp(UploadedFile $file): string
+    protected function saveImageAsWebp(UploadedFile $file, int $maxWidth = 800): string
     {
         $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         $mime = $file->getMimeType();
@@ -28,6 +28,20 @@ abstract class AdminController extends Controller
             abort(422, 'No se pudo procesar la imagen.');
         }
 
+        // Resize maintaining aspect ratio
+        $origW = imagesx($image);
+        $origH = imagesy($image);
+        if ($origW > $maxWidth) {
+            $newH = (int) round($origH * $maxWidth / $origW);
+            $resized = imagecreatetruecolor($maxWidth, $newH);
+            // Preserve transparency
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            imagecopyresampled($resized, $image, 0, 0, 0, 0, $maxWidth, $newH, $origW, $origH);
+            imagedestroy($image);
+            $image = $resized;
+        }
+
         $uuid = (string) Str::uuid();
         $filename = $uuid . '.webp';
         $directory = storage_path('app/public/images');
@@ -37,7 +51,7 @@ abstract class AdminController extends Controller
         }
 
         $fullPath = $directory . '/' . $filename;
-        imagewebp($image, $fullPath, 85);
+        imagewebp($image, $fullPath, 80);
         imagedestroy($image);
 
         return 'images/' . $filename;

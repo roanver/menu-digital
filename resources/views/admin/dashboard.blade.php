@@ -122,6 +122,59 @@
 
 </div>
 
+{{-- Scan Stats --}}
+<div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] mb-5 overflow-hidden">
+    <div class="px-5 pt-5 pb-4">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <div class="text-[13px] font-bold text-[#111827]">Escaneos de QR / NFC</div>
+                <div class="text-[11.5px] text-[#9CA3AF] mt-[1px]">Últimos 14 días · Total mes: <span class="font-semibold text-[#111827]">{{ number_format($monthTotal) }}</span></div>
+            </div>
+            <div class="text-right">
+                <div class="text-[22px] font-bold text-[#111827] leading-none">{{ number_format($last7) }}</div>
+                <div class="text-[11px] font-semibold mt-[2px] {{ $scanDelta >= 0 ? 'text-[#059669]' : 'text-[#DC2626]' }}">
+                    {{ $scanDelta >= 0 ? '↑' : '↓' }} {{ abs($scanDelta) }}% vs semana ant.
+                </div>
+            </div>
+        </div>
+
+        {{-- Bar chart --}}
+        @php $maxVal = max(1, collect($days)->max('total')); @endphp
+        <div class="flex items-end gap-[3px] h-[56px]">
+            @foreach($days as $i => $day)
+                @php
+                    $pct  = round($day['total'] / $maxVal * 100);
+                    $isRecent = $i >= 7;
+                    $isToday = $day['date'] === now()->toDateString();
+                @endphp
+                <div class="flex-1 flex flex-col items-center gap-[2px]" title="{{ $day['date'] }}: {{ $day['total'] }} escaneos">
+                    <div class="w-full rounded-t-[3px] transition-all"
+                         style="height:{{ max(2, (int)round($pct * 48 / 100)) }}px;background:{{ $isToday ? '#4F46E5' : ($isRecent ? '#A5B4FC' : '#E5E7EB') }};"></div>
+                </div>
+            @endforeach
+        </div>
+        <div class="flex justify-between mt-1">
+            <span class="text-[9px] text-[#9CA3AF]">{{ now()->subDays(13)->format('d/m') }}</span>
+            <span class="text-[9px] text-[#9CA3AF]">Hoy</span>
+        </div>
+
+        {{-- Tag breakdown --}}
+        @if($tagBreakdown->isNotEmpty())
+        <div class="mt-4 space-y-1">
+            @foreach($tagBreakdown->take(4) as $tag)
+            <div class="flex items-center gap-2 text-[12px]">
+                <span class="flex-1 text-[#4B5563] truncate">{{ $tag->label ?? ($tag->type === 'menu' ? 'Menú' : 'Reseña') }}</span>
+                <span class="font-semibold text-[#111827]">{{ number_format($tag->month_scans ?? 0) }}</span>
+                <div class="w-[60px] h-[5px] bg-[#F3F4F6] rounded-full overflow-hidden">
+                    <div class="h-full bg-[#4F46E5] rounded-full" style="width:{{ $monthTotal > 0 ? min(100, round(($tag->month_scans ?? 0) / $monthTotal * 100)) : 0 }}%"></div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </div>
+</div>
+
 {{-- Two-panel grid --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 

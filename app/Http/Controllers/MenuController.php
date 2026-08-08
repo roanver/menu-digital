@@ -17,9 +17,9 @@ class MenuController extends Controller
                 ->firstOrFail();
 
             // Verificar gracia de 7 días post-vencimiento
-            if (!$restaurant->planIsActive()) {
+            if (! $restaurant->planIsActive()) {
                 $grace = $restaurant->subscription_ends_at ?? $restaurant->trial_ends_at;
-                if (!$grace || now()->gt($grace->addDays(7))) {
+                if (! $grace || now()->gt($grace->addDays(7))) {
                     abort(404);
                 }
             }
@@ -34,8 +34,14 @@ class MenuController extends Controller
 
         $restaurant = $data['restaurant'];
         $categories = $data['categories'];
+
+        // Estado abierto/cerrado: NO se cachea (cambia cada minuto)
+        $restaurant->loadMissing('businessHours');
+        $isOpen      = $restaurant->isOpenNow();
+        $nextOpening = $isOpen ? null : $restaurant->nextOpeningTime();
+
         $template = $restaurant->template ?: 'minimal';
 
-        return view("menu.templates.{$template}", compact('restaurant', 'categories'));
+        return view("menu.templates.{$template}", compact('restaurant', 'categories', 'isOpen', 'nextOpening'));
     }
 }

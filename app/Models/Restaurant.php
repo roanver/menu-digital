@@ -52,6 +52,59 @@ class Restaurant extends Model
         return $this->hasMany(NfcTag::class);
     }
 
+    public function businessHours(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(BusinessHour::class)->orderBy('day_of_week');
+    }
+
+    public function isOpenNow(): bool
+    {
+        $dayOfWeek = (int) now()->dayOfWeek; // 0=Sun…6=Sat
+        $hour      = now()->format('H:i:s');
+
+        $bh = $this->businessHours()->where('day_of_week', $dayOfWeek)->first();
+
+        if (! $bh) {
+            return true; // sin configurar → asumir abierto
+        }
+        if ($bh->is_closed) {
+            return false;
+        }
+
+        $inFirst  = $bh->opens_at  && $bh->closes_at  && $hour >= $bh->opens_at  && $hour < $bh->closes_at;
+        $inSecond = $bh->opens_at_2 && $bh->closes_at_2 && $hour >= $bh->opens_at_2 && $hour < $bh->closes_at_2;
+
+        return $inFirst || $inSecond;
+    }
+
+    public function nextOpeningTime(): ?string
+    {
+        $dayOfWeek = (int) now()->dayOfWeek;
+        $hour      = now()->format('H:i:s');
+
+        $bh = $this->businessHours()->where('day_of_week', $dayOfWeek)->first();
+
+        if (! $bh || $bh->is_closed) {
+            // Look at next day(s)
+            for ($i = 1; $i <= 7; $i++) {
+                $nextDay = ($dayOfWeek + $i) % 7;
+                $next    = $this->businessHours()->where('day_of_week', $nextDay)->first();
+                if ($next && ! $next->is_closed && $next->opens_at) {
+                    return \App\Models\BusinessHour::dayName($nextDay) . ' ' . substr($next->opens_at, 0, 5);
+                }
+            }
+            return null;
+        }
+
+        if ($bh->opens_at && $hour < $bh->opens_at) {
+            return 'hoy a las ' . substr($bh->opens_at, 0, 5);
+        }
+        if ($bh->opens_at_2 && $hour < $bh->opens_at_2) {
+            return 'hoy a las ' . substr($bh->opens_at_2, 0, 5);
+        }
+        return null;
+    }
+
     public function planIsActive(): bool
     {
         return ($this->trial_ends_at && now()->lt($this->trial_ends_at))

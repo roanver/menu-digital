@@ -37,7 +37,7 @@ class RestaurantController extends AdminController
 
         if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
             $oldLogo = $restaurant->logo;
-            $validated['logo'] = $this->saveImageAsWebp($request->file('logo'));
+            $validated['logo'] = $this->saveImageAsWebp($request->file('logo'), 400);
             $this->deleteImageFile($oldLogo);
         } else {
             unset($validated['logo']);

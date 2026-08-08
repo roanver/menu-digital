@@ -13,10 +13,7 @@
     <meta property="og:url" content="{{ url('/' . $restaurant->slug) }}">
     <meta property="og:site_name" content="MenuDigital">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite(['resources/css/menu.css', 'resources/js/menu.js'])
     <style>
         html,body{margin:0;padding:0;background:#FFF6DE;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
@@ -24,6 +21,7 @@
         .hsc::-webkit-scrollbar{height:0}
         [x-cloak]{display:none!important}
         @keyframes md-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        body,body>div{min-height:100vh;min-height:100dvh}
     </style>
 </head>
 <body style="font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410;background:#FFF6DE;min-height:100vh;">
@@ -53,6 +51,7 @@
         <div style="display:flex;align-items:center;gap:12px;">
             @if($restaurant->logo)
                 <img src="{{ Storage::url($restaurant->logo) }}" alt="{{ $restaurant->name }}"
+                     width="58" height="58" loading="eager" decoding="async"
                      style="width:58px;height:58px;border-radius:16px;object-fit:cover;border:2px solid #191410;box-shadow:3px 3px 0 #191410;flex:0 0 auto;transform:rotate(-4deg);">
             @else
                 <div style="width:58px;height:58px;border-radius:16px;background:#E85D2F;border:2px solid #191410;box-shadow:3px 3px 0 #191410;display:flex;align-items:center;justify-content:center;transform:rotate(-4deg);flex:0 0 auto;">
@@ -63,12 +62,12 @@
                 <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1;">{{ $restaurant->name }}</h1>
                 <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
                     @if($restaurant->welcome_message)
-                        <span style="font-size:10.5px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->welcome_message }}</span>
+                        <span style="font-size:12px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->welcome_message }}</span>
                     @else
-                        <span style="font-size:10.5px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">Abierto</span>
+                        <span style="font-size:12px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">Abierto</span>
                     @endif
                     @if($restaurant->phone)
-                        <span style="font-size:10.5px;font-weight:700;color:#191410;background:#fff;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->phone }}</span>
+                        <span style="font-size:12px;font-weight:700;color:#191410;background:#fff;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->phone }}</span>
                     @endif
                 </div>
             </div>
@@ -83,7 +82,7 @@
                 if ($restaurant->address) $marqueeText .= htmlspecialchars($restaurant->address) . ' ✶ ';
                 $marqueeText = str_repeat($marqueeText, 6);
             @endphp
-            <span style="font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">{!! $marqueeText !!}</span>
+            <span style="font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">{!! $marqueeText !!}</span>
         </div>
     </div>
 
@@ -91,12 +90,12 @@
     @if($categories->count() > 0)
         <div class="hsc" style="display:flex;gap:8px;padding:14px 18px 12px;overflow-x:auto;position:sticky;top:0;background:#FFF6DE;z-index:3;">
             <a href="#" class="chip-all"
-               style="white-space:nowrap;font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:999px;border:1.5px solid #191410;color:#FFD84D;background:#191410;box-shadow:2px 2px 0 rgba(25,20,16,.3);cursor:pointer;">
+               style="white-space:nowrap;font-size:12px;font-weight:800;padding:7px 13px;border-radius:999px;border:1.5px solid #191410;color:#FFD84D;background:#191410;box-shadow:2px 2px 0 rgba(25,20,16,.3);cursor:pointer;">
                 Todo
             </a>
             @foreach($categories as $category)
                 <a href="#cat-{{ $category->id }}" class="cat-chip" data-cat="{{ $category->id }}"
-                   style="white-space:nowrap;font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:999px;border:1.5px solid #191410;color:#191410;background:#fff;cursor:pointer;">
+                   style="white-space:nowrap;font-size:12px;font-weight:800;padding:7px 13px;border-radius:999px;border:1.5px solid #191410;color:#191410;background:#fff;cursor:pointer;">
                     {{ $category->name }}
                 </a>
             @endforeach
@@ -122,6 +121,7 @@
                             <div style="position:relative;">
                                 @if($item->image)
                                     <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
+                                         loading="lazy" decoding="async" width="200" height="92"
                                          style="height:92px;width:100%;object-fit:cover;border-bottom:1.5px solid #191410;display:block;">
                                 @else
                                     <div style="height:92px;background:{{ $ph }};border-bottom:1.5px solid #191410;display:flex;align-items:center;justify-content:center;position:relative;">
@@ -129,26 +129,26 @@
                                     </div>
                                 @endif
                                 @if(!$item->is_available)
-                                    <div style="position:absolute;top:6px;left:6px;background:#191410;color:#FFF6DE;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;">Agotado</div>
+                                    <div style="position:absolute;top:6px;left:6px;background:#191410;color:#FFF6DE;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;">Agotado</div>
                                 @endif
                                 @if($item->is_promo && $item->promo_price)
-                                    <div style="position:absolute;top:6px;right:6px;background:#E85D2F;color:#fff;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;">Promo</div>
+                                    <div style="position:absolute;top:6px;right:6px;background:#E85D2F;color:#fff;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:5px;">Promo</div>
                                 @endif
                             </div>
                             <div style="padding:10px 11px 11px;display:flex;flex-direction:column;gap:4px;flex:1;">
                                 <div style="font-size:12.5px;font-weight:800;line-height:1.25;letter-spacing:-.015em;">{{ $item->name }}</div>
                                 @if($restaurant->show_description && $item->description)
-                                    <div style="font-size:10.5px;font-weight:500;color:#8A8073;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $item->description }}</div>
+                                    <div style="font-size:12px;font-weight:500;color:#8A8073;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $item->description }}</div>
                                 @endif
                                 <div style="flex:1;"></div>
                                 <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
                                     @if($restaurant->show_price)
                                         <span style="flex:1;min-width:0;">
                                             @if($item->is_promo && $item->promo_price)
-                                                <span style="display:block;font-size:9px;font-weight:700;color:#8A8073;text-decoration:line-through;">${{ number_format($item->price, 0, ',', '.') }}</span>
-                                                <span style="display:inline-block;font-size:11.5px;font-weight:800;background:#E85D2F;color:#fff;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
+                                                <span style="display:block;font-size:12px;font-weight:700;color:#8A8073;text-decoration:line-through;">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                                <span style="display:inline-block;font-size:12px;font-weight:800;background:#E85D2F;color:#fff;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
                                             @else
-                                                <span style="display:inline-block;font-size:11.5px;font-weight:800;background:#FFD84D;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->price, 0, ',', '.') }}</span>
+                                                <span style="display:inline-block;font-size:12px;font-weight:800;background:#FFD84D;border:1.5px solid #191410;border-radius:7px;padding:3px 7px;transform:rotate(-2deg);">${{ number_format($item->price, 0, ',', '.') }}</span>
                                             @endif
                                         </span>
                                     @endif
@@ -175,12 +175,13 @@
                 </div>
             </div>
         @endforeach
-        <div style="text-align:center;font-size:10px;font-weight:700;color:#C9B98F;padding-top:26px;letter-spacing:.1em;text-transform:uppercase;">Menú creado con MenuDigital</div>
+        <div style="text-align:center;font-size:12px;font-weight:700;color:#C9B98F;padding-top:26px;letter-spacing:.1em;text-transform:uppercase;">Menú creado con MenuDigital</div>
     </div>
 </div>
 
 {{-- WhatsApp FAB (solo si NO acepta pedidos por carrito) --}}
 @if($whatsappNum && !$restaurant->accepts_orders)
+    @if($isOpen ?? true)
     <div style="position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:0 16px 18px;pointer-events:none;z-index:10;">
         <a href="https://wa.me/{{ $whatsappNum }}" target="_blank" rel="noopener"
            style="flex:1;display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:14px;background:#191410;color:#FFF6DE;border:1.5px solid #191410;box-shadow:3px 3px 0 rgba(25,20,16,.25);pointer-events:auto;">
@@ -193,6 +194,13 @@
             <span style="flex:1;min-width:0;font-size:13px;font-weight:800;">Pedir por WhatsApp</span>
         </a>
     </div>
+    @else
+    <div style="position:fixed;bottom:0;right:0;padding:0 18px 20px;z-index:10;">
+        <div style="padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.7);color:#fff;font-size:12px;font-weight:600;">
+            Cerrado{{ $nextOpening ? ' · ' . $nextOpening : '' }}
+        </div>
+    </div>
+    @endif
 @endif
 
 @include('components.menu-cart', ['restaurant' => $restaurant])
