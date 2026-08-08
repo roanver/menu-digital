@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
 use App\Models\MenuItem;
-use App\Services\AnthropicService;
+use App\Services\GeminiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -40,7 +40,7 @@ class PostGeneratorController extends AdminController
 
         // Generate copy with Anthropic
         try {
-            $service = new AnthropicService();
+            $service = new GeminiService();
             $copy = $service->generatePostCopy($item->name, $item->description ?? '', $item->price);
         } catch (\Exception $e) {
             $copy = '';

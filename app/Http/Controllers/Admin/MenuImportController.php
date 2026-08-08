@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
 use App\Models\MenuItem;
-use App\Services\AnthropicService;
+use App\Services\GeminiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -40,7 +40,7 @@ class MenuImportController extends AdminController
         }
 
         try {
-            $service = new AnthropicService();
+            $service = new GeminiService();
             $categories = $service->extractMenuFromImages($base64Images);
         } catch (\Exception $e) {
             return back()->with('error', 'Error al conectar con la IA. Intenta nuevamente: ' . $e->getMessage());

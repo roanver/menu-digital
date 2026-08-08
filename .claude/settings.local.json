@@ -44,7 +44,11 @@
       "Bash(php -l app/Http/Controllers/Admin/PostGeneratorController.php)",
       "Bash(php -l app/Http/Middleware/EnsurePlanActive.php)",
       "Bash(php -l app/Models/Restaurant.php)",
-      "Bash(php -l app/Models/MenuItem.php)"
+      "Bash(php -l app/Models/MenuItem.php)",
+      "Bash(git commit:*)",
+      "Bash(python3 -c:*)",
+      "Bash(grep -E \"^\\(keyv|cacheable|flat-cache|file-entry-cache|cache-manager|ecto\\)$\" ls node_modules/@cacheable/)",
+      "Bash(npm install:*)"
     ]
   }
 }
