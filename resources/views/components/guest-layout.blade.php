@@ -1,29 +1,50 @@
+@props([
+    'title'       => 'MenuDigital',
+    'description' => 'Carta digital con QR y NFC para tu restaurante. Cambiá precios desde el celular en segundos.',
+    'robots'      => 'noindex,nofollow',
+])
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'MenuDigital') }}</title>
+    <title>{{ $title }}</title>
+    <meta name="description" content="{{ $description }}">
+    <meta name="robots" content="{{ $robots }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $title }}">
+    <meta property="og:description" content="{{ $description }}">
+    <meta property="og:site_name" content="MenuDigital">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
     <style>
+        :root{
+            --tinta:#16211C;
+            --papel:#F5F4EF;
+            --papel-2:#EDEBE3;
+            --oliva:#3E5A47;
+            --oliva-cl:#6E8A76;
+            --aji:#C8452F;
+            --linea:#D6D2C6;
+        }
         html,body{margin:0;padding:0;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
-        body{font-family:Inter,system-ui,sans-serif;color:#201914;background:#FBF3E4;min-height:100vh}
+        body{font-family:Archivo,system-ui,sans-serif;color:var(--tinta);background:var(--papel);min-height:100vh}
+        h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.015em;margin:0}
     </style>
 </head>
 <body style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));min-height:100vh">
 
-    <!-- Left: form -->
-    <div style="background:#FBF3E4;padding:clamp(22px,3vw,34px) clamp(20px,4vw,48px);display:flex;flex-direction:column">
-        <a href="/" style="display:inline-flex;align-items:center;gap:10px;align-self:flex-start;text-decoration:none;color:#201914">
-            <div style="width:34px;height:34px;border-radius:11px;background:#E85D2F;border:1.5px solid #201914;box-shadow:2.5px 2.5px 0 #201914;display:flex;align-items:center;justify-content:center;transform:rotate(-5deg);flex-shrink:0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M5 4v7a3 3 0 0 0 6 0V4M8 11v9M19 4c-1.7 1-2.5 2.7-2.5 5s.8 3.4 2.5 4v7"/></svg>
+    <!-- Izquierda: formulario -->
+    <div style="background:var(--papel);padding:clamp(22px,3vw,34px) clamp(20px,4vw,48px);display:flex;flex-direction:column">
+        <a href="/" style="display:inline-flex;align-items:center;gap:9px;align-self:flex-start;text-decoration:none;color:var(--tinta)">
+            <div style="width:33px;height:33px;border-radius:10px;background:var(--oliva);border:1.5px solid var(--tinta);box-shadow:2px 2px 0 var(--tinta);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#F5F4EF" stroke-width="2" stroke-linecap="round"><path d="M5 4v7a3 3 0 0 0 6 0V4M8 11v9M19 4c-1.7 1-2.5 2.7-2.5 5s.8 3.4 2.5 4v7"/></svg>
             </div>
-            <span style="font-family:'Bricolage Grotesque',Inter,sans-serif;font-size:17px;font-weight:800;letter-spacing:-.025em">MenuDigital</span>
+            <span style="font-family:Fraunces,Georgia,serif;font-size:18px;font-weight:700;letter-spacing:-.02em">MenuDigital</span>
         </a>
 
         <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:394px;width:100%;margin:0 auto;padding:32px 0">
@@ -31,28 +52,28 @@
         </div>
     </div>
 
-    <!-- Right: dark panel -->
-    <div style="background:#201914;padding:clamp(32px,4vw,56px) clamp(24px,3.5vw,48px);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden">
-        <div style="position:absolute;inset:0;background:radial-gradient(50% 60% at 50% 100%,rgba(232,93,47,.26),transparent 72%);pointer-events:none"></div>
+    <!-- Derecha: panel oscuro -->
+    <div style="background:var(--tinta);padding:clamp(32px,4vw,56px) clamp(24px,3.5vw,48px);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(50% 60% at 50% 100%,rgba(62,90,71,.35),transparent 72%);pointer-events:none"></div>
 
         <div style="position:relative">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5C5245">Restaurantes que ya lo usan</div>
-            <blockquote style="margin:20px 0 0;font-family:'Instrument Serif',Georgia,serif;font-size:clamp(20px,2.2vw,26px);line-height:1.42;color:#FBF3E4;max-width:420px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--oliva-cl)">Restaurantes que ya lo usan</div>
+            <blockquote style="margin:20px 0 0;font-family:Fraunces,Georgia,serif;font-size:clamp(20px,2.2vw,26px);line-height:1.42;color:var(--papel);max-width:420px">
                 "Imprimíamos 300 cartas por temporada. Ahora cambio el precio del día <em>desde la caja</em> y los pedidos por WhatsApp se triplicaron."
             </blockquote>
             <div style="display:flex;align-items:center;gap:11px;margin-top:20px">
-                <div style="width:38px;height:38px;border-radius:50%;background:#E85D2F;border:1.5px solid #FBF3E4;color:#FBF3E4;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',Inter,sans-serif;flex-shrink:0">CV</div>
+                <div style="width:38px;height:38px;border-radius:50%;background:var(--oliva);border:1.5px solid var(--papel);color:var(--papel);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:Archivo,sans-serif;flex-shrink:0">CV</div>
                 <div>
-                    <div style="font-size:13.5px;font-weight:700;color:#FBF3E4">Carolina Vera</div>
-                    <div style="font-size:12px;color:#8A7B62">Sazón de Barrio · Valparaíso</div>
+                    <div style="font-size:13.5px;font-weight:600;color:var(--papel)">Carolina Vera</div>
+                    <div style="font-size:12px;color:var(--oliva-cl)">Sazón de Barrio · Valparaíso</div>
                 </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px;margin-top:36px">
                 @foreach([['1.200+','restaurantes en Chile'],['30 s','para cambiar un precio'],['0 %','comisión por pedido']] as [$num,$label])
-                <div style="background:rgba(255,255,255,.04);border:1px solid #3A2F28;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px">
-                    <span style="font-family:'Bricolage Grotesque',Inter,sans-serif;font-size:22px;font-weight:800;color:#FFD84D;min-width:56px">{{ $num }}</span>
-                    <span style="font-size:13px;color:#B8AA92">{{ $label }}</span>
+                <div style="background:rgba(255,255,255,.04);border:1px solid rgba(110,138,118,.25);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px">
+                    <span style="font-family:Fraunces,Georgia,serif;font-size:22px;font-weight:700;color:var(--oliva-cl);min-width:56px">{{ $num }}</span>
+                    <span style="font-size:13px;color:#A0B4A0">{{ $label }}</span>
                 </div>
                 @endforeach
             </div>
