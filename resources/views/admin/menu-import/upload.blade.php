@@ -89,8 +89,37 @@ const input = document.getElementById('images-input');
 const dropZone = document.getElementById('drop-zone');
 const previewGrid = document.getElementById('preview-grid');
 const submitBtn = document.getElementById('submit-btn');
+const form = document.getElementById('upload-form');
 
-input.addEventListener('change', handleFiles);
+// Archivos comprimidos listos para subir
+let compressedFiles = [];
+
+const MAX_PX = 1280;   // máx lado largo
+const QUALITY = 0.82;  // calidad JPEG
+
+function resizeImage(file) {
+    return new Promise(resolve => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            let w = img.naturalWidth, h = img.naturalHeight;
+            if (w > MAX_PX || h > MAX_PX) {
+                if (w >= h) { h = Math.round(h * MAX_PX / w); w = MAX_PX; }
+                else        { w = Math.round(w * MAX_PX / h); h = MAX_PX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            canvas.toBlob(blob => {
+                URL.revokeObjectURL(url);
+                resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+            }, 'image/jpeg', QUALITY);
+        };
+        img.src = url;
+    });
+}
+
+input.addEventListener('change', () => handleFiles(Array.from(input.files).slice(0, 5)));
 
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor='#4F46E5'; dropZone.style.background='#EEF2FF'; });
 dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor='#E5E7EB'; dropZone.style.background=''; });
@@ -98,46 +127,56 @@ dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.style.borderColor='#E5E7EB';
     dropZone.style.background='';
-    if (e.dataTransfer.files.length) {
-        const dt = new DataTransfer();
-        Array.from(e.dataTransfer.files).slice(0, 5).forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        handleFiles();
-    }
+    if (e.dataTransfer.files.length) handleFiles(Array.from(e.dataTransfer.files).slice(0, 5));
 });
 
-function handleFiles() {
-    const files = Array.from(input.files).slice(0, 5);
+async function handleFiles(files) {
     previewGrid.innerHTML = '';
-    if (files.length === 0) {
-        previewGrid.style.display = 'none';
-        submitBtn.disabled = true;
-        return;
-    }
+    compressedFiles = [];
+    if (!files.length) { previewGrid.style.display = 'none'; submitBtn.disabled = true; return; }
+
+    submitBtn.disabled = true;
     previewGrid.style.display = 'grid';
-    files.forEach(file => {
+
+    for (const file of files) {
+        // Thumbnail con el original mientras comprime
         const div = document.createElement('div');
         div.style.cssText = 'position:relative;border-radius:10px;overflow:hidden;border:1px solid #E5E7EB;aspect-ratio:4/3;background:#F9FAFB;';
-        const img = document.createElement('img');
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-        img.src = URL.createObjectURL(file);
-        const label = document.createElement('div');
-        label.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(17,24,39,.6);color:#fff;font-size:10px;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        label.textContent = file.name;
-        div.appendChild(img);
-        div.appendChild(label);
+        const imgEl = document.createElement('img');
+        imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+        imgEl.src = URL.createObjectURL(file);
+        const badge = document.createElement('div');
+        badge.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(17,24,39,.6);color:#fff;font-size:10px;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+        badge.textContent = '…';
+        div.appendChild(imgEl); div.appendChild(badge);
         previewGrid.appendChild(div);
-    });
-    submitBtn.disabled = false;
 
-    // Loading state on submit
-    document.getElementById('upload-form').addEventListener('submit', () => {
-        submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Analizando…';
-        submitBtn.disabled = true;
-        const style = document.createElement('style');
-        style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
-        document.head.appendChild(style);
-    }, { once: true });
+        const compressed = await resizeImage(file);
+        compressedFiles.push(compressed);
+
+        const kb = Math.round(compressed.size / 1024);
+        badge.textContent = `${compressed.name} · ${kb} KB`;
+    }
+
+    submitBtn.disabled = false;
 }
+
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!compressedFiles.length) return;
+
+    // Reemplazar el input con los archivos comprimidos
+    const dt = new DataTransfer();
+    compressedFiles.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+
+    submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Analizando…';
+    submitBtn.disabled = true;
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+
+    form.submit();
+});
 </script>
 </x-admin-layout>
