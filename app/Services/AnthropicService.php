@@ -18,12 +18,12 @@ class AnthropicService
     public function extractMenuFromImages(array $base64Images): array
     {
         $content = [];
-        foreach ($base64Images as $b64) {
+        foreach ($base64Images as [$b64, $mimeType]) {
             $content[] = [
                 'type'   => 'image',
                 'source' => [
                     'type'       => 'base64',
-                    'media_type' => 'image/jpeg',
+                    'media_type' => $mimeType,
                     'data'       => $b64,
                 ],
             ];

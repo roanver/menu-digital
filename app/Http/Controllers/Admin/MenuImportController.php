@@ -32,7 +32,10 @@ class MenuImportController extends AdminController
         $base64Images = [];
         foreach ($request->file('images') as $file) {
             if ($file->isValid()) {
-                $base64Images[] = base64_encode(file_get_contents($file->getRealPath()));
+                $base64Images[] = [
+                    base64_encode(file_get_contents($file->getRealPath())),
+                    $file->getMimeType() ?: 'image/jpeg',
+                ];
             }
         }
 
