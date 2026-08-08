@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 class GeminiService
 {
     private string $apiKey;
-    private string $model = 'gemini-2.0-flash';
+    private string $model = 'gemini-1.5-flash';
     private string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
 
     public function __construct()
