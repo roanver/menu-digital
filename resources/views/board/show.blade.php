@@ -314,7 +314,9 @@ function boardApp() {
 
         startPolling() {
             const token = this.token;
-            let delay = 30000;
+            const NORMAL = 12000;   // 12s entre polls
+            const MAX_BACKOFF = 2 * 60 * 1000; // máx 2 min en backoff
+            let delay = NORMAL;
 
             const attempt = async () => {
                 try {
@@ -326,18 +328,18 @@ function boardApp() {
                         this.hash = hash;
                     } else if (this.hash !== hash) {
                         location.reload();
-                        return; // no seguir poling
+                        return; // no seguir poling tras reload
                     }
-                    delay = 30000;
+                    delay = NORMAL;
                 } catch {
                     this.isOnline = false;
-                    delay = Math.min(delay * 2, 5 * 60 * 1000); // máx 5 min
+                    delay = Math.min(delay * 2, MAX_BACKOFF);
                 }
                 setTimeout(attempt, delay);
             };
 
-            // Primera consulta a los 30s de carga
-            setTimeout(attempt, 30000);
+            // Primera consulta a los 3s de carga
+            setTimeout(attempt, 3000);
         }
     };
 }
