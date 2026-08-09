@@ -16,6 +16,7 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
 @endpush
 
 @section('body')
+@php $whatsappNum = $whatsappNum ?? null; @endphp
 
 <div style="max-width:600px;margin:0 auto;padding-bottom:100px;">
 

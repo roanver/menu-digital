@@ -6,6 +6,7 @@
 
 @section('body')
 @php
+    $whatsappNum = $whatsappNum ?? null;
     $roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 @endphp
 

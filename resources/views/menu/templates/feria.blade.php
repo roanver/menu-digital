@@ -10,6 +10,7 @@ body{font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410}
 
 @section('body')
 @php
+    $whatsappNum = $whatsappNum ?? null;
     $words = preg_split('/\s+/', trim($restaurant->name));
     $initials = mb_strtoupper(mb_substr($words[0], 0, 1) . (isset($words[1]) ? mb_substr($words[1], 0, 1) : ''));
     $phFeria = [
