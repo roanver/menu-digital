@@ -111,6 +111,12 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
                                 @if($restaurant->show_description && $item->description)
                                     <div style="font-size:12px;color:#777;line-height:1.45;margin-top:1px;">{{ Str::limit($item->description, 80) }}</div>
                                 @endif
+                                @if($item->variants->isNotEmpty())
+                                    <div style="font-size:11px;color:#AAA;margin-top:3px;">
+                                        @foreach($item->variants as $variant){{ $variant->name }}@if(!$loop->last) · @endif
+                                        @endforeach
+                                    </div>
+                                @endif
 
                                 <div style="margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
                                     @if($restaurant->show_price)

@@ -17,7 +17,7 @@
         Items
     </a>
 
-    <form method="POST" action="{{ route('admin.items.update', $item) }}" enctype="multipart/form-data">
+    <form id="edit-form" method="POST" action="{{ route('admin.items.update', $item) }}" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
 
@@ -266,29 +266,32 @@
 
         <!-- Bottom bar -->
         <div class="sticky bottom-0 mt-4 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB] flex items-center justify-between gap-2 shadow-[0_-1px_4px_rgba(16,24,40,.06)]">
-            <!-- Destructive -->
-            <form method="POST" action="{{ route('admin.items.destroy', $item) }}" onsubmit="return confirm('¿Eliminar este item permanentemente?')">
-                @csrf @method('DELETE')
-                <button type="submit"
-                        class="inline-flex items-center gap-1.5 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-[12px] py-[9px] text-[12.5px] font-semibold transition-colors">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    </svg>
-                    Eliminar
-                </button>
-            </form>
+            <!-- Destructive — button linked to external delete-form via HTML5 form= attribute -->
+            <button type="submit" form="delete-form"
+                    onclick="return confirm('¿Eliminar este item permanentemente?')"
+                    class="inline-flex items-center gap-1.5 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-[12px] py-[9px] text-[12.5px] font-semibold transition-colors">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                </svg>
+                Eliminar
+            </button>
 
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.items.index') }}"
                    class="inline-flex items-center gap-2 bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-[10px] px-[16px] py-[9px] text-[13px] font-semibold shadow-[0_1px_2px_rgba(16,24,40,.04)] transition-colors">
                     Cancelar
                 </a>
-                <button type="submit"
+                <button type="submit" form="edit-form"
                         class="inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white border border-[#4338CA] rounded-[10px] px-[16px] py-[9px] text-[13px] font-semibold shadow-[0_1px_2px_rgba(79,70,229,.35)] transition-colors">
                     Guardar cambios
                 </button>
             </div>
         </div>
+    </form>
+
+    {{-- Delete form sits OUTSIDE the edit form to avoid nested-form HTML5 invalidity --}}
+    <form id="delete-form" method="POST" action="{{ route('admin.items.destroy', $item) }}" style="display:none;">
+        @csrf @method('DELETE')
     </form>
 </div>
 </x-admin-layout>

@@ -120,6 +120,12 @@ body{font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410}
                                 @if($restaurant->show_description && $item->description)
                                     <div style="font-size:12px;font-weight:500;color:#8A8073;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $item->description }}</div>
                                 @endif
+                                @if($item->variants->isNotEmpty())
+                                    <div style="font-size:11px;font-weight:700;color:#8A8073;margin-top:3px;">
+                                        @foreach($item->variants as $variant){{ $variant->name }}@if(!$loop->last) · @endif
+                                        @endforeach
+                                    </div>
+                                @endif
                                 <div style="flex:1;"></div>
                                 <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
                                     @if($restaurant->show_price)
