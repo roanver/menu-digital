@@ -45,7 +45,7 @@ class BoardController extends Controller
     public function version(string $token): JsonResponse
     {
         $screen = Screen::where('token', $token)
-            ->select(['id', 'restaurant_id', 'category_ids', 'updated_at'])
+            ->select(['id', 'restaurant_id', 'category_ids', 'updated_at', 'is_active'])
             ->firstOrFail();
 
         if (! $screen->is_active) {
