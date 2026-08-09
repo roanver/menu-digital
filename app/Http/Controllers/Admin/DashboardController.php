@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\NfcScan;
 use App\Models\NfcTag;
+use App\Models\WhatsappClick;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -13,7 +14,7 @@ class DashboardController extends AdminController
 {
     public function index(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $categoriesCount = Category::where('restaurant_id', $restaurant->id)->count();
         $itemsCount      = MenuItem::where('restaurant_id', $restaurant->id)->count();
@@ -57,9 +58,15 @@ class DashboardController extends AdminController
             ->orderByDesc('month_scans')
             ->get();
 
+        $waClicksMonth = WhatsappClick::where('restaurant_id', $restaurant->id)
+            ->whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
+            ->sum('count');
+
         return view('admin.dashboard', compact(
             'restaurant', 'categoriesCount', 'itemsCount',
-            'days', 'last7', 'prev7', 'scanDelta', 'monthTotal', 'tagBreakdown'
+            'days', 'last7', 'prev7', 'scanDelta', 'monthTotal', 'tagBreakdown',
+            'waClicksMonth'
         ));
     }
 }

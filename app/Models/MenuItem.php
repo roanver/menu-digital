@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'restaurant_id', 'category_id', 'name', 'description', 'price',
-    'image', 'is_available', 'sort_order', 'is_promo', 'promo_price',
+    'restaurant_id', 'category_id', 'name', 'sku', 'description', 'price',
+    'image', 'is_available', 'stock', 'sort_order', 'is_promo', 'promo_price',
 ])]
 class MenuItem extends Model
 {
@@ -21,6 +21,7 @@ class MenuItem extends Model
         return [
             'price'        => 'integer',
             'is_available' => 'boolean',
+            'stock'        => 'integer',
             'is_promo'     => 'boolean',
             'promo_price'  => 'integer',
         ];

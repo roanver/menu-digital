@@ -10,7 +10,14 @@ class EnsureIsOwner
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()?->role !== 'owner') {
+        $user = $request->user();
+
+        // Superadmin impersonando — acceso total
+        if ($user?->role === 'super_admin') {
+            return $next($request);
+        }
+
+        if (! $user?->isOwner()) {
             return redirect()->route('admin.dashboard')
                 ->with('error', 'No tienes permiso para acceder a esta sección.');
         }

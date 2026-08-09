@@ -14,7 +14,7 @@ class MenuItemController extends AdminController
 {
     public function index(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $categories = Category::where('restaurant_id', $restaurant->id)
             ->with(['menuItems' => function ($q) {
@@ -29,25 +29,27 @@ class MenuItemController extends AdminController
 
     public function create(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $categories = Category::where('restaurant_id', $restaurant->id)
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.items.create', compact('categories'));
+        return view('admin.items.create', compact('categories', 'restaurant'));
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $restaurantCategoryIds = Category::where('restaurant_id', $restaurant->id)->pluck('id')->toArray();
 
         $validated = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
+            'sku'         => ['nullable', 'string', 'max:100'],
             'category_id' => ['required', 'integer', 'in:' . implode(',', $restaurantCategoryIds ?: [0])],
             'price'       => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'is_available'=> ['nullable', 'boolean'],
+            'stock'       => ['nullable', 'integer', 'min:0'],
             'is_promo'    => ['nullable', 'boolean'],
             'promo_price' => ['nullable', 'integer', 'min:0'],
             'image'       => ['nullable', 'image', 'max:2048'],
@@ -71,10 +73,12 @@ class MenuItemController extends AdminController
             'restaurant_id' => $restaurant->id,
             'category_id'   => $validated['category_id'],
             'name'          => $validated['name'],
+            'sku'           => $validated['sku'] ?? null,
             'description'   => $validated['description'] ?? null,
             'price'         => $validated['price'],
             'image'         => $imagePath,
             'is_available'  => isset($validated['is_available']) ? (bool) $validated['is_available'] : true,
+            'stock'         => isset($validated['stock']) ? (int) $validated['stock'] : null,
             'is_promo'      => $isPromo,
             'promo_price'   => $isPromo ? ($validated['promo_price'] ?? null) : null,
             'sort_order'    => $maxSort + 1,
@@ -92,29 +96,31 @@ class MenuItemController extends AdminController
     {
         $this->authorizeItem($item);
 
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $categories = Category::where('restaurant_id', $restaurant->id)
             ->orderBy('sort_order')
             ->get();
 
         $item->load('variants');
 
-        return view('admin.items.edit', compact('item', 'categories'));
+        return view('admin.items.edit', compact('item', 'categories', 'restaurant'));
     }
 
     public function update(Request $request, MenuItem $item): RedirectResponse
     {
         $this->authorizeItem($item);
 
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $restaurantCategoryIds = Category::where('restaurant_id', $restaurant->id)->pluck('id')->toArray();
 
         $validated = $request->validate([
             'name'        => ['required', 'string', 'max:255'],
+            'sku'         => ['nullable', 'string', 'max:100'],
             'category_id' => ['required', 'integer', 'in:' . implode(',', $restaurantCategoryIds ?: [0])],
             'price'       => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'is_available'=> ['nullable', 'boolean'],
+            'stock'       => ['nullable', 'integer', 'min:0'],
             'is_promo'    => ['nullable', 'boolean'],
             'promo_price' => ['nullable', 'integer', 'min:0'],
             'image'       => ['nullable', 'image', 'max:2048'],
@@ -131,9 +137,11 @@ class MenuItemController extends AdminController
         $updateData = [
             'category_id'  => $validated['category_id'],
             'name'         => $validated['name'],
+            'sku'          => $validated['sku'] ?? null,
             'description'  => $validated['description'] ?? null,
             'price'        => $validated['price'],
             'is_available' => isset($validated['is_available']) ? (bool) $validated['is_available'] : false,
+            'stock'        => array_key_exists('stock', $validated) ? ($validated['stock'] !== null ? (int) $validated['stock'] : null) : null,
             'is_promo'     => $isPromo,
             'promo_price'  => $isPromo ? ($validated['promo_price'] ?? null) : null,
         ];
@@ -147,7 +155,7 @@ class MenuItemController extends AdminController
 
         $this->syncVariants($item, $request->input('variants', []));
 
-        MenuCacheService::forget(auth()->user()->restaurant);
+        MenuCacheService::forget($this->restaurant());
 
         return redirect()->route('admin.items.index')
             ->with('success', 'Ítem actualizado correctamente.');
@@ -161,7 +169,7 @@ class MenuItemController extends AdminController
         $item->variants()->delete();
         $item->delete();
 
-        MenuCacheService::forget(auth()->user()->restaurant);
+        MenuCacheService::forget($this->restaurant());
 
         return redirect()->route('admin.items.index')
             ->with('success', 'Ítem eliminado correctamente.');
@@ -169,7 +177,7 @@ class MenuItemController extends AdminController
 
     public function reorder(Request $request): JsonResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $request->validate([
             'ids'   => ['required', 'array'],
@@ -204,7 +212,7 @@ class MenuItemController extends AdminController
 
     private function authorizeItem(MenuItem $item): void
     {
-        if ($item->restaurant_id !== auth()->user()->restaurant_id) {
+        if ($item->restaurant_id !== $this->restaurant()->id) {
             abort(403);
         }
     }

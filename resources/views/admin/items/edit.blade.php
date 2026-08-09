@@ -32,9 +32,10 @@
                         <div class="text-[13px] font-bold text-[#111827]">Datos del item</div>
                     </div>
                     <div class="px-5 py-5 space-y-4">
+                        @php $vertical = $restaurant->vertical(); @endphp
                         <!-- Nombre -->
                         <label class="flex flex-col gap-[6px]">
-                            <span class="text-[12px] font-semibold text-[#374151]">Nombre del plato</span>
+                            <span class="text-[12px] font-semibold text-[#374151]">Nombre {{ $vertical['has_stock'] ? 'del producto' : 'del plato' }}</span>
                             <input type="text" name="name" value="{{ old('name', $item->name) }}" required autofocus
                                    class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
                                    placeholder="Ej: Lomo saltado">
@@ -42,6 +43,19 @@
                             <p class="text-[11.5px] text-[#DC2626]">{{ $message }}</p>
                             @enderror
                         </label>
+
+                        @if($vertical['has_sku'])
+                        <!-- SKU -->
+                        <label class="flex flex-col gap-[6px]">
+                            <span class="text-[12px] font-semibold text-[#374151]">SKU / Código <span class="font-normal text-[#9CA3AF]">(opcional)</span></span>
+                            <input type="text" name="sku" value="{{ old('sku', $item->sku) }}"
+                                   class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
+                                   placeholder="Ej: PROD-001">
+                            @error('sku')
+                            <p class="text-[11.5px] text-[#DC2626]">{{ $message }}</p>
+                            @enderror
+                        </label>
+                        @endif
 
                         <!-- Precio + Categoría -->
                         <div class="grid grid-cols-2 gap-3">
@@ -147,7 +161,7 @@
                 <!-- Foto -->
                 <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden">
                     <div class="px-5 py-4 border-b border-[#F3F4F6]">
-                        <div class="text-[13px] font-bold text-[#111827]">Foto del plato</div>
+                        <div class="text-[13px] font-bold text-[#111827]">Foto del {{ $vertical['has_stock'] ? 'producto' : 'plato' }}</div>
                         <p class="text-[11px] text-[#9CA3AF] mt-0.5">JPG, PNG o WebP · máx 2 MB</p>
                     </div>
 
@@ -233,6 +247,18 @@
                             @enderror
                         </label>
                     </div>
+
+                    @if($vertical['has_stock'])
+                    <label class="flex flex-col gap-[6px] pt-1">
+                        <span class="text-[12px] font-semibold text-[#374151]">Stock disponible <span class="font-normal text-[#9CA3AF]">(opcional)</span></span>
+                        <input type="number" name="stock" value="{{ old('stock', $item->stock) }}" min="0" step="1"
+                               class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
+                               placeholder="Dejar vacío = sin límite">
+                        @error('stock')
+                        <p class="text-[11.5px] text-[#DC2626]">{{ $message }}</p>
+                        @enderror
+                    </label>
+                    @endif
                 </div>
 
             </div>

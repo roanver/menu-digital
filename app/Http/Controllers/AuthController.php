@@ -31,6 +31,8 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        auth()->user()->update(['last_login_at' => now()]);
+
         if (auth()->user()->role === 'super_admin') {
             return redirect()->route('superadmin.index');
         }
@@ -66,7 +68,7 @@ class AuthController extends Controller
         $restaurant = Restaurant::create([
             'name'          => $request->restaurant_name,
             'slug'          => $slug,
-            'plan'          => 'carta',
+            'plan'          => 'basico',
             'trial_ends_at' => now()->addDays(14),
             'is_active'     => true,
         ]);

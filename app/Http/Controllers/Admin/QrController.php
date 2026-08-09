@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\NfcTag;
+use App\Models\Restaurant;
 use Illuminate\Http\Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class QrController extends Controller
+class QrController extends AdminController
 {
     private function getOrCreateMenuTag(): NfcTag
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $tag = NfcTag::where('restaurant_id', $restaurant->id)
             ->where('type', 'menu')
@@ -30,11 +30,24 @@ class QrController extends Controller
         return $tag;
     }
 
+    /**
+     * Plan gratis → URL directa (/{slug}), QR estático sin estadísticas.
+     * Planes pagados → redirect propio (/m/{code}), permite cambiar destino
+     *                  y contar escaneos sin reimprimir.
+     */
+    private function resolveQrUrl(Restaurant $restaurant): string
+    {
+        if (! $restaurant->planCan('nfc')) {
+            return url('/' . $restaurant->slug);
+        }
+
+        return route('nfc.menu', $this->getOrCreateMenuTag()->code);
+    }
+
     public function show()
     {
-        $restaurant = auth()->user()->restaurant;
-        $tag        = $this->getOrCreateMenuTag();
-        $url        = route('nfc.menu', $tag->code);
+        $restaurant = $this->restaurant();
+        $url        = $this->resolveQrUrl($restaurant);
         $qr         = QrCode::format('svg')->size(300)->margin(1)->generate($url);
 
         return view('admin.qr.show', compact('restaurant', 'url', 'qr'));
@@ -42,9 +55,8 @@ class QrController extends Controller
 
     public function download()
     {
-        $restaurant = auth()->user()->restaurant;
-        $tag        = $this->getOrCreateMenuTag();
-        $url        = route('nfc.menu', $tag->code);
+        $restaurant = $this->restaurant();
+        $url        = $this->resolveQrUrl($restaurant);
         $qr         = QrCode::format('png')->size(600)->margin(2)->generate($url);
 
         return response($qr, 200)
@@ -54,9 +66,8 @@ class QrController extends Controller
 
     public function print()
     {
-        $restaurant = auth()->user()->restaurant;
-        $tag        = $this->getOrCreateMenuTag();
-        $url        = route('nfc.menu', $tag->code);
+        $restaurant = $this->restaurant();
+        $url        = $this->resolveQrUrl($restaurant);
         $qr         = QrCode::format('svg')->size(280)->margin(1)->generate($url);
 
         return view('admin.qr.print', compact('restaurant', 'url', 'qr'));

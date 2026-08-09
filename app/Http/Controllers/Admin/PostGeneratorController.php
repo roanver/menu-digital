@@ -14,7 +14,7 @@ class PostGeneratorController extends AdminController
 {
     public function index(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $categories = Category::where('restaurant_id', $restaurant->id)
             ->with(['menuItems' => fn ($q) => $q->where('is_available', true)->orderBy('sort_order')])
             ->orderBy('sort_order')
@@ -25,7 +25,7 @@ class PostGeneratorController extends AdminController
 
     public function generate(Request $request): View|RedirectResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $validated = $request->validate([
             'item_id' => ['required', 'integer'],
@@ -38,7 +38,7 @@ class PostGeneratorController extends AdminController
         // Generate GD image
         $imageBase64 = $this->generateImage($item, $restaurant);
 
-        // Generate copy with Anthropic
+        // Generate copy with Gemini
         try {
             $service = new GeminiService();
             $copy = $service->generatePostCopy($item->name, $item->description ?? '', $item->price);
@@ -51,7 +51,7 @@ class PostGeneratorController extends AdminController
 
     public function downloadImage(Request $request): Response
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $validated = $request->validate([
             'item_id' => ['required', 'integer'],
@@ -140,7 +140,6 @@ class PostGeneratorController extends AdminController
             // Built-in GD font (bigger number = bigger text)
             $gdfont = 5; // largest built-in font
             $charW = imagefontwidth($gdfont);
-            $charH = imagefontheight($gdfont);
 
             $nameX = max(20, (int)((1080 - strlen($name) * $charW * 2) / 2));
             imagestring($img, $gdfont, $nameX, 680, $name, $white);

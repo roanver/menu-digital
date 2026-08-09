@@ -1,13 +1,22 @@
 <x-admin-layout>
 
 @php
-    $now = \Carbon\Carbon::now();
+    use Carbon\Carbon;
 
-    $inTrial  = $restaurant->trial_ends_at && $now->lt($restaurant->trial_ends_at);
-    $inPaid   = $restaurant->subscription_ends_at && $now->lt($restaurant->subscription_ends_at);
-    $isActive = $inTrial || $inPaid;
+    $now = Carbon::now();
 
-    if ($inTrial) {
+    $isFree   = $restaurant->plan === 'free';
+    $inTrial  = !$isFree && $restaurant->trial_ends_at && $now->lt($restaurant->trial_ends_at);
+    $inPaid   = !$isFree && $restaurant->subscription_ends_at && $now->lt($restaurant->subscription_ends_at);
+    $isActive = $isFree || $inTrial || $inPaid;
+
+    if ($isFree) {
+        $daysLeft        = null;
+        $endDate         = null;
+        $statusLabel     = 'Plan Gratuito';
+        $statusSub       = 'Sin vencimiento · actualizá cuando quieras';
+        $progressPercent = 0;
+    } elseif ($inTrial) {
         $daysLeft        = (int) $now->diffInDays($restaurant->trial_ends_at, false);
         $totalDays       = 14;
         $elapsed         = min((int) optional($restaurant->created_at)->diffInDays($now), $totalDays);
@@ -32,32 +41,67 @@
         $progressPercent = 100;
     }
 
-    $planNames  = ['carta' => 'Carta', 'pedidos' => 'Pedidos', 'full' => 'Full'];
-    $planName   = $planNames[$restaurant->plan] ?? ucfirst($restaurant->plan);
+    $planNames = ['free' => 'Gratis', 'basico' => 'Básico', 'pro' => 'Pro'];
+    $planName  = $planNames[$restaurant->plan] ?? ucfirst($restaurant->plan);
 
     $waNumber  = '56912345678';
-    $waMessage = urlencode('Hola, quiero renovar/activar mi plan en MenuDigital. Mi restaurante es: ' . $restaurant->name);
+    $waMessage = urlencode('Hola, quiero renovar/activar mi plan en MenuDigital. Mi negocio es: ' . $restaurant->name);
     $waUrl     = "https://wa.me/{$waNumber}?text={$waMessage}";
 
+    // Jerarquía numérica para comparar planes
+    $planRank  = ['free' => 0, 'basico' => 1, 'pro' => 2];
+    $myRank    = $planRank[$restaurant->plan] ?? 0;
+
+    // Precio extra local adicional
+    $extraLocationPrice = config('plans.extra_location_price', 7990);
+
+    // Datos de planes desde config — solo precios y límites; colores/features en el array local
     $plans = [
-        'carta' => [
-            'name'     => 'Carta',
-            'price'    => '$8.000',
+        'free' => [
+            'name'     => 'Gratis',
+            'price'    => '$0',
             'color'    => '#10B981',
-            'features' => ['Carta digital', 'Chip NFC y QR', 'Pedidos por WhatsApp', 'Importación por foto IA'],
+            'features' => [
+                'Carta digital pública',
+                'QR descargable',
+                'Hasta 20 productos / 3 categorías',
+                '1 template',
+                'Incluye "Hecho con MenuDigital" en tu carta',
+            ],
         ],
-        'pedidos' => [
-            'name'     => 'Pedidos',
-            'price'    => '$15.000',
+        'basico' => [
+            'name'     => 'Básico',
+            'price'    => '$' . number_format(config('plans.plans.basico.price', 9990), 0, ',', '.'),
             'color'    => '#4F46E5',
-            'features' => ['Todo lo de Carta', 'Panel de pedidos', 'Generador de posts redes', 'Estadísticas básicas'],
+            'features' => [
+                'Productos y categorías ilimitados',
+                'Chips NFC con estadísticas de escaneo',
+                'Todos los templates',
+                'Importación por foto IA (3 por mes)',
+                'Carrito de pedidos WhatsApp',
+            ],
         ],
-        'full' => [
-            'name'     => 'Full',
-            'price'    => '$25.000',
+        'pro' => [
+            'name'     => 'Pro',
+            'price'    => '$' . number_format(config('plans.plans.pro.price', 19990), 0, ',', '.'),
             'color'    => '#7C3AED',
-            'features' => ['Todo lo de Pedidos', 'Reportes de ventas', 'Soporte prioritario WhatsApp', 'Acceso anticipado a funciones'],
+            'features' => [
+                'Todo lo de Básico',
+                'Importación por foto IA sin límite',
+                'Pantallas TV (hasta 3)',
+                'Asesor de carta IA',
+                'Generador de posts IA',
+                'Estadísticas completas',
+                'Staff adicional',
+            ],
         ],
+    ];
+
+    // Datos para el modal de bajada de plan
+    $planLimits = [
+        'free'   => ['max_items' => 20, 'max_categories' => 3, 'max_screens' => 0, 'max_nfc' => 0],
+        'basico' => ['max_items' => -1, 'max_categories' => -1, 'max_screens' => 0, 'max_nfc' => -1],
+        'pro'    => ['max_items' => -1, 'max_categories' => -1, 'max_screens' => 3, 'max_nfc' => -1],
     ];
 
     $bankData = [
@@ -68,6 +112,13 @@
         ['label' => 'RUT',         'value' => '76.xxx.xxx-x',        'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
         ['label' => 'Email',       'value' => 'pagos@menudigital.cl','icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
     ];
+
+    // Uso IA importación
+    $aiMax   = $restaurant->maxAiImports();  // -1 sin límite, 0 sin acceso, N límite
+    $aiUsed  = $restaurant->ai_imports_this_month ?? 0;
+    $aiReset = $restaurant->ai_imports_reset_at
+        ? $restaurant->ai_imports_reset_at->format('d/m/Y')
+        : now()->startOfMonth()->addMonth()->format('d/m/Y');
 @endphp
 
 <style>
@@ -96,7 +147,24 @@
 .expired-banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
 </style>
 
-<div class="max-w-[760px] space-y-5">
+<div class="max-w-[760px] space-y-5"
+     x-data="{
+        showDowngradeModal: false,
+        downgradeTarget: '',
+        downgradeTargetName: '',
+        downgradeWarnings: [],
+        waUrl: '{{ $waUrl }}',
+        openDowngrade(key, name, warnings) {
+            this.downgradeTarget = key;
+            this.downgradeTargetName = name;
+            this.downgradeWarnings = warnings;
+            this.showDowngradeModal = true;
+        },
+        confirmDowngrade() {
+            window.open(this.waUrl + encodeURIComponent(' Quiero cambiar a plan ' + this.downgradeTargetName + '.'), '_blank');
+            this.showDowngradeModal = false;
+        }
+     }">
 
     {{-- ── HERO STATUS ──────────────────────────────────────────── --}}
     @if($isActive)
@@ -114,7 +182,8 @@
                     <div style="font-size:13px;color:#c7d2fe;margin-top:6px;">{{ $statusSub }}</div>
                 </div>
 
-                {{-- Ring --}}
+                {{-- Ring (oculto en plan free) --}}
+                @if(!$isFree)
                 <div class="ring-wrap">
                     @php
                         $r = 36; $circ = 2 * M_PI * $r;
@@ -131,9 +200,11 @@
                         <span class="days-lbl">días</span>
                     </div>
                 </div>
+                @endif
             </div>
 
-            {{-- Progress bar --}}
+            {{-- Progress bar (oculto en free) --}}
+            @if(!$isFree)
             <div style="margin-top:24px;">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:#a5b4fc;margin-bottom:8px;font-weight:600;">
                     <span>{{ $inTrial ? 'Inicio del trial' : 'Inicio del período' }}</span>
@@ -143,6 +214,7 @@
                     <div style="height:100%;width:{{ $progressPercent }}%;background:linear-gradient(90deg,#818cf8,#a5b4fc);border-radius:999px;"></div>
                 </div>
             </div>
+            @endif
 
         </div>
     </div>
@@ -173,8 +245,29 @@
 
             @foreach($plans as $key => $plan)
             @php
-                $isCurrent = $restaurant->plan === $key;
-                $isPopular = $key === 'full';
+                $isCurrent  = $restaurant->plan === $key;
+                $isPopular  = $key === 'basico';
+                $targetRank = $planRank[$key] ?? 0;
+                $isUpgrade  = $targetRank > $myRank;
+                $isDowngrade= $targetRank < $myRank;
+
+                // Calcular advertencias de bajada de plan
+                $warnings = [];
+                $limits = $planLimits[$key] ?? [];
+                if ($isDowngrade) {
+                    if (isset($limits['max_items']) && $limits['max_items'] !== -1 && $itemCount > $limits['max_items']) {
+                        $warnings[] = ($itemCount - $limits['max_items']) . ' producto(s) quedarán archivados (el plan ' . $plan['name'] . ' permite ' . $limits['max_items'] . ')';
+                    }
+                    if (isset($limits['max_categories']) && $limits['max_categories'] !== -1 && $categoryCount > $limits['max_categories']) {
+                        $warnings[] = ($categoryCount - $limits['max_categories']) . ' categoría(s) quedarán archivadas (límite: ' . $limits['max_categories'] . ')';
+                    }
+                    if (isset($limits['max_screens']) && $limits['max_screens'] !== -1 && $screenCount > $limits['max_screens']) {
+                        $warnings[] = ($screenCount - $limits['max_screens']) . ' pantalla(s) TV quedarán desactivadas';
+                    }
+                    if (isset($limits['max_nfc']) && $limits['max_nfc'] === 0 && $nfcActiveCount > 0) {
+                        $warnings[] = $nfcActiveCount . ' chip(s) NFC quedarán sin estadísticas';
+                    }
+                }
             @endphp
 
             <div class="plan-card {{ $isPopular && !$isCurrent ? 'plan-card-popular' : 'bg-white border border-[#E5E7EB]' }}
@@ -193,10 +286,19 @@
                 </div>
 
                 {{-- Price --}}
-                <div style="margin-bottom:20px;">
+                <div style="margin-bottom:4px;">
                     <div class="plan-price" style="font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;color:{{ $isPopular && !$isCurrent ? '#fff' : '#111827' }};">{{ $plan['price'] }}</div>
                     <div class="plan-sub" style="font-size:12px;color:{{ $isPopular && !$isCurrent ? '#c4b5fd' : '#9CA3AF' }};margin-top:3px;">CLP / mes</div>
                 </div>
+
+                {{-- Local adicional --}}
+                @if($key !== 'free')
+                <div style="margin-bottom:18px;font-size:11px;color:{{ $isPopular && !$isCurrent ? 'rgba(255,255,255,.5)' : '#9CA3AF' }};">
+                    + ${{ number_format($extraLocationPrice, 0, ',', '.') }} por local adicional
+                </div>
+                @else
+                <div style="margin-bottom:18px;"></div>
+                @endif
 
                 {{-- Features --}}
                 <ul style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px;">
@@ -208,6 +310,19 @@
                         {{ $feat }}
                     </li>
                     @endforeach
+
+                    {{-- Uso IA importación (solo planes con límite) --}}
+                    @if($isCurrent && $aiMax > 0)
+                    <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:{{ $isPopular && !$isCurrent ? 'rgba(255,255,255,.65)' : '#6B7280' }};margin-top:4px;border-top:1px solid {{ $isPopular ? 'rgba(255,255,255,.1)' : '#F3F4F6' }};padding-top:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Importaciones IA: {{ $aiUsed }} de {{ $aiMax }} usadas · renueva el {{ $aiReset }}</span>
+                    </li>
+                    @elseif($isCurrent && $aiMax === -1)
+                    <li style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:{{ $isPopular && !$isCurrent ? 'rgba(255,255,255,.65)' : '#6B7280' }};margin-top:4px;border-top:1px solid {{ $isPopular ? 'rgba(255,255,255,.1)' : '#F3F4F6' }};padding-top:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Importaciones IA: sin límite este mes</span>
+                    </li>
+                    @endif
                 </ul>
 
                 {{-- CTA --}}
@@ -216,19 +331,39 @@
                     <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                     Plan actual
                 </div>
-                @else
+                @elseif($isUpgrade)
                 <a href="{{ $waUrl }}" target="_blank"
                    style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .15s;
-                          background:{{ $isPopular ? 'rgba(255,255,255,.18)' : '#F3F4F6' }};
-                          color:{{ $isPopular ? '#fff' : '#111827' }};
-                          border:1px solid {{ $isPopular ? 'rgba(255,255,255,.25)' : '#E5E7EB' }};">
-                    Contratar {{ $plan['name'] }}
+                          background:{{ $isPopular ? 'rgba(255,255,255,.18)' : '#4F46E5' }};
+                          color:{{ $isPopular ? '#fff' : '#fff' }};
+                          border:1px solid {{ $isPopular ? 'rgba(255,255,255,.25)' : '#4338CA' }};">
+                    Mejorar a {{ $plan['name'] }}
                 </a>
+                @else
+                {{-- Downgrade --}}
+                @php $warningsJson = json_encode($warnings); @endphp
+                <button type="button"
+                        @click="openDowngrade('{{ $key }}', '{{ $plan['name'] }}', {{ $warningsJson }})"
+                        style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;width:100%;
+                               background:#F9FAFB;color:#374151;border:1px solid #E5E7EB;">
+                    Cambiar a {{ $plan['name'] }}
+                </button>
                 @endif
 
             </div>
             @endforeach
 
+        </div>
+
+        {{-- Nota de instalación --}}
+        <div style="margin-top:14px;padding:14px 18px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:12px;display:flex;align-items:flex-start;gap:10px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p style="font-size:12.5px;color:#374151;margin:0;">
+                <strong>Instalación desde ${{ number_format(config('plans.installation_price', 35000), 0, ',', '.') }}, pago único.</strong>
+                Incluye carga inicial del menú, chips NFC e instalación en tu local.
+            </p>
         </div>
     </div>
 
@@ -244,7 +379,7 @@
         {{-- Steps --}}
         <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #F3F4F6;">
             @foreach([
-                ['num'=>'1','text'=>'Elige tu plan arriba y haz clic en "Contratar"'],
+                ['num'=>'1','text'=>'Elige tu plan arriba y haz clic en "Mejorar" o "Cambiar"'],
                 ['num'=>'2','text'=>'Transfiere el monto mensual a los datos de abajo'],
                 ['num'=>'3','text'=>'Envíanos el comprobante por WhatsApp y listo'],
             ] as $step)
@@ -292,6 +427,58 @@
             </a>
         </div>
 
+    </div>
+
+    {{-- ── MODAL BAJADA DE PLAN ─────────────────────────────────── --}}
+    <div x-show="showDowngradeModal" x-transition.opacity
+         style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;"
+         @click.self="showDowngradeModal = false">
+        <div style="background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.18);" @click.stop>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div>
+                    <div style="font-size:15px;font-weight:700;color:#111827;" x-text="'Cambiar a plan ' + downgradeTargetName"></div>
+                    <div style="font-size:12px;color:#6B7280;margin-top:1px;">Revisá qué cambia antes de continuar</div>
+                </div>
+            </div>
+
+            <template x-if="downgradeWarnings.length > 0">
+                <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:14px;margin-bottom:16px;">
+                    <div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:8px;">Lo siguiente quedará archivado:</div>
+                    <ul style="display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;">
+                        <template x-for="w in downgradeWarnings" :key="w">
+                            <li style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:#78350F;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><polyline points="9 18 15 12 9 6"/></svg>
+                                <span x-text="w"></span>
+                            </li>
+                        </template>
+                    </ul>
+                    <div style="font-size:11.5px;color:#92400E;margin-top:10px;padding-top:10px;border-top:1px solid #FDE68A;">
+                        Tus datos nunca se borran. Si volvés a subir de plan, todo se reactiva automáticamente.
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="downgradeWarnings.length === 0">
+                <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#166534;">
+                    No tenés datos que excedan los límites de este plan. El cambio no afecta tu contenido actual.
+                </div>
+            </template>
+
+            <div style="display:flex;gap:10px;">
+                <button type="button" @click="showDowngradeModal = false"
+                        style="flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:600;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;cursor:pointer;">
+                    Cancelar
+                </button>
+                <button type="button" @click="confirmDowngrade()"
+                        style="flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;background:#111827;color:#fff;border:1px solid #111827;cursor:pointer;">
+                    Continuar por WhatsApp
+                </button>
+            </div>
+        </div>
     </div>
 
 </div>

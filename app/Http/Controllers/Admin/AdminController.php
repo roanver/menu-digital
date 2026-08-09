@@ -3,73 +3,45 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Restaurant;
+use App\Services\ImageService;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
 
 abstract class AdminController extends Controller
 {
-    /**
-     * Convert an uploaded image to WebP and save it to storage/app/public/images/.
-     * Returns the relative path (images/uuid.webp).
-     */
-    protected function saveImageAsWebp(UploadedFile $file, int $maxWidth = 800): string
+    protected ?Restaurant $restaurant = null;
+
+    protected function restaurant(): Restaurant
     {
-        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $mime = $file->getMimeType();
-
-        if (! in_array($mime, $allowedMimes)) {
-            abort(422, 'Tipo de imagen no soportado.');
+        if ($this->restaurant) {
+            return $this->restaurant;
         }
 
-        $imageData = file_get_contents($file->getPathname());
-        $image = imagecreatefromstring($imageData);
-
-        if ($image === false) {
-            abort(422, 'No se pudo procesar la imagen.');
+        // Superadmin impersonando un negocio
+        if (auth()->user()?->role === 'super_admin') {
+            $id = session('superadmin_entry_restaurant_id');
+            if ($id) {
+                return $this->restaurant = Restaurant::findOrFail($id);
+            }
         }
 
-        // Resize maintaining aspect ratio
-        $origW = imagesx($image);
-        $origH = imagesy($image);
-        if ($origW > $maxWidth) {
-            $newH = (int) round($origH * $maxWidth / $origW);
-            $resized = imagecreatetruecolor($maxWidth, $newH);
-            // Preserve transparency
-            imagealphablending($resized, false);
-            imagesavealpha($resized, true);
-            imagecopyresampled($resized, $image, 0, 0, 0, 0, $maxWidth, $newH, $origW, $origH);
-            imagedestroy($image);
-            $image = $resized;
+        // Negocio activo en sesión (multi-negocio)
+        $activeId = session('active_restaurant_id');
+        if ($activeId) {
+            return $this->restaurant = Restaurant::findOrFail($activeId);
         }
 
-        $uuid = (string) Str::uuid();
-        $filename = $uuid . '.webp';
-        $directory = storage_path('app/public/images');
-
-        if (! is_dir($directory)) {
-            mkdir($directory, 0755, true);
-        }
-
-        $fullPath = $directory . '/' . $filename;
-        imagewebp($image, $fullPath, 80);
-        imagedestroy($image);
-
-        return 'images/' . $filename;
+        // Fallback legacy: relación directa users.restaurant_id
+        return $this->restaurant = auth()->user()->restaurant;
     }
 
-    /**
-     * Delete an image file from storage given its relative path.
-     */
+    protected function saveImageAsWebp(UploadedFile $file, int $maxWidth = 800): string
+    {
+        return ImageService::saveAsWebp($file, $maxWidth);
+    }
+
     protected function deleteImageFile(?string $relativePath): void
     {
-        if (! $relativePath) {
-            return;
-        }
-
-        $fullPath = storage_path('app/public/' . $relativePath);
-
-        if (file_exists($fullPath)) {
-            unlink($fullPath);
-        }
+        ImageService::delete($relativePath);
     }
 }

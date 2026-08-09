@@ -1,6 +1,41 @@
 <x-admin-layout>
 <div class="max-w-[640px] space-y-5">
 
+    {{-- Banner de importaciones IA --}}
+    @php
+        $aiMax  = $restaurant->maxAiImports();
+        $aiUsed = $restaurant->ai_imports_this_month ?? 0;
+        $aiLeft = $aiMax === -1 ? null : max(0, $aiMax - $aiUsed);
+        $aiReset = $restaurant->ai_imports_reset_at
+            ? $restaurant->ai_imports_reset_at->format('d/m/Y')
+            : now()->startOfMonth()->addMonth()->format('d/m/Y');
+    @endphp
+
+    @if($aiMax === 0)
+    <div class="bg-[#FEF9C3] border border-[#FDE047] rounded-[12px] p-4 flex items-start gap-3">
+        <svg class="flex-none mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div class="text-[12.5px] text-[#713F12]">
+            Tu plan Gratis no incluye importación por IA.
+            <a href="{{ route('admin.billing.show') }}" class="font-semibold underline">Mejorá tu plan</a> para habilitarla.
+        </div>
+    </div>
+    @elseif($aiMax !== -1 && $aiLeft === 0)
+    <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-[12px] p-4 flex items-start gap-3">
+        <svg class="flex-none mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="text-[12.5px] text-[#7F1D1D]">
+            Usaste las {{ $aiMax }} importaciones de este mes. Se renuevan el {{ $aiReset }}.
+            Podés cargar tu carta manualmente en el paso siguiente.
+        </div>
+    </div>
+    @elseif($aiMax !== -1)
+    <div class="bg-[#EEF2FF] border border-[#E0E7FF] rounded-[12px] p-4 flex items-start gap-3">
+        <svg class="flex-none mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="text-[12.5px] text-[#3730A3]">
+            Importaciones IA: <strong>{{ $aiLeft }} de {{ $aiMax }} disponibles</strong> este mes · se renuevan el {{ $aiReset }}.
+        </div>
+    </div>
+    @endif
+
     {{-- Step indicator --}}
     <div class="flex items-center gap-3">
         <div class="flex items-center gap-2">
@@ -72,6 +107,7 @@
 
         <div class="flex gap-3">
             <button type="submit" id="submit-btn" disabled
+                    {{ ($aiMax === 0 || ($aiMax !== -1 && $aiLeft === 0)) ? 'disabled' : '' }}
                     class="flex-1 bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-40 disabled:cursor-not-allowed text-white border border-[#4338CA] rounded-[10px] px-4 py-[11px] text-[13.5px] font-semibold flex items-center justify-center gap-2 shadow-[0_1px_2px_rgba(79,70,229,.35)] transition-colors">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M20.2 7.8l-7.7-1.9-1.9 7.7 7.7 1.9 1.9-7.7z"/></svg>
                 Analizar con IA

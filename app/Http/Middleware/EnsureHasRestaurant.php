@@ -10,10 +10,20 @@ class EnsureHasRestaurant
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->restaurant_id) {
-            if ($request->user()?->role === 'super_admin') {
-                return redirect()->route('superadmin.index');
-            }
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect('/');
+        }
+
+        if ($user->role === 'super_admin') {
+            return redirect()->route('superadmin.index');
+        }
+
+        // Tiene negocios en el pivote o en la relación legacy
+        $hasRestaurant = $user->restaurants()->exists() || $user->restaurant_id;
+
+        if (! $hasRestaurant) {
             return redirect('/')->with('error', 'No tienes un restaurante asociado a tu cuenta.');
         }
 

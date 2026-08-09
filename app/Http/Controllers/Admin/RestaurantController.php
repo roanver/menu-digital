@@ -11,17 +11,18 @@ class RestaurantController extends AdminController
 {
     public function edit(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         return view('admin.restaurant.edit', compact('restaurant'));
     }
 
     public function update(Request $request): RedirectResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $validated = $request->validate([
             'name'             => ['required', 'string', 'max:255'],
+            'type'             => ['nullable', 'string', 'in:' . implode(',', array_keys(config('verticals', [])))],
             'address'          => ['nullable', 'string', 'max:500'],
             'phone'            => ['nullable', 'string', 'max:50'],
             'whatsapp'         => ['nullable', 'string', 'max:50'],
@@ -30,6 +31,7 @@ class RestaurantController extends AdminController
             'accepts_delivery' => ['boolean'],
             'delivery_zone'    => ['nullable', 'string', 'max:1000'],
             'min_order'        => ['nullable', 'integer', 'min:0'],
+            'delivery_cost'    => ['nullable', 'integer', 'min:0'],
         ], [
             'logo.max'   => 'El logo no debe superar los 2 MB.',
             'logo.image' => 'El logo debe ser una imagen (jpg, png, webp).',
@@ -46,11 +48,18 @@ class RestaurantController extends AdminController
         $validated['accepts_orders']   = $request->boolean('accepts_orders');
         $validated['accepts_delivery'] = $request->boolean('accepts_delivery');
 
+        $originalSlug = $restaurant->slug;
+
         $restaurant->update($validated);
 
-        MenuCacheService::forget($restaurant);
+        MenuCacheService::forgetSlug($originalSlug);
+        if ($restaurant->slug !== $originalSlug) {
+            MenuCacheService::forgetSlug($restaurant->slug);
+        }
+
+        $typeLabel = config('verticals.' . ($restaurant->type ?: 'restaurant') . '.label', 'Negocio');
 
         return redirect()->route('admin.restaurant.edit')
-            ->with('success', 'Restaurante actualizado correctamente.');
+            ->with('success', $typeLabel . ' actualizado correctamente.');
     }
 }

@@ -39,4 +39,10 @@ return [
         'key' => env('GEMINI_API_KEY', ''),
     ],
 
+    'anthropic' => [
+        'key'          => env('ANTHROPIC_API_KEY', ''),
+        'model_vision' => env('ANTHROPIC_MODEL_VISION', 'claude-sonnet-4-5'),
+        'model_text'   => env('ANTHROPIC_MODEL_TEXT', 'claude-haiku-4-5-20251001'),
+    ],
+
 ];

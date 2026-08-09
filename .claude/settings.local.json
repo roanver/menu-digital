@@ -48,7 +48,11 @@
       "Bash(git commit:*)",
       "Bash(python3 -c:*)",
       "Bash(grep -E \"^\\(keyv|cacheable|flat-cache|file-entry-cache|cache-manager|ecto\\)$\" ls node_modules/@cacheable/)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep:*)",
+      "Bash(wc -l /c/laragon/www/menu-digital/app/Http/Controllers/Admin/*.php)",
+      "Bash(Get-Content:*)",
+      "Bash(php -r 'require '\\\\''vendor/autoload.php'\\\\''; $app = require '\\\\''bootstrap/app.php'\\\\''; $app->make\\('\\\\''Illuminate\\\\Contracts\\\\Console\\\\Kernel'\\\\''\\)->bootstrap\\(\\); echo json_encode\\(config\\('\\\\''plans'\\\\''\\), JSON_PRETTY_PRINT\\);')"
     ]
   }
 }

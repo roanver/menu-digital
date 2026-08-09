@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
 use App\Models\MenuItem;
-use App\Services\GeminiService;
+use App\Services\AnthropicService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,7 +13,12 @@ class MenuImportController extends AdminController
 {
     public function showUpload(): View
     {
-        return view('admin.menu-import.upload');
+        $restaurant = $this->restaurant();
+
+        // Refresh monthly counter if the reset date has passed
+        $this->maybeResetImportCounter($restaurant);
+
+        return view('admin.menu-import.upload', compact('restaurant'));
     }
 
     public function upload(Request $request): RedirectResponse
@@ -29,6 +34,34 @@ class MenuImportController extends AdminController
             'images.*.mimes'    => 'Solo se aceptan formatos jpg, jpeg, png y webp.',
         ]);
 
+        $restaurant = $this->restaurant();
+        $maxImports = $restaurant->maxAiImports();
+
+        // Plan sin acceso a IA
+        if ($maxImports === 0) {
+            session([
+                'import_preview' => [],
+                'import_error'   => 'Tu plan no incluye importación por IA. Puedes escribir los ítems manualmente.',
+            ]);
+            return redirect()->route('admin.import.review');
+        }
+
+        // Resetear counter si cambió el mes
+        $this->maybeResetImportCounter($restaurant);
+
+        // Límite mensual alcanzado
+        if ($maxImports !== -1 && $restaurant->ai_imports_this_month >= $maxImports) {
+            $resetDate = $restaurant->ai_imports_reset_at
+                ? $restaurant->ai_imports_reset_at->format('d/m/Y')
+                : '1/' . now()->addMonth()->format('m/Y');
+
+            session([
+                'import_preview' => [],
+                'import_error'   => "Usaste las {$maxImports} importaciones de este mes. Se renuevan el {$resetDate}. Podés cargar tu carta manualmente.",
+            ]);
+            return redirect()->route('admin.import.review');
+        }
+
         $base64Images = [];
         foreach ($request->file('images') as $file) {
             if ($file->isValid()) {
@@ -40,15 +73,30 @@ class MenuImportController extends AdminController
         }
 
         try {
-            $service = new GeminiService();
+            $service    = new AnthropicService();
             $categories = $service->extractMenuFromImages($base64Images);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al conectar con la IA. Intenta nuevamente: ' . $e->getMessage());
+            session([
+                'import_images_preview' => $base64Images,
+                'import_error'          => 'No pudimos leer la carta automáticamente. Podés escribir los platos acá abajo.',
+                'import_preview'        => [],
+            ]);
+
+            return redirect()->route('admin.import.review');
         }
 
         if (empty($categories)) {
-            return back()->with('error', 'No se pudieron detectar platos en las imágenes. Intenta con fotos más claras.');
+            session([
+                'import_images_preview' => $base64Images,
+                'import_error'          => 'No pudimos leer la carta automáticamente. Podés escribir los platos acá abajo.',
+                'import_preview'        => [],
+            ]);
+
+            return redirect()->route('admin.import.review');
         }
+
+        // Contar la llamada a la API (se cobró, se descuenta aunque no se confirme)
+        $restaurant->increment('ai_imports_this_month');
 
         session(['import_preview' => $categories]);
 
@@ -57,14 +105,15 @@ class MenuImportController extends AdminController
 
     public function showReview(): View
     {
-        $categories = session('import_preview', []);
+        $categories  = session('import_preview', []);
+        $importError = session('import_error');
 
-        if (empty($categories)) {
+        if (empty($categories) && !$importError) {
             return redirect()->route('admin.import.upload')
                 ->with('error', 'No hay datos para revisar. Por favor sube imágenes primero.');
         }
 
-        return view('admin.menu-import.review', compact('categories'));
+        return view('admin.menu-import.review', compact('categories', 'importError'));
     }
 
     public function confirm(Request $request): RedirectResponse
@@ -79,7 +128,7 @@ class MenuImportController extends AdminController
             'categories.*.items.*.price'   => ['required_with:categories.*.items', 'integer', 'min:0'],
         ]);
 
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $imported = 0;
 
         foreach ($validated['categories'] as $catData) {
@@ -92,7 +141,6 @@ class MenuImportController extends AdminController
             );
 
             foreach ($catData['items'] ?? [] as $itemData) {
-                // Skip if not included
                 if (isset($itemData['include']) && !$itemData['include']) {
                     continue;
                 }
@@ -115,10 +163,25 @@ class MenuImportController extends AdminController
 
         session()->forget('import_preview');
 
-        // Clear menu cache
         \App\Services\MenuCacheService::forget($restaurant);
 
+        $vertical = $restaurant->vertical();
+        $itemsLabel = strtolower($vertical['items_label'] ?? 'platos');
+
         return redirect()->route('admin.items.index')
-            ->with('success', "¡Importación completada! {$imported} platos agregados al menú.");
+            ->with('success', "¡Importación completada! {$imported} {$itemsLabel} agregados al menú.");
+    }
+
+    private function maybeResetImportCounter($restaurant): void
+    {
+        $now = now();
+
+        if ($restaurant->ai_imports_reset_at === null || $now->gte($restaurant->ai_imports_reset_at)) {
+            $restaurant->update([
+                'ai_imports_this_month' => 0,
+                'ai_imports_reset_at'   => $now->copy()->startOfMonth()->addMonth(),
+            ]);
+            $restaurant->refresh();
+        }
     }
 }

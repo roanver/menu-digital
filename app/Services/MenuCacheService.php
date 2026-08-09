@@ -11,4 +11,9 @@ class MenuCacheService
     {
         Cache::forget("menu:{$restaurant->slug}");
     }
+
+    public static function forgetSlug(string $slug): void
+    {
+        Cache::forget("menu:{$slug}");
+    }
 }

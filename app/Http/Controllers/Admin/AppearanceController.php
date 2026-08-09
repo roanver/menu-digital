@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Services\MenuCacheService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class AppearanceController extends Controller
+class AppearanceController extends AdminController
 {
     public function edit(): View
     {
         return view('admin.appearance.edit', [
-            'restaurant' => auth()->user()->restaurant,
+            'restaurant' => $this->restaurant(),
         ]);
     }
 
@@ -32,7 +31,7 @@ class AppearanceController extends Controller
         $validated['show_price']       = $request->boolean('show_price');
         $validated['show_description'] = $request->boolean('show_description');
 
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $restaurant->update($validated);
 
         MenuCacheService::forget($restaurant);

@@ -13,7 +13,7 @@ class CategoryController extends AdminController
 {
     public function index(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
         $categories = Category::where('restaurant_id', $restaurant->id)
             ->orderBy('sort_order')
             ->orderBy('id')
@@ -29,7 +29,7 @@ class CategoryController extends AdminController
 
     public function store(Request $request): RedirectResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $validated = $request->validate([
             'name'      => ['required', 'string', 'max:255'],
@@ -72,7 +72,7 @@ class CategoryController extends AdminController
             'is_active' => isset($validated['is_active']) ? (bool) $validated['is_active'] : false,
         ]);
 
-        MenuCacheService::forget(auth()->user()->restaurant);
+        MenuCacheService::forget($this->restaurant());
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría actualizada correctamente.');
@@ -84,7 +84,7 @@ class CategoryController extends AdminController
 
         $category->delete();
 
-        MenuCacheService::forget(auth()->user()->restaurant);
+        MenuCacheService::forget($this->restaurant());
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría eliminada correctamente.');
@@ -92,7 +92,7 @@ class CategoryController extends AdminController
 
     public function reorder(Request $request): JsonResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $request->validate([
             'ids'   => ['required', 'array'],
@@ -110,7 +110,7 @@ class CategoryController extends AdminController
 
     private function authorizeCategory(Category $category): void
     {
-        if ($category->restaurant_id !== auth()->user()->restaurant_id) {
+        if ($category->restaurant_id !== $this->restaurant()->id) {
             abort(403);
         }
     }

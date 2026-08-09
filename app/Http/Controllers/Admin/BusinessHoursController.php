@@ -11,7 +11,7 @@ class BusinessHoursController extends AdminController
 {
     public function index(): View
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $hours = [];
         $existing = BusinessHour::where('restaurant_id', $restaurant->id)
@@ -31,7 +31,7 @@ class BusinessHoursController extends AdminController
 
     public function update(Request $request): RedirectResponse
     {
-        $restaurant = auth()->user()->restaurant;
+        $restaurant = $this->restaurant();
 
         $validated = $request->validate([
             'hours'                  => ['required', 'array'],

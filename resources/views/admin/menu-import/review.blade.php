@@ -18,6 +18,26 @@
         </div>
     </div>
 
+    @if(!empty($importError))
+    {{-- Error banner with retry --}}
+    <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] p-5 flex items-start gap-4">
+        <div class="w-[44px] h-[44px] rounded-[12px] bg-[#FEE2E2] border border-[#FECACA] flex items-center justify-center flex-none">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="flex-1">
+            <h2 class="text-[16px] font-bold text-[#991B1B]">No se pudo leer la carta automáticamente</h2>
+            <p class="text-[13px] text-[#7F1D1D] mt-0.5">{{ $importError }}</p>
+        </div>
+        <form method="POST" action="{{ route('admin.import.process') }}" class="flex-none">
+            @csrf
+            <button type="submit"
+                    class="inline-flex items-center gap-2 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-[14px] py-[9px] text-[13px] font-semibold shadow-[0_1px_2px_rgba(16,24,40,.04)] transition-colors">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Reintentar
+            </button>
+        </form>
+    </div>
+    @else
     {{-- Success header --}}
     <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] p-5 flex items-start gap-4">
         <div class="w-[44px] h-[44px] rounded-[12px] bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-center flex-none">
@@ -29,6 +49,7 @@
             <p class="text-[13px] text-[#6B7280] mt-0.5">{{ $totalItems }} {{ $totalItems === 1 ? 'plato detectado' : 'platos detectados' }} en total · Revisa y edita antes de importar</p>
         </div>
     </div>
+    @endif
 
     {{-- Warning --}}
     <div class="bg-[#FEF3C7] border border-[#FDE68A] rounded-[12px] p-4 flex gap-3">

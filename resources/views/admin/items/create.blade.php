@@ -31,16 +31,31 @@
                         <div class="text-[13px] font-bold text-[#111827]">Datos del item</div>
                     </div>
                     <div class="px-5 py-5 space-y-4">
+                        @php $vertical = $restaurant->vertical(); @endphp
+
                         <!-- Nombre -->
                         <label class="flex flex-col gap-[6px]">
-                            <span class="text-[12px] font-semibold text-[#374151]">Nombre del plato</span>
+                            <span class="text-[12px] font-semibold text-[#374151]">Nombre {{ $vertical['has_stock'] ? 'del producto' : 'del plato' }}</span>
                             <input type="text" name="name" value="{{ old('name') }}" required autofocus
                                    class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
-                                   placeholder="Ej: Lomo saltado, Pisco sour, Tiramisú…">
+                                   placeholder="{{ $vertical['has_stock'] ? 'Ej: Polera blanca talla M, Jarro de cerámica…' : 'Ej: Lomo saltado, Pisco sour, Tiramisú…' }}">
                             @error('name')
                             <p class="text-[11.5px] text-[#DC2626]">{{ $message }}</p>
                             @enderror
                         </label>
+
+                        @if($vertical['has_sku'])
+                        <!-- SKU -->
+                        <label class="flex flex-col gap-[6px]">
+                            <span class="text-[12px] font-semibold text-[#374151]">SKU / Código <span class="font-normal text-[#9CA3AF]">(opcional)</span></span>
+                            <input type="text" name="sku" value="{{ old('sku') }}"
+                                   class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] font-mono text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
+                                   placeholder="Ej: POL-BL-M">
+                            @error('sku')
+                            <p class="text-[11.5px] text-[#DC2626]">{{ $message }}</p>
+                            @enderror
+                        </label>
+                        @endif
 
                         <!-- Precio + Categoría -->
                         <div class="grid grid-cols-2 gap-3">
@@ -189,6 +204,19 @@
                 <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] p-5 space-y-3"
                      x-data="{ isPromo: {{ old('is_promo') ? 'true' : 'false' }} }">
                     <div class="text-[13px] font-bold text-[#111827]">Opciones</div>
+
+                    @if($vertical['has_stock'])
+                    <!-- Stock -->
+                    <label class="flex flex-col gap-[6px]">
+                        <span class="text-[12px] font-semibold text-[#374151]">Stock disponible <span class="font-normal text-[#9CA3AF]">(vacío = sin límite)</span></span>
+                        <input type="number" name="stock" value="{{ old('stock') }}" min="0" step="1"
+                               class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] shadow-[0_1px_2px_rgba(16,24,40,.03)] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
+                               placeholder="Ej: 10">
+                        @error('stock')
+                        <p class="text-[11.5px] text-[#DC2626]">{{ $message }}</p>
+                        @enderror
+                    </label>
+                    @endif
 
                     <input type="hidden" name="is_available" value="0">
                     <label class="flex items-center gap-4 cursor-pointer p-3.5 bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] hover:border-[#C7D2FE] transition-colors">

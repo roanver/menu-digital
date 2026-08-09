@@ -8,14 +8,14 @@
     $__isActive = $__inTrial || $__inPaid;
     $__trialDays = $__inTrial ? (int) now()->diffInDays($restaurant->trial_ends_at) : null;
     $__paidEnds  = $__inPaid ? $restaurant->subscription_ends_at->format('d/m/Y') : null;
-    $availableCount = $restaurant->menuItems()->where('is_available', true)->count();
+    $__totalScans = array_sum(array_column($days, 'total'));
 
     // Checklist progress
     $steps = [
         (bool)$restaurant->logo,
         $categoriesCount > 0,
         $itemsCount > 0,
-        false, // apariencia — siempre pendiente como sugerencia
+        false,
     ];
     $completedSteps = count(array_filter($steps));
 @endphp
@@ -54,70 +54,50 @@
                     <span class="w-[5px] h-[5px] rounded-full bg-emerald-400"></span> {{ $__planLabel }} · vence {{ $__paidEnds }}
                 </span>
                 @endif
-                <a href="{{ url('/' . $restaurant->slug) }}" target="_blank"
-                   class="inline-flex items-center gap-[6px] bg-white text-[#312e81] rounded-[10px] px-[14px] py-[9px] text-[12.5px] font-bold shadow-lg hover:bg-indigo-50 transition-colors whitespace-nowrap">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
-                    Ver menú
-                </a>
             </div>
         </div>
     </div>
 </div>
 
 {{-- Stat Cards --}}
-<div class="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+<div class="grid grid-cols-2 xl:grid-cols-3 gap-3 mb-5">
 
-    {{-- Categorías --}}
+    {{-- Escaneos esta semana --}}
     <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-4 shadow-[0_1px_3px_rgba(16,24,40,.05)] hover:shadow-[0_4px_12px_rgba(16,24,40,.08)] hover:-translate-y-[2px] transition-all">
         <div class="w-[38px] h-[38px] rounded-[10px] bg-[#EEF2FF] flex items-center justify-center mb-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/>
+                <rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/>
             </svg>
         </div>
-        <div class="text-[30px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ $categoriesCount }}</div>
-        <div class="text-[12px] font-semibold text-[#6B7280]">Categorías</div>
-        <div class="text-[11px] text-[#9CA3AF] mt-0.5">{{ $categoriesCount > 0 ? 'en el menú' : 'Sin categorías' }}</div>
+        <div class="text-[30px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ number_format($last7) }}</div>
+        <div class="text-[12px] font-semibold text-[#6B7280]">Escaneos (7 días)</div>
+        <div class="text-[11px] text-[#9CA3AF] mt-0.5">{{ $last7 > 0 ? 'este período' : 'Sin datos aún' }}</div>
     </div>
 
-    {{-- Items --}}
+    {{-- WhatsApp iniciados --}}
     <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-4 shadow-[0_1px_3px_rgba(16,24,40,.05)] hover:shadow-[0_4px_12px_rgba(16,24,40,.08)] hover:-translate-y-[2px] transition-all">
         <div class="w-[38px] h-[38px] rounded-[10px] bg-[#F0FDF4] flex items-center justify-center mb-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-                <circle cx="3.5" cy="6" r=".5" fill="#16a34a"/><circle cx="3.5" cy="12" r=".5" fill="#16a34a"/><circle cx="3.5" cy="18" r=".5" fill="#16a34a"/>
+                <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/>
             </svg>
         </div>
-        <div class="text-[30px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ $itemsCount }}</div>
-        <div class="text-[12px] font-semibold text-[#6B7280]">Items totales</div>
-        <div class="text-[11px] text-[#9CA3AF] mt-0.5">{{ $itemsCount > 0 ? 'en el menú' : 'Sin items' }}</div>
+        <div class="text-[30px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ number_format($waClicksMonth) }}</div>
+        <div class="text-[12px] font-semibold text-[#6B7280]">Pedidos WhatsApp</div>
+        <div class="text-[11px] text-[#9CA3AF] mt-0.5">{{ $waClicksMonth > 0 ? 'iniciados este mes' : 'Sin datos aún' }}</div>
     </div>
 
-    {{-- Disponibles --}}
+    {{-- Items en carta --}}
     <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-4 shadow-[0_1px_3px_rgba(16,24,40,.05)] hover:shadow-[0_4px_12px_rgba(16,24,40,.08)] hover:-translate-y-[2px] transition-all">
         <div class="w-[38px] h-[38px] rounded-[10px] bg-[#FFF7ED] flex items-center justify-center mb-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                <circle cx="3.5" cy="6" r=".5" fill="#EA580C"/><circle cx="3.5" cy="12" r=".5" fill="#EA580C"/><circle cx="3.5" cy="18" r=".5" fill="#EA580C"/>
             </svg>
         </div>
-        <div class="text-[30px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ $availableCount }}</div>
-        <div class="text-[12px] font-semibold text-[#6B7280]">Disponibles</div>
-        <div class="text-[11px] text-[#9CA3AF] mt-0.5">pedibles ahora</div>
-    </div>
-
-    {{-- Plan --}}
-    <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-4 shadow-[0_1px_3px_rgba(16,24,40,.05)] hover:shadow-[0_4px_12px_rgba(16,24,40,.08)] hover:-translate-y-[2px] transition-all">
-        <div class="w-[38px] h-[38px] rounded-[10px] bg-[#F5F3FF] flex items-center justify-center mb-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-        </div>
-        <div class="text-[22px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ $__planLabel }}</div>
-        <div class="text-[12px] font-semibold text-[#6B7280]">Plan activo</div>
-        <div class="text-[11px] mt-0.5 @if($__isActive) text-[#9CA3AF] @else text-[#DC2626] font-semibold @endif">
-            @if(!$__isActive) Vencido
-            @elseif($__inTrial) Trial · {{ $__trialDays }} días
-            @else Vence {{ $__paidEnds }} @endif
-        </div>
+        <div class="text-[30px] font-bold tracking-tight leading-none text-[#111827] mb-1">{{ $itemsCount }}</div>
+        <div class="text-[12px] font-semibold text-[#6B7280]">Ítems en carta</div>
+        <div class="text-[11px] text-[#9CA3AF] mt-0.5">{{ $categoriesCount }} {{ $categoriesCount === 1 ? 'categoría' : 'categorías' }}</div>
     </div>
 
 </div>
@@ -125,6 +105,26 @@
 {{-- Scan Stats --}}
 <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] mb-5 overflow-hidden">
     <div class="px-5 pt-5 pb-4">
+
+        @if($__totalScans === 0)
+        {{-- Estado vacío --}}
+        <div class="text-center py-6">
+            <div class="w-[52px] h-[52px] rounded-[14px] bg-[#EEF2FF] flex items-center justify-center mx-auto mb-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/>
+                    <rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/>
+                </svg>
+            </div>
+            <div class="text-[15px] font-bold text-[#111827] mb-1">Todavía no hay escaneos</div>
+            <div class="text-[13px] text-[#6B7280] mb-4">Poné el QR en las mesas para que tus clientes puedan ver el menú.</div>
+            <a href="{{ route('admin.qr.show') }}"
+               class="inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-[10px] px-4 py-[9px] text-[13px] font-semibold transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Descargar QR
+            </a>
+        </div>
+        @else
+        {{-- Gráfico con datos --}}
         <div class="flex items-center justify-between mb-4">
             <div>
                 <div class="text-[13px] font-bold text-[#111827]">Escaneos de QR / NFC</div>
@@ -132,9 +132,13 @@
             </div>
             <div class="text-right">
                 <div class="text-[22px] font-bold text-[#111827] leading-none">{{ number_format($last7) }}</div>
+                @if($prev7 > 0)
                 <div class="text-[11px] font-semibold mt-[2px] {{ $scanDelta >= 0 ? 'text-[#059669]' : 'text-[#DC2626]' }}">
                     {{ $scanDelta >= 0 ? '↑' : '↓' }} {{ abs($scanDelta) }}% vs semana ant.
                 </div>
+                @elseif($last7 > 0)
+                <div class="text-[11px] text-[#6B7280] mt-[2px]">Primera semana con datos</div>
+                @endif
             </div>
         </div>
 
@@ -172,6 +176,8 @@
             @endforeach
         </div>
         @endif
+        @endif
+
     </div>
 </div>
 
@@ -281,7 +287,7 @@
 
         <div class="grid grid-cols-2 gap-3">
             <a href="{{ route('admin.categories.create') }}"
-               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group">
+               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group min-h-[56px]">
                 <div class="w-[34px] h-[34px] rounded-[9px] bg-[#EEF2FF] flex items-center justify-center flex-none">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                 </div>
@@ -291,19 +297,8 @@
                 </div>
             </a>
 
-            <a href="{{ url('/' . $restaurant->slug) }}" target="_blank"
-               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group">
-                <div class="w-[34px] h-[34px] rounded-[9px] bg-[#F0FDF4] flex items-center justify-center flex-none">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
-                </div>
-                <div>
-                    <div class="text-[13px] font-bold text-[#111827]">Ver menú público</div>
-                    <div class="text-[11px] text-[#9CA3AF]">Abre en nueva pestaña</div>
-                </div>
-            </a>
-
             <a href="{{ route('admin.qr.show') }}"
-               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group">
+               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group min-h-[56px]">
                 <div class="w-[34px] h-[34px] rounded-[9px] bg-[#FFF7ED] flex items-center justify-center flex-none">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
                 </div>
@@ -314,13 +309,24 @@
             </a>
 
             <a href="{{ route('admin.appearance.edit') }}"
-               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group">
+               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group min-h-[56px]">
                 <div class="w-[34px] h-[34px] rounded-[9px] bg-[#F5F3FF] flex items-center justify-center flex-none">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1m0 16v1m8-9h1M3 12H2m14.5-6.5-.7.7m-9.6 9.6-.7.7m0-10.3-.7-.7m10.3 10.3-.7-.7"/></svg>
                 </div>
                 <div>
                     <div class="text-[13px] font-bold text-[#111827]">Apariencia</div>
                     <div class="text-[11px] text-[#9CA3AF]">Plantilla y colores</div>
+                </div>
+            </a>
+
+            <a href="{{ route('admin.import.upload') }}"
+               class="flex items-center gap-3 bg-white border border-[#E5E7EB] hover:border-[#C7D2FE] hover:bg-[#FAFBFF] rounded-[14px] px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,.05)] transition-all group min-h-[56px]">
+                <div class="w-[34px] h-[34px] rounded-[9px] bg-[#F0FDF4] flex items-center justify-center flex-none">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4-4 4 4M12 12V3"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+                </div>
+                <div>
+                    <div class="text-[13px] font-bold text-[#111827]">Importar menú</div>
+                    <div class="text-[11px] text-[#9CA3AF]">Por foto con IA</div>
                 </div>
             </a>
         </div>

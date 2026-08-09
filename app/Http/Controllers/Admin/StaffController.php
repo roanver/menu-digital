@@ -11,7 +11,7 @@ class StaffController extends AdminController
 {
     public function index()
     {
-        $staff = auth()->user()->restaurant->users()
+        $staff = $this->restaurant()->users()
             ->where('role', 'staff')
             ->orderBy('name')
             ->get();
@@ -32,21 +32,31 @@ class StaffController extends AdminController
 
         $password = Str::random(10);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($password),
-            'restaurant_id' => auth()->user()->restaurant_id,
-            'role' => 'staff',
+        // Si el usuario ya existe, sumarlo al pivote sin duplicar
+        $existing = User::where('email', $request->email)->first();
+        if ($existing) {
+            $this->restaurant()->members()->syncWithoutDetaching([
+                $existing->id => ['role' => 'staff'],
+            ]);
+            return back()->with('success', "El usuario {$existing->name} ya existía y fue agregado como staff.");
+        }
+
+        $user = User::create([
+            'name'          => $request->name,
+            'email'         => $request->email,
+            'password'      => Hash::make($password),
+            'restaurant_id' => $this->restaurant()->id,
+            'role'          => 'staff',
         ]);
+
+        $this->restaurant()->members()->attach($user->id, ['role' => 'staff']);
 
         return back()->with('staff_password', $password)->with('staff_email', $request->email);
     }
 
     public function destroy(User $user)
     {
-        // Only allow deleting staff from same restaurant
-        if ($user->restaurant_id !== auth()->user()->restaurant_id || $user->role !== 'staff') {
+        if ($user->restaurant_id !== $this->restaurant()->id || $user->role !== 'staff') {
             abort(403);
         }
         $user->delete();

@@ -4,63 +4,71 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'MenuDigital') }}</title>
+    @isset($title)<title>{{ $title }}</title>@else<title>{{ config('app.name', 'MenuDigital') }}</title>@endisset
+    @isset($description)<meta name="description" content="{{ $description }}">@endisset
+    @isset($robots)<meta name="robots" content="{{ $robots }}">@endisset
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        :root{
+            --tinta:#16211C;
+            --papel:#F5F4EF;
+            --papel-2:#EDEBE3;
+            --oliva:#3E5A47;
+            --aji:#C8452F;
+            --linea:#D6D2C6;
+        }
         html,body{margin:0;padding:0;-webkit-font-smoothing:antialiased}
         *{box-sizing:border-box}
         a{text-decoration:none;color:inherit}
+        body{font-family:Archivo,system-ui,sans-serif;color:var(--tinta);background:var(--papel)}
     </style>
 </head>
-<body style="font-family:Inter,system-ui,sans-serif;color:#201914;background:#FBF3E4;min-height:100vh;">
+<body>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));min-height:100vh;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));min-height:100vh;">
 
     {{-- Left: form --}}
-    <div style="background:#FBF3E4;padding:clamp(22px,3vw,34px) clamp(20px,4vw,48px);display:flex;flex-direction:column;">
+    <div style="background:var(--papel);padding:clamp(24px,3vw,36px) clamp(22px,4vw,52px);display:flex;flex-direction:column;">
 
         {{-- Brand --}}
         <a href="/" style="display:inline-flex;align-items:center;gap:10px;align-self:flex-start;">
-            <div style="width:34px;height:34px;border-radius:11px;background:#E85D2F;border:1.5px solid #201914;box-shadow:2.5px 2.5px 0 #201914;display:flex;align-items:center;justify-content:center;transform:rotate(-5deg);flex:0 0 auto;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round">
+            <div style="width:32px;height:32px;border-radius:10px;background:var(--oliva);border:1.5px solid var(--tinta);box-shadow:2px 2px 0 var(--tinta);display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#F5F4EF" stroke-width="1.9" stroke-linecap="round">
                     <path d="M5 4v7a3 3 0 0 0 6 0V4M8 11v9M19 4c-1.7 1-2.5 2.7-2.5 5s.8 3.4 2.5 4v7"/>
                 </svg>
             </div>
-            <span style="font-family:'Bricolage Grotesque',Inter,sans-serif;font-size:17px;font-weight:800;letter-spacing:-.025em;">MenuDigital</span>
+            <span style="font-family:Fraunces,Georgia,serif;font-size:18px;font-weight:700;letter-spacing:-.02em;">MenuDigital</span>
         </a>
 
         {{-- Form slot --}}
-        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:394px;width:100%;margin:0 auto;padding:32px 0;">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:390px;width:100%;margin:0 auto;padding:36px 0;">
             {{ $slot }}
         </div>
     </div>
 
     {{-- Right: dark panel --}}
-    <div style="background:#201914;padding:clamp(32px,4vw,56px) clamp(24px,3.5vw,48px);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;">
-        <div style="position:absolute;inset:0;background:radial-gradient(50% 60% at 50% 100%,rgba(232,93,47,.26),transparent 72%);pointer-events:none;"></div>
+    <div style="background:var(--tinta);padding:clamp(36px,4vw,60px) clamp(26px,3.5vw,52px);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:radial-gradient(55% 55% at 50% 100%,rgba(200,69,47,.2),transparent 70%);pointer-events:none;"></div>
 
         <div style="position:relative;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5C5245;">Restaurantes que ya lo usan</div>
-            <blockquote style="margin:20px 0 0;font-family:'Instrument Serif',Georgia,serif;font-size:clamp(20px,2.2vw,26px);line-height:1.42;color:#FBF3E4;max-width:420px;">
-                "Imprimíamos 300 cartas por temporada. Ahora cambio el precio del día <em>desde la caja</em> y los pedidos por WhatsApp se triplicaron."
-            </blockquote>
-            <div style="display:flex;align-items:center;gap:11px;margin-top:20px;">
-                <div style="width:38px;height:38px;border-radius:50%;background:#E85D2F;border:1.5px solid #FBF3E4;color:#FBF3E4;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',Inter,sans-serif;flex:0 0 auto;">CV</div>
-                <div>
-                    <div style="font-size:13.5px;font-weight:700;color:#FBF3E4;">Carolina Vera</div>
-                    <div style="font-size:12px;color:#8A7B62;">Sazón de Barrio · Valparaíso</div>
-                </div>
-            </div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#4A5A50;">Por qué MenuDigital</div>
+            <p style="margin:18px 0 0;font-family:Fraunces,Georgia,serif;font-size:clamp(19px,2.1vw,25px);line-height:1.45;color:var(--papel);max-width:400px;font-weight:400;">
+                Tu carta digital lista en minutos, sin apps, sin comisiones.
+            </p>
 
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:36px;">
-                @foreach([['1.200+', 'restaurantes en Chile'], ['30 s', 'para cambiar un precio'], ['0 %', 'comisión por pedido']] as [$num, $label])
-                    <div style="background:rgba(255,255,255,.04);border:1px solid #3A2F28;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
-                        <span style="font-family:'Bricolage Grotesque',Inter,sans-serif;font-size:22px;font-weight:800;color:#FFD84D;min-width:56px;">{{ $num }}</span>
-                        <span style="font-size:13px;color:#B8AA92;">{{ $label }}</span>
-                    </div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:34px;">
+                @foreach([
+                    ['2 min', 'y tu menú queda publicado en línea'],
+                    ['QR + NFC', 'incluidos en todos los planes'],
+                    ['0 %', 'de comisión por pedido o venta'],
+                ] as [$num, $label])
+                <div style="background:rgba(255,255,255,.04);border:1px solid #2A3830;border-radius:13px;padding:13px 15px;display:flex;align-items:center;gap:13px;">
+                    <span style="font-family:Fraunces,Georgia,serif;font-size:22px;font-weight:700;color:var(--aji);min-width:60px;letter-spacing:-.01em;">{{ $num }}</span>
+                    <span style="font-size:12.5px;color:#9EB0A4;">{{ $label }}</span>
+                </div>
                 @endforeach
             </div>
         </div>

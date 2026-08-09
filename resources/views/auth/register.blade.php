@@ -3,16 +3,16 @@
     description="Publicá la carta digital de tu restaurante en 2 minutos. QR y NFC incluidos, sin comisión por venta."
     robots="noindex,nofollow">
 
-    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Creá tu menú digital</h1>
-    <p style="margin:0 0 20px;font-size:14px;color:#4A4A42;line-height:1.5">Dos minutos y tu carta queda publicada con su QR.</p>
+    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Creá tu carta digital</h1>
+    <p style="margin:0 0 20px;font-size:14px;color:#4A4A42;line-height:1.5">Dos minutos y tu menú queda publicado con QR incluido.</p>
 
     <form method="POST" action="{{ route('register') }}" style="display:flex;flex-direction:column;gap:13px">
         @csrf
 
         <div>
-            <label style="display:block;font-size:12px;font-weight:700;color:#16211C;letter-spacing:.03em;text-transform:uppercase;margin-bottom:5px">Nombre del restaurante</label>
+            <label style="display:block;font-size:12px;font-weight:700;color:#16211C;letter-spacing:.03em;text-transform:uppercase;margin-bottom:5px">Nombre de tu negocio</label>
             <input type="text" name="restaurant_name" value="{{ old('restaurant_name') }}" required
-                placeholder="El Fogón"
+                placeholder="El Fogón, Mi Tienda…"
                 style="width:100%;padding:11px 14px;border:1.5px solid {{ $errors->has('restaurant_name') ? '#C8452F' : '#16211C' }};border-radius:10px;font-size:14px;font-family:Archivo,system-ui,sans-serif;color:#16211C;background:#fff;outline:none"
                 onfocus="this.style.borderColor='#C8452F';this.style.boxShadow='0 0 0 3px rgba(200,69,47,.1)'"
                 onblur="this.style.borderColor='{{ $errors->has('restaurant_name') ? '#C8452F' : '#16211C' }}';this.style.boxShadow='none'">
@@ -24,7 +24,7 @@
             <div style="display:flex;align-items:stretch;border:1.5px solid {{ $errors->has('restaurant_slug') ? '#C8452F' : '#16211C' }};border-radius:10px;overflow:hidden;background:#fff" id="slug-container">
                 <span style="display:flex;align-items:center;padding:0 12px;background:#EDEBE3;border-right:1.5px solid #16211C;font-size:12.5px;color:#6B6B60;white-space:nowrap;flex-shrink:0">menudigital.cl/</span>
                 <input type="text" name="restaurant_slug" value="{{ old('restaurant_slug') }}"
-                    placeholder="mi-restaurante"
+                    placeholder="mi-negocio"
                     style="flex:1;padding:11px 12px;border:none;font-size:14px;font-family:Archivo,system-ui,sans-serif;color:#16211C;background:#fff;outline:none;min-width:0"
                     onfocus="document.getElementById('slug-container').style.borderColor='#C8452F';document.getElementById('slug-container').style.boxShadow='0 0 0 3px rgba(200,69,47,.1)'"
                     onblur="document.getElementById('slug-container').style.borderColor='{{ $errors->has('restaurant_slug') ? '#C8452F' : '#16211C' }}';document.getElementById('slug-container').style.boxShadow='none'">
@@ -46,7 +46,7 @@
         <div>
             <label style="display:block;font-size:12px;font-weight:700;color:#16211C;letter-spacing:.03em;text-transform:uppercase;margin-bottom:5px">Correo electrónico</label>
             <input type="email" name="email" value="{{ old('email') }}" required autocomplete="username"
-                placeholder="hola@mirestaurante.cl"
+                placeholder="hola@minegocio.cl"
                 style="width:100%;padding:11px 14px;border:1.5px solid {{ $errors->has('email') ? '#C8452F' : '#16211C' }};border-radius:10px;font-size:14px;font-family:Archivo,system-ui,sans-serif;color:#16211C;background:#fff;outline:none"
                 onfocus="this.style.borderColor='#C8452F';this.style.boxShadow='0 0 0 3px rgba(200,69,47,.1)'"
                 onblur="this.style.borderColor='{{ $errors->has('email') ? '#C8452F' : '#16211C' }}';this.style.boxShadow='none'">

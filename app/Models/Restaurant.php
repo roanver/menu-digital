@@ -4,15 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'name', 'slug', 'logo', 'address', 'phone', 'whatsapp', 'plan',
+    'name', 'slug', 'type', 'logo', 'address', 'phone', 'whatsapp', 'plan',
+    'ai_imports_this_month', 'ai_imports_reset_at',
     'trial_ends_at', 'subscription_ends_at', 'is_active',
     'template', 'primary_color', 'font', 'bg_color',
     'show_price', 'show_description', 'welcome_message',
-    'accepts_orders', 'accepts_delivery', 'delivery_zone', 'min_order',
+    'accepts_orders', 'accepts_delivery', 'delivery_zone', 'min_order', 'delivery_cost',
 ])]
 class Restaurant extends Model
 {
@@ -21,20 +23,31 @@ class Restaurant extends Model
     protected function casts(): array
     {
         return [
-            'trial_ends_at'        => 'datetime',
-            'subscription_ends_at' => 'datetime',
-            'is_active'            => 'boolean',
-            'show_price'           => 'boolean',
-            'show_description'     => 'boolean',
-            'accepts_orders'       => 'boolean',
-            'accepts_delivery'     => 'boolean',
-            'min_order'            => 'integer',
+            'trial_ends_at'          => 'datetime',
+            'subscription_ends_at'   => 'datetime',
+            'ai_imports_reset_at'    => 'datetime',
+            'ai_imports_this_month'  => 'integer',
+            'is_active'              => 'boolean',
+            'show_price'             => 'boolean',
+            'show_description'       => 'boolean',
+            'accepts_orders'         => 'boolean',
+            'accepts_delivery'       => 'boolean',
+            'min_order'              => 'integer',
         ];
     }
 
+    /** Legacy: usuarios vinculados por restaurant_id */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /** Multi-negocio: miembros del equipo con rol */
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'restaurant_user')
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
     public function categories(): HasMany
@@ -50,6 +63,11 @@ class Restaurant extends Model
     public function nfcTags(): HasMany
     {
         return $this->hasMany(NfcTag::class);
+    }
+
+    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Payment::class)->latest('paid_at');
     }
 
     public function businessHours(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -105,9 +123,47 @@ class Restaurant extends Model
         return null;
     }
 
+    /** Devuelve la config del vertical activo (config/verticals.php). */
+    public function vertical(): array
+    {
+        return config('verticals.' . ($this->type ?: 'restaurant'), config('verticals.restaurant'));
+    }
+
     public function planIsActive(): bool
     {
+        if ($this->plan === 'free') {
+            return true;
+        }
+
         return ($this->trial_ends_at && now()->lt($this->trial_ends_at))
             || ($this->subscription_ends_at && now()->lt($this->subscription_ends_at));
+    }
+
+    public function planCan(string $feature): bool
+    {
+        return match ($feature) {
+            'unlimited_items'   => in_array($this->plan, ['basico', 'pro']),
+            'nfc'               => in_array($this->plan, ['basico', 'pro']),
+            'all_templates'     => in_array($this->plan, ['basico', 'pro']),
+            'ai_import'         => $this->maxAiImports() !== 0,
+            'cart'              => in_array($this->plan, ['basico', 'pro']),
+            'ai_advisor'        => $this->plan === 'pro',
+            'ai_posts'          => $this->plan === 'pro',
+            'full_stats'        => $this->plan === 'pro',
+            'staff'             => $this->plan === 'pro',
+            'screens'           => $this->plan === 'pro',
+            default             => false,
+        };
+    }
+
+    /** -1 = sin límite, 0 = no permitido, N = N por mes */
+    public function maxAiImports(): int
+    {
+        return (int) config('plans.plans.' . $this->plan . '.ai_imports_per_month', 0);
+    }
+
+    public function maxScreens(): int
+    {
+        return (int) config('plans.plans.' . $this->plan . '.max_screens', 0);
     }
 }

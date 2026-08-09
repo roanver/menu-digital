@@ -16,7 +16,7 @@
     @endif
 
     <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Hola de nuevo</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.5">Ingresá para administrar la carta de tu restaurante.</p>
+    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.5">Ingresá para administrar tu carta digital.</p>
 
     <form method="POST" action="{{ route('login') }}" style="display:flex;flex-direction:column;gap:14px">
         @csrf
@@ -24,7 +24,7 @@
         <div>
             <label for="email" style="display:block;font-size:12px;font-weight:700;color:#16211C;letter-spacing:.03em;text-transform:uppercase;margin-bottom:5px">Correo electrónico</label>
             <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
-                placeholder="hola@mirestaurante.cl"
+                placeholder="hola@minegocio.cl"
                 style="width:100%;padding:11px 14px;border:1.5px solid {{ $errors->has('email') ? '#C8452F' : '#16211C' }};border-radius:10px;font-size:14px;font-family:Archivo,system-ui,sans-serif;color:#16211C;background:#fff;outline:none"
                 onfocus="this.style.borderColor='#C8452F';this.style.boxShadow='0 0 0 3px rgba(200,69,47,.1)'"
                 onblur="this.style.borderColor='{{ $errors->has('email') ? '#C8452F' : '#16211C' }}';this.style.boxShadow='none'">

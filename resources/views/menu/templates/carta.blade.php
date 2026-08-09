@@ -1,37 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $restaurant->name }}</title>
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $restaurant->name }}">
-    <meta property="og:description" content="{{ $restaurant->description ?? 'Menú digital de ' . $restaurant->name . ' en Chile.' }}">
-    @if($restaurant->logo)
-    <meta property="og:image" content="{{ Storage::url($restaurant->logo) }}">
-    @endif
-    <meta property="og:url" content="{{ url('/' . $restaurant->slug) }}">
-    <meta property="og:site_name" content="MenuDigital">
-    <meta name="twitter:card" content="summary_large_image">
-    @vite(['resources/css/menu.css', 'resources/js/menu.js'])
-    <style>
-        html,body{margin:0;padding:0;background:#F6F1E7;-webkit-font-smoothing:antialiased}
-        *{box-sizing:border-box}
-        a{text-decoration:none;color:inherit}
-        .hsc::-webkit-scrollbar{height:0}
-        [x-cloak]{display:none!important}
-        body,body>div{min-height:100vh;min-height:100dvh}
-    </style>
-</head>
-<body style="font-family:Inter,system-ui,sans-serif;color:#211A12;background:#F6F1E7;min-height:100vh;">
+@extends('layouts.menu')
 
+@push('head')
+<style>html,body{background:#F6F1E7}body{color:#211A12}</style>
+@endpush
+
+@section('body')
 @php
-    $whatsappNum = $restaurant->whatsapp ? preg_replace('/\D/', '', $restaurant->whatsapp) : null;
     $roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 @endphp
-
-<div x-data="menuCart('{{ $restaurant->slug }}', {{ $restaurant->accepts_orders ? 'true' : 'false' }}, '{{ $whatsappNum }}', {{ $restaurant->accepts_delivery ? 'true' : 'false' }})"
-     style="min-height:100vh;">
 
 <div style="max-width:440px;margin:0 auto;padding-bottom:120px;">
 
@@ -138,7 +114,9 @@
         </div>
     </div>
 
-    <div style="text-align:center;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#C9BCA6;padding:18px 0;">Menú creado con MenuDigital</div>
+    @if(($restaurant->plan ?? 'free') === 'free')
+    <div style="text-align:center;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#C9BCA6;padding:18px 0;"><a href="https://menudigital.cl" style="color:inherit;text-decoration:none;">Hecho con MenuDigital</a></div>
+    @endif
 </div>
 
 {{-- WhatsApp pill (solo si NO acepta pedidos por carrito) --}}
@@ -162,10 +140,6 @@
     @endif
 @endif
 
-@include('components.menu-cart', ['restaurant' => $restaurant])
-
-</div>{{-- end alpine x-data --}}
-
 <script>
 document.querySelectorAll('.cat-link').forEach(link => {
     link.addEventListener('click', function(e) {
@@ -181,5 +155,4 @@ document.querySelectorAll('.cat-link').forEach(link => {
     });
 });
 </script>
-</body>
-</html>
+@endsection
