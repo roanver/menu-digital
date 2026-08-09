@@ -35,6 +35,12 @@
         }
     },
     "scripts": {
+        "deploy": [
+            "@php artisan view:clear",
+            "@php artisan config:clear",
+            "@php artisan route:clear",
+            "@php artisan migrate --force"
+        ],
         "setup": [
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
