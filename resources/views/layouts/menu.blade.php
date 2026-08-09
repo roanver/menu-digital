@@ -39,9 +39,9 @@
 
     @yield('body')
 
-</div>
+    @include('components.menu-cart', ['restaurant' => $restaurant])
 
-@include('components.menu-cart', ['restaurant' => $restaurant])
+</div>
 
 </body>
 </html>
