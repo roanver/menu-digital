@@ -132,10 +132,10 @@
                                     @endif
                                     @if($item->is_available && $restaurant->accepts_orders)
                                         @if($item->variants->isNotEmpty())
-                                            <button @click="openVariantModal({{ json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]) }})"
+                                            <button x-on:click="openVariantModal({{ json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]) }})"
                                                     style="width:27px;height:27px;border-radius:9px;background:#4F46E5;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 2px 6px rgba(79,70,229,.4);border:none;cursor:pointer;color:#fff;font-size:18px;line-height:1;">+</button>
                                         @else
-                                            <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }})"
+                                            <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }})"
                                                     style="width:27px;height:27px;border-radius:9px;background:#4F46E5;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 2px 6px rgba(79,70,229,.4);border:none;cursor:pointer;color:#fff;font-size:18px;line-height:1;">+</button>
                                         @endif
                                     @elseif(!$item->is_available)

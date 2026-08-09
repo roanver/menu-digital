@@ -143,7 +143,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
 
 {{-- Floating cart button --}}
 <button
-    @click="cartOpen = true"
+    x-on:click="cartOpen = true"
     x-show="totalCount() > 0"
     x-cloak
     style="position:fixed;bottom:22px;right:18px;z-index:50;width:58px;height:58px;border-radius:50%;background:#1C1917;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.35);outline:none;"
@@ -171,7 +171,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
 @endif
 
 {{-- Overlay --}}
-<div @click="cartOpen = false"
+<div x-on:click="cartOpen = false"
      x-show="cartOpen"
      x-cloak
      style="position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:51;backdrop-filter:blur(2px);">
@@ -201,7 +201,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             <div style="font-size:11px;color:#6B7280;margin-top:1px;">{{ $tableLabel }}</div>
             @endif
         </div>
-        <button @click="cartOpen = false"
+        <button x-on:click="cartOpen = false"
                 style="width:28px;height:28px;border-radius:8px;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
@@ -210,12 +210,12 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
     {{-- Tipo de entrega --}}
     @if($restaurant->accepts_delivery)
     <div style="padding:10px 18px;border-bottom:1px solid #F3F4F6;display:flex;gap:8px;">
-        <button @click="deliveryType = 'retiro'"
+        <button x-on:click="deliveryType = 'retiro'"
                 :style="deliveryType === 'retiro' ? 'background:#111827;color:#fff;' : 'background:#F3F4F6;color:#374151;'"
                 style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;">
             Retiro
         </button>
-        <button @click="deliveryType = 'delivery'"
+        <button x-on:click="deliveryType = 'delivery'"
                 :style="deliveryType === 'delivery' ? 'background:#111827;color:#fff;' : 'background:#F3F4F6;color:#374151;'"
                 style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;">
             Delivery{{ $deliveryCost > 0 ? ' (+' . number_format($deliveryCost, 0, ',', '.') . ')' : '' }}
@@ -234,12 +234,12 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
                          style="font-size:12px;color:#6B7280;margin-top:2px;"></div>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
-                    <button @click="removeItem(item.key)"
+                    <button x-on:click="removeItem(item.key)"
                             style="width:26px;height:26px;border-radius:8px;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#374151;font-weight:600;">
                         −
                     </button>
                     <span x-text="item.qty" style="font-size:13px;font-weight:700;min-width:18px;text-align:center;"></span>
-                    <button @click="addItem(item.id, item.name, item.price, item.variantName)"
+                    <button x-on:click="addItem(item.id, item.name, item.price, item.variantName)"
                             style="width:26px;height:26px;border-radius:8px;background:#111827;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:600;">
                         +
                     </button>
@@ -287,7 +287,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
         </div>
         @endif
 
-        <button @click="!belowMinOrder() && sendWhatsApp()"
+        <button x-on:click="!belowMinOrder() && sendWhatsApp()"
                 :style="belowMinOrder() ? 'opacity:.5;cursor:not-allowed;' : 'opacity:1;cursor:pointer;'"
                 style="width:100%;padding:14px;border-radius:12px;background:#25D366;color:#fff;border:none;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -303,7 +303,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
      x-cloak
      style="position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0;">
 
-    <div @click="showVariantModal = false; pendingItem = null;"
+    <div x-on:click="showVariantModal = false; pendingItem = null;"
          style="position:absolute;inset:0;background:rgba(0,0,0,.45);"></div>
 
     <div style="position:relative;width:100%;max-width:440px;background:#fff;border-radius:20px 20px 0 0;padding:20px 18px 32px;z-index:61;">
@@ -312,7 +312,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
 
         <div style="display:flex;flex-direction:column;gap:8px;">
             <template x-for="variant in (pendingItem ? pendingItem.variants : [])" :key="variant.name">
-                <button @click="addVariant(variant)"
+                <button x-on:click="addVariant(variant)"
                         style="width:100%;padding:12px 14px;border-radius:10px;background:#F9FAFB;border:1px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:left;">
                     <span x-text="variant.name" style="font-size:14px;font-weight:600;color:#111827;"></span>
                     <span x-text="variant.price_delta > 0 ? '+' + formatPrice(variant.price_delta) : (variant.price_delta < 0 ? formatPrice(variant.price_delta) : '')"
@@ -321,7 +321,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             </template>
         </div>
 
-        <button @click="showVariantModal = false; pendingItem = null;"
+        <button x-on:click="showVariantModal = false; pendingItem = null;"
                 style="width:100%;margin-top:12px;padding:11px;border-radius:10px;background:#F3F4F6;border:none;cursor:pointer;font-size:13px;font-weight:600;color:#374151;">
             Cancelar
         </button>
