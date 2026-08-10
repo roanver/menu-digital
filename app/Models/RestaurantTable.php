@@ -8,13 +8,14 @@ class RestaurantTable extends Model
 {
     protected $table = 'restaurant_tables';
 
-    protected $fillable = ['restaurant_id', 'name', 'qr_tag_id', 'nfc_tag_id', 'is_active', 'order'];
+    protected $fillable = ['restaurant_id', 'name', 'qr_tag_id', 'nfc_tag_id', 'is_active', 'order', 'nfc_chip_written'];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
-            'order'     => 'integer',
+            'is_active'        => 'boolean',
+            'order'            => 'integer',
+            'nfc_chip_written' => 'boolean',
         ];
     }
 

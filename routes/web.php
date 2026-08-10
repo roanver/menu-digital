@@ -136,9 +136,8 @@ Route::middleware(['auth', 'has.restaurant', 'set.restaurant', 'billing.check'])
             Route::patch('/tables/reorder', [TableController::class, 'reorder'])->name('tables.reorder');
             Route::patch('/tables/{table}', [TableController::class, 'update'])->name('tables.update');
             Route::post('/tables/{table}/toggle', [TableController::class, 'toggleActive'])->name('tables.toggle');
+            Route::post('/tables/{table}/chip-written', [TableController::class, 'toggleChipWritten'])->name('tables.chip-written');
             Route::delete('/tables/{table}', [TableController::class, 'destroy'])->name('tables.destroy');
-            Route::post('/tables/{table}/link-nfc', [TableController::class, 'linkNfc'])->name('tables.link-nfc');
-            Route::post('/tables/{table}/unlink-nfc', [TableController::class, 'unlinkNfc'])->name('tables.unlink-nfc');
             Route::get('/tables/{table}/qr', [TableController::class, 'downloadQr'])->name('tables.qr');
         });
     });
