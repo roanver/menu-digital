@@ -5,9 +5,10 @@
          addVariant() { this.variants.push({ name: '', price_delta: 0 }); },
          removeVariant(index) { this.variants.splice(index, 1); },
          previewUrl: {{ $item->image ? "'" . Storage::url($item->image) . "'" : 'null' }},
+         removeImage: false,
          handleFile(e) {
              var file = e.target.files[0];
-             if (file) this.previewUrl = URL.createObjectURL(file);
+             if (file) { this.previewUrl = URL.createObjectURL(file); this.removeImage = false; }
          }
      }">
 
@@ -166,8 +167,14 @@
                     </div>
 
                     <div class="p-4">
-                        <label class="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-[#E5E7EB] rounded-[14px] p-7 cursor-pointer hover:border-[#4F46E5] hover:bg-[#EEF2FF] transition-colors relative"
-                               x-show="!previewUrl">
+                        {{-- Un solo input real: siempre en el DOM, siempre se envía --}}
+                        <input type="file" name="image" accept="image/*" class="hidden"
+                               x-ref="fileInput" @change="handleFile($event)">
+                        <input type="hidden" name="remove_image" :value="removeImage ? '1' : '0'">
+
+                        <div x-show="!previewUrl"
+                             @click="$refs.fileInput.click()"
+                             class="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-[#E5E7EB] rounded-[14px] p-7 cursor-pointer hover:border-[#4F46E5] hover:bg-[#EEF2FF] transition-colors">
                             <div class="w-[52px] h-[52px] rounded-[14px] bg-[#F3F4F6] flex items-center justify-center">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="8.5" r="1.5"/>
@@ -177,21 +184,19 @@
                                 <span class="text-[13px] font-semibold text-[#374151]">Arrastra o toca para subir</span>
                                 <p class="text-[11px] text-[#9CA3AF] mt-0.5">Una foto atractiva aumenta los pedidos</p>
                             </div>
-                            <input type="file" name="image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer"
-                                   @change="handleFile($event)">
-                        </label>
+                        </div>
 
                         <div x-show="previewUrl" class="relative rounded-[12px] overflow-hidden border border-[#E5E7EB]">
                             <img :src="previewUrl" class="w-full h-[180px] object-cover">
                             <button type="button"
-                                    @click="previewUrl = null"
+                                    @click="previewUrl = null; $refs.fileInput.value = ''; removeImage = true"
                                     class="absolute top-2 right-2 w-[28px] h-[28px] flex items-center justify-center bg-white rounded-full shadow-md text-[#6B7280] hover:text-[#DC2626] transition-colors">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                             </button>
-                            <label class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[11px] font-semibold py-2 text-center cursor-pointer hover:bg-black/65 transition-colors">
+                            <div @click="$refs.fileInput.click()"
+                                 class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[11px] font-semibold py-2 text-center cursor-pointer hover:bg-black/65 transition-colors">
                                 Cambiar foto
-                                <input type="file" name="image" accept="image/*" class="sr-only" @change="handleFile($event)">
-                            </label>
+                            </div>
                         </div>
                     </div>
 

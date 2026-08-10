@@ -123,7 +123,8 @@ class MenuItemController extends AdminController
             'stock'       => ['nullable', 'integer', 'min:0'],
             'is_promo'    => ['nullable', 'boolean'],
             'promo_price' => ['nullable', 'integer', 'min:0'],
-            'image'       => ['nullable', 'image', 'max:2048'],
+            'image'        => ['nullable', 'image', 'max:2048'],
+            'remove_image' => ['nullable', 'boolean'],
             'variants'    => ['nullable', 'array'],
             'variants.*.name'        => ['required_with:variants', 'string', 'max:255'],
             'variants.*.price_delta' => ['nullable', 'integer'],
@@ -149,6 +150,9 @@ class MenuItemController extends AdminController
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $this->deleteImageFile($item->image);
             $updateData['image'] = $this->saveImageAsWebp($request->file('image'));
+        } elseif ($request->boolean('remove_image') && $item->image) {
+            $this->deleteImageFile($item->image);
+            $updateData['image'] = null;
         }
 
         $item->update($updateData);
