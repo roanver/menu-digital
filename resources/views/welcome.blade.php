@@ -84,7 +84,7 @@ html { scroll-behavior: smooth; }
   <div style="flex: 1 1 430px; min-width: 300px; position: relative; display: flex; justify-content: center">
     <!-- Panel de foto del local -->
     <div style="position: relative; width: 100%; max-width: 470px; border-radius: 26px; overflow: hidden; background: #E7E1D5; aspect-ratio: 4 / 4.6">
-      <img src="https://loremflickr.com/900/1000/restaurant,interior?lock=21" alt="Interior del local" style="width: 100%; height: 100%; object-fit: cover; display: block">
+      <img src="{{ asset('images/landing/hero-local.svg') }}" alt="Local con placas MenuDigital en las mesas" style="width: 100%; height: 100%; object-fit: cover; display: block">
       <div style="position: absolute; inset: 0; background: linear-gradient(190deg, rgba(18,32,26,0.10) 0%, rgba(18,32,26,0) 42%, rgba(18,32,26,0.34) 100%); pointer-events: none"></div>
     </div>
 
@@ -110,7 +110,7 @@ html { scroll-behavior: smooth; }
         <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; background: #FFFDF9">
           <!-- Portada -->
           <div style="position: relative; height: 124px; flex: 0 0 auto; background: #E7E1D5">
-            <img src="https://loremflickr.com/800/400/burger?lock=3" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block">
+            <img src="{{ asset('images/landing/portada-carta.svg') }}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block">
             <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,22,17,0.05), rgba(12,22,17,0.72)); pointer-events: none"></div>
             <div style="position: absolute; left: 12px; right: 12px; bottom: 9px; pointer-events: none">
               <div style="font-size: 7.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Av. Concha y Toro 1240</div>
@@ -242,7 +242,7 @@ html { scroll-behavior: smooth; }
       <!-- Foto -->
       <div style="flex: 1 1 340px; min-width: 280px; max-width: 460px; display: flex; flex-direction: column; gap: 14px">
         <div style="position: relative; border-radius: 18px; overflow: hidden; background: #E7E1D5; aspect-ratio: 4 / 3.2">
-          <img src="https://loremflickr.com/800/640/menu,restaurant?lock=12" alt="Carta de papel sobre la mesa" style="width: 100%; height: 100%; object-fit: cover; display: block">
+          <img src="{{ asset('images/landing/como-es.svg') }}" alt="Carta de papel sobre la mesa" style="width: 100%; height: 100%; object-fit: cover; display: block">
         </div>
         <p style="font-size: 13.5px; color: #6C7C71; margin: 0; line-height: 1.5">Placa de acrílico en cada mesa. Si se raya o se pierde, te la reponemos sin costo.</p>
       </div>
@@ -324,7 +324,7 @@ html { scroll-behavior: smooth; }
           </div>
           <!-- Portada -->
           <div style="position: relative; height: 118px; flex: 0 0 auto; background: #E7E1D5">
-            <img src="https://loremflickr.com/800/400/steak,plate?lock=19" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block">
+            <img src="{{ asset('images/landing/demo-portada.svg') }}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block">
             <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,22,17,0.05), rgba(12,22,17,0.74)); pointer-events: none"></div>
             <div style="position: absolute; left: 14px; right: 14px; bottom: 10px; pointer-events: none">
               <div style="font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.72)">Mesa 4 · Av. Concha y Toro 1240</div>

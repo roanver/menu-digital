@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <defs>
+    <radialGradient id="plate-g" cx="40%" cy="38%" r="56%">
+      <stop offset="0%" stop-color="#FAFAF6"/>
+      <stop offset="100%" stop-color="#E6E0D4"/>
+    </radialGradient>
+    <radialGradient id="table-g" cx="25%" cy="25%" r="80%">
+      <stop offset="0%" stop-color="#5A8C6A"/>
+      <stop offset="100%" stop-color="#2E5A3C"/>
+    </radialGradient>
+    <radialGradient id="lomo-g" cx="40%" cy="35%" r="58%">
+      <stop offset="0%" stop-color="#7A4A22"/>
+      <stop offset="100%" stop-color="#5A3018"/>
+    </radialGradient>
+    <radialGradient id="egg-g" cx="42%" cy="38%" r="52%">
+      <stop offset="0%" stop-color="#FFF8DC"/>
+      <stop offset="100%" stop-color="#F8E8A0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background: green tablecloth -->
+  <rect width="800" height="400" fill="url(#table-g)"/>
+  <!-- Subtle texture -->
+  <line x1="0" y1="80" x2="800" y2="76" stroke="rgba(255,255,255,0.05)" stroke-width="20"/>
+  <line x1="0" y1="200" x2="800" y2="206" stroke="rgba(0,0,0,0.08)" stroke-width="16"/>
+  <line x1="0" y1="320" x2="800" y2="316" stroke="rgba(255,255,255,0.05)" stroke-width="18"/>
+
+  <!-- Plate shadow -->
+  <ellipse cx="400" cy="225" rx="192" ry="26" fill="rgba(0,0,0,0.28)"/>
+  <!-- Plate -->
+  <circle cx="400" cy="204" r="192" fill="url(#plate-g)"/>
+  <circle cx="400" cy="204" r="186" fill="none" stroke="rgba(18,32,26,0.06)" stroke-width="2"/>
+  <circle cx="400" cy="204" r="160" fill="none" stroke="rgba(18,32,26,0.04)" stroke-width="1"/>
+
+  <!-- Mashed potatoes / papas -->
+  <ellipse cx="380" cy="216" rx="98" ry="54" fill="#F0E8C8"/>
+  <ellipse cx="382" cy="212" rx="90" ry="46" fill="#F8F0D8"/>
+  <!-- Potato texture -->
+  <ellipse cx="362" cy="210" rx="22" ry="14" fill="rgba(0,0,0,0.04)"/>
+  <ellipse cx="402" cy="206" rx="20" ry="12" fill="rgba(0,0,0,0.03)"/>
+  <!-- Butter dollop -->
+  <ellipse cx="375" cy="208" rx="14" ry="10" fill="#F0C040" opacity="0.8"/>
+  <ellipse cx="373" cy="206" rx="8" ry="6" fill="#F8D060" opacity="0.9"/>
+
+  <!-- Meat (lomo a lo pobre) - thick steak -->
+  <ellipse cx="400" cy="200" rx="106" ry="52" fill="#5A3018"/>
+  <ellipse cx="398" cy="196" rx="100" ry="46" fill="url(#lomo-g)"/>
+  <!-- Grill marks on steak -->
+  <path d="M334,194 Q350,186 366,194" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M348,204 Q364,196 380,204" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M380,190 Q396,182 412,190" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M394,200 Q410,192 426,200" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M420,192 Q436,184 452,192" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Meat highlight -->
+  <ellipse cx="374" cy="186" rx="34" ry="14" fill="rgba(255,255,255,0.08)"/>
+
+  <!-- Fried egg (huevo frito) on top -->
+  <ellipse cx="406" cy="190" rx="56" ry="38" fill="#F8E860" opacity="0.95"/><!-- yolk area -->
+  <ellipse cx="406" cy="190" rx="56" ry="38" fill="url(#egg-g)"/>
+  <!-- Egg white -->
+  <ellipse cx="406" cy="192" rx="72" ry="46" fill="rgba(255,255,255,0.92)"/>
+  <ellipse cx="400" cy="192" rx="64" ry="40" fill="rgba(255,255,255,0.95)"/>
+  <!-- Egg white edge (cooked look) -->
+  <ellipse cx="406" cy="192" rx="72" ry="46" fill="none" stroke="#E8D8A0" stroke-width="1"/>
+  <!-- Yolk -->
+  <circle cx="406" cy="188" r="26" fill="#F0BC20"/>
+  <circle cx="406" cy="188" r="22" fill="#F8CC30"/>
+  <circle cx="406" cy="188" r="18" fill="#FCD840"/>
+  <!-- Yolk highlight -->
+  <circle cx="398" cy="181" r="8" fill="rgba(255,255,255,0.32)"/>
+
+  <!-- Caramelized onions (cebollas) -->
+  <ellipse cx="332" cy="210" rx="46" ry="26" fill="#C07028" opacity="0.88"/>
+  <ellipse cx="334" cy="208" rx="40" ry="21" fill="#D08030"/>
+  <!-- Onion strands -->
+  <path d="M308,206 Q322,198 336,206 Q350,214 332,218" fill="none" stroke="#E09040" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M314,212 Q328,204 342,210" fill="none" stroke="#E09040" stroke-width="2" stroke-linecap="round"/>
+  <path d="M318,218 Q330,212 344,218" fill="none" stroke="#C06020" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Sausage / chorizo on side -->
+  <ellipse cx="488" cy="216" rx="52" ry="22" fill="#8B2814" transform="rotate(-15,488,216)"/>
+  <ellipse cx="488" cy="213" rx="46" ry="17" fill="#A03020" transform="rotate(-15,488,213)"/>
+  <ellipse cx="478" cy="208" rx="12" ry="6" fill="rgba(255,255,255,0.1)" transform="rotate(-15,478,208)"/>
+  <!-- Sausage texture lines -->
+  <path d="M460,210 Q470,203 480,210" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" transform="rotate(-15,470,210)"/>
+  <path d="M478,208 Q488,201 498,208" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" transform="rotate(-15,488,208)"/>
+  <path d="M496,206 Q506,199 516,206" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" transform="rotate(-15,506,206)"/>
+
+  <!-- Parsley / perejil garnish -->
+  <circle cx="360" cy="168" r="9" fill="#157347"/>
+  <circle cx="372" cy="163" r="8" fill="#1A8040"/>
+  <circle cx="382" cy="166" r="7" fill="#157347"/>
+  <circle cx="370" cy="158" r="7" fill="#1A8040"/>
+  <circle cx="380" cy="158" r="6" fill="#157347"/>
+
+  <!-- Plate rim highlight -->
+  <ellipse cx="336" cy="106" rx="58" ry="18" fill="rgba(255,255,255,0.2)" transform="rotate(-28,336,106)"/>
+
+  <!-- Wine glass (copa de vino) - to the right -->
+  <ellipse cx="674" cy="232" rx="38" ry="10" fill="rgba(0,0,0,0.2)"/>
+  <ellipse cx="668" cy="224" rx="44" ry="44" fill="#FEFEFE" fill-opacity="0.18"/>
+  <ellipse cx="668" cy="224" rx="44" ry="44" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+  <!-- Wine liquid -->
+  <ellipse cx="668" cy="228" rx="36" ry="32" fill="#8B1A1A" fill-opacity="0.65"/>
+  <ellipse cx="660" cy="218" rx="14" ry="10" fill="rgba(255,255,255,0.15)"/>
+  <!-- Glass stem -->
+  <rect x="665" y="268" width="6" height="48" rx="3" fill="rgba(255,255,255,0.4)"/>
+  <!-- Glass base -->
+  <ellipse cx="668" cy="316" rx="24" ry="5" fill="rgba(255,255,255,0.35)"/>
+</svg>
