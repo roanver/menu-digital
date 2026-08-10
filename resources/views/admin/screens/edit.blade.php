@@ -7,7 +7,7 @@
         Pantallas
     </a>
 
-    <form method="POST" action="{{ route('admin.screens.update', $screen) }}" enctype="multipart/form-data" class="space-y-4">
+    <form id="edit-form" method="POST" action="{{ route('admin.screens.update', $screen) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PATCH')
 
@@ -200,25 +200,27 @@
         </div>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-            <form method="POST" action="{{ route('admin.screens.destroy', $screen) }}"
-                  onsubmit="return confirm('¿Eliminar la pantalla &quot;{{ addslashes($screen->name) }}&quot;?')">
-                @csrf @method('DELETE')
-                <button type="submit"
-                        class="inline-flex items-center gap-1.5 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-3 py-[9px] text-[12.5px] font-semibold transition-colors">
-                    Eliminar
-                </button>
-            </form>
+            <button type="submit" form="delete-form"
+                    onclick="return confirm('¿Eliminar la pantalla &quot;{{ addslashes($screen->name) }}&quot;?')"
+                    class="inline-flex items-center gap-1.5 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-3 py-[9px] text-[12.5px] font-semibold transition-colors">
+                Eliminar
+            </button>
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.screens.index') }}"
                    class="inline-flex items-center gap-2 bg-white hover:bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-[10px] px-4 py-[9px] text-[13px] font-semibold transition-colors">
                     Cancelar
                 </a>
-                <button type="submit"
+                <button type="submit" form="edit-form"
                         class="inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white border border-[#4338CA] rounded-[10px] px-4 py-[9px] text-[13px] font-semibold shadow-[0_1px_2px_rgba(79,70,229,.35)] transition-colors">
                     Guardar cambios
                 </button>
             </div>
         </div>
+    </form>
+
+    {{-- Form de eliminar fuera del form de edición para evitar anidamiento --}}
+    <form id="delete-form" method="POST" action="{{ route('admin.screens.destroy', $screen) }}" style="display:none;">
+        @csrf @method('DELETE')
     </form>
 </div>
 </x-admin-layout>
