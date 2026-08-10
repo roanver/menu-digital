@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\RestaurantTable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -63,6 +64,11 @@ class Restaurant extends Model
     public function nfcTags(): HasMany
     {
         return $this->hasMany(NfcTag::class);
+    }
+
+    public function tables(): HasMany
+    {
+        return $this->hasMany(RestaurantTable::class)->orderBy('order')->orderBy('id');
     }
 
     public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany

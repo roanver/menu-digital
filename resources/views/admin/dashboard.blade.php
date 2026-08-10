@@ -181,6 +181,30 @@
     </div>
 </div>
 
+{{-- Escaneos por mesa este mes --}}
+@if(isset($tableScans) && $tableScans->isNotEmpty())
+<div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] mb-5 overflow-hidden">
+    <div class="px-5 pt-4 pb-4">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-[13px] font-bold text-[#111827]">Escaneos por mesa</div>
+            <a href="{{ route('admin.tables.index') }}" class="text-[11.5px] font-semibold text-[#4F46E5] hover:underline">Ver mesas →</a>
+        </div>
+        @php $maxTableScans = max(1, $tableScans->max('scans')); @endphp
+        <div class="space-y-1.5">
+            @foreach($tableScans->take(6) as $ts)
+            <div class="flex items-center gap-2 text-[12px]">
+                <span class="flex-1 text-[#4B5563] truncate">{{ $ts['name'] }}</span>
+                <span class="font-semibold text-[#111827] tabular-nums w-[28px] text-right">{{ $ts['scans'] }}</span>
+                <div class="w-[80px] h-[5px] bg-[#F3F4F6] rounded-full overflow-hidden flex-none">
+                    <div class="h-full bg-[#4F46E5] rounded-full" style="width:{{ $maxTableScans > 0 ? min(100, round($ts['scans'] / $maxTableScans * 100)) : 0 }}%"></div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- Two-panel grid --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 

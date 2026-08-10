@@ -214,6 +214,22 @@
                 QR
             </a>
 
+            {{-- Mesas --}}
+            @php
+                $__maxT = config('plans.plans.'.$_plan.'.max_tables', 0);
+                $__active = request()->routeIs('admin.tables.*');
+            @endphp
+            @if(($_activeRestaurant?->type === 'restaurant' || !$_activeRestaurant?->type) && $__maxT !== 0)
+            <a href="{{ route('admin.tables.index') }}"
+               class="flex items-center gap-[10px] w-full px-[10px] py-[8px] rounded-[9px] border text-[13px] transition-colors no-underline mb-[2px]
+                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-bold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
+                <svg class="w-[16px] h-[16px] flex-none {{ $__active ? 'opacity-100' : 'opacity-60' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="7" width="18" height="4" rx="1"/><line x1="5" y1="11" x2="5" y2="17"/><line x1="19" y1="11" x2="19" y2="17"/>
+                </svg>
+                Mesas
+            </a>
+            @endif
+
             {{-- Pantallas --}}
             @php $__active = request()->routeIs('admin.screens.*'); @endphp
             <a href="{{ route('admin.screens.index') }}"
@@ -488,7 +504,7 @@
 
             {{-- Más --}}
             @php
-                $__inMore = request()->routeIs('admin.import.*') || request()->routeIs('admin.posts.*') || request()->routeIs('admin.qr.*') || request()->routeIs('admin.appearance.*') || request()->routeIs('admin.restaurant.*') || request()->routeIs('admin.staff.*') || request()->routeIs('admin.billing.*') || request()->routeIs('admin.hours.*') || request()->routeIs('admin.advisor.*') || request()->routeIs('admin.screens.*');
+                $__inMore = request()->routeIs('admin.import.*') || request()->routeIs('admin.posts.*') || request()->routeIs('admin.qr.*') || request()->routeIs('admin.appearance.*') || request()->routeIs('admin.restaurant.*') || request()->routeIs('admin.staff.*') || request()->routeIs('admin.billing.*') || request()->routeIs('admin.hours.*') || request()->routeIs('admin.advisor.*') || request()->routeIs('admin.screens.*') || request()->routeIs('admin.tables.*');
             @endphp
             <button @click="moreOpen = true"
                     class="flex-1 flex flex-col items-center justify-center gap-[3px] min-h-[56px] {{ $__inMore ? 'text-[#4F46E5]' : 'text-[#9CA3AF]' }}">
@@ -575,6 +591,17 @@
                 <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
                 <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">QR</span>
             </a>
+
+            {{-- Mesas --}}
+            @php $__maxTm = config('plans.plans.'.$_plan.'.max_tables', 0); @endphp
+            @if(($_activeRestaurant?->type === 'restaurant' || !$_activeRestaurant?->type) && $__maxTm !== 0)
+            @php $__a = request()->routeIs('admin.tables.*'); @endphp
+            <a href="{{ route('admin.tables.index') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="4" rx="1"/><line x1="5" y1="11" x2="5" y2="17"/><line x1="19" y1="11" x2="19" y2="17"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Mesas</span>
+            </a>
+            @endif
 
             {{-- Pantallas --}}
             @php $__a = request()->routeIs('admin.screens.*'); @endphp

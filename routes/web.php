@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AppearanceController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ScreenController;
+use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\Admin\MenuAdvisorController;
 use App\Http\Controllers\Admin\RestaurantSwitchController;
@@ -126,6 +127,19 @@ Route::middleware(['auth', 'has.restaurant', 'set.restaurant', 'billing.check'])
 
             // Pantallas (cartelería digital TV) — solo plan Pro
             Route::resource('screens', ScreenController::class)->except(['show']);
+
+            // Mesas
+            Route::get('/tables/print', [TableController::class, 'printAll'])->name('tables.print');
+            Route::get('/tables', [TableController::class, 'index'])->name('tables.index');
+            Route::post('/tables', [TableController::class, 'store'])->name('tables.store');
+            Route::post('/tables/bulk', [TableController::class, 'storeBulk'])->name('tables.bulk');
+            Route::patch('/tables/reorder', [TableController::class, 'reorder'])->name('tables.reorder');
+            Route::patch('/tables/{table}', [TableController::class, 'update'])->name('tables.update');
+            Route::post('/tables/{table}/toggle', [TableController::class, 'toggleActive'])->name('tables.toggle');
+            Route::delete('/tables/{table}', [TableController::class, 'destroy'])->name('tables.destroy');
+            Route::post('/tables/{table}/link-nfc', [TableController::class, 'linkNfc'])->name('tables.link-nfc');
+            Route::post('/tables/{table}/unlink-nfc', [TableController::class, 'unlinkNfc'])->name('tables.unlink-nfc');
+            Route::get('/tables/{table}/qr', [TableController::class, 'downloadQr'])->name('tables.qr');
         });
     });
 

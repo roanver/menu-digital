@@ -22,6 +22,7 @@ return [
             'max_categories'       => 3,
             'max_screens'          => 0,
             'max_nfc'              => 0,
+            'max_tables'           => 0,
             'ai_imports_per_month' => 0,
         ],
 
@@ -32,6 +33,7 @@ return [
             'max_categories'       => -1,
             'max_screens'          => 0,
             'max_nfc'              => -1,
+            'max_tables'           => 15,
             'ai_imports_per_month' => 3,
         ],
 
@@ -42,6 +44,7 @@ return [
             'max_categories'       => -1,
             'max_screens'          => 3,
             'max_nfc'              => -1,
+            'max_tables'           => -1,
             'ai_imports_per_month' => -1,
         ],
 

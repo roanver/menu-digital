@@ -9,6 +9,7 @@ use App\Models\NfcTag;
 use App\Models\WhatsappClick;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Models\RestaurantTable;
 
 class DashboardController extends AdminController
 {
@@ -63,10 +64,23 @@ class DashboardController extends AdminController
             ->whereMonth('date', now()->month)
             ->sum('count');
 
+        $tableScans = collect();
+        if (config('plans.plans.'.$restaurant->plan.'.max_tables', 0) !== 0) {
+            $tableScans = $restaurant->tables()
+                ->with(['nfcTag' => fn($q) => $q->with(['scans' => fn($q) => $q->whereYear('date', now()->year)->whereMonth('date', now()->month)])])
+                ->get()
+                ->map(fn($t) => [
+                    'name'  => $t->name,
+                    'scans' => $t->nfcTag ? $t->nfcTag->scans->sum('count') : 0,
+                ])
+                ->sortByDesc('scans')
+                ->values();
+        }
+
         return view('admin.dashboard', compact(
             'restaurant', 'categoriesCount', 'itemsCount',
             'days', 'last7', 'prev7', 'scanDelta', 'monthTotal', 'tagBreakdown',
-            'waClicksMonth'
+            'waClicksMonth', 'tableScans'
         ));
     }
 }
