@@ -1,7 +1,32 @@
 @extends('layouts.menu')
 
 @push('head')
-<style>html,body{background:#F6F1E7}body{color:#211A12}</style>
+<style>
+html,body{background:#F6F1E7}
+body{color:#211A12}
+:root{
+    --cart-bg:#F6F1E7;
+    --cart-surface:#EDE8DC;
+    --cart-text:#211A12;
+    --cart-text-muted:#8A7B66;
+    --cart-border:1px solid rgba(33,26,18,.14);
+    --cart-accent:#211A12;
+    --cart-accent-text:#F6F1E7;
+    --cart-radius:14px;
+    --cart-fab-bg:#211A12;
+    --cart-fab-text:#F6F1E7;
+    --cart-chip-bg:#211A12;
+    --cart-chip-text:#F6F1E7;
+    --cart-chip-idle-bg:rgba(33,26,18,.08);
+    --cart-chip-idle-text:#8A7B66;
+    --cart-qty-bg:rgba(33,26,18,.08);
+    --cart-qty-active-bg:#211A12;
+    --cart-qty-active-text:#F6F1E7;
+    --cart-input-border:rgba(33,26,18,.22);
+    --cart-input-focus:#211A12;
+    --cart-drawer-border-top:none;
+}
+</style>
 @endpush
 
 @section('body')

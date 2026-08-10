@@ -26,6 +26,31 @@
     @if(isset($jsonLd))
     <script type="application/ld+json">{{ json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</script>
     @endif
+    <style>
+    /* Cart token defaults — templates override via @push('head') which runs AFTER this */
+    :root{
+        --cart-bg:#fff;
+        --cart-surface:#F3F4F6;
+        --cart-text:#111827;
+        --cart-text-muted:#6B7280;
+        --cart-border:1px solid #F3F4F6;
+        --cart-accent:#25D366;
+        --cart-accent-text:#fff;
+        --cart-radius:20px;
+        --cart-fab-bg:#1C1917;
+        --cart-fab-text:#fff;
+        --cart-chip-bg:#111827;
+        --cart-chip-text:#fff;
+        --cart-chip-idle-bg:#F3F4F6;
+        --cart-chip-idle-text:#374151;
+        --cart-qty-bg:#F3F4F6;
+        --cart-qty-active-bg:#111827;
+        --cart-qty-active-text:#fff;
+        --cart-input-border:#E5E7EB;
+        --cart-input-focus:#111827;
+        --cart-drawer-border-top:none;
+    }
+    </style>
     @stack('head')
 </head>
 <body>

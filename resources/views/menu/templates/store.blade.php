@@ -20,8 +20,9 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
     --cart-radius:16px;
     --cart-fab-bg:#1A1A1A;
     --cart-fab-text:#fff;
-    --cart-action-bg:#25D366;
-    --cart-action-text:#fff;
+    --cart-accent:#25D366;
+    --cart-accent-text:#fff;
+    --cart-surface:#F3F3F1;
     --cart-chip-bg:#1A1A1A;
     --cart-chip-text:#fff;
     --cart-chip-idle-bg:#F3F3F1;

@@ -12,31 +12,6 @@
     $closedText   = (!$isOpen && $nextOpening) ? ('Cerrado · abre ' . $nextOpening) : 'Cerrado ahora';
 @endphp
 
-<style>
-/* Cart design tokens — each template overrides these in its @push('head') */
-:root {
-    --cart-bg:               #fff;
-    --cart-text:             #111827;
-    --cart-text-muted:       #6B7280;
-    --cart-border:           1px solid #F3F4F6;
-    --cart-radius:           20px;
-    --cart-fab-bg:           #1C1917;
-    --cart-fab-text:         #fff;
-    --cart-action-bg:        #25D366;
-    --cart-action-text:      #fff;
-    --cart-chip-bg:          #111827;
-    --cart-chip-text:        #fff;
-    --cart-chip-idle-bg:     #F3F4F6;
-    --cart-chip-idle-text:   #374151;
-    --cart-qty-bg:           #F3F4F6;
-    --cart-qty-active-bg:    #111827;
-    --cart-qty-active-text:  #fff;
-    --cart-input-border:     #E5E7EB;
-    --cart-input-focus:      #111827;
-    --cart-drawer-border-top: none;
-}
-</style>
-
 <script>
 function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCost, minOrder, tableLabel, waTrackUrl, csrfToken, isOpen, closedText) {
     return {
@@ -258,7 +233,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
      x-transition:leave-end="transform translate-y-full"
      style="position:fixed;bottom:0;left:0;right:0;z-index:52;display:flex;justify-content:center;pointer-events:none;">
 
-    <div :style="'pointer-events:auto;width:100%;max-width:480px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -6px 40px rgba(0,0,0,.18);transform:translateY(' + translateY + 'px);' + (touchDragging ? '' : 'transition:transform .2s;')"
+    <div :style="'pointer-events:auto;width:100%;max-width:440px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -6px 40px rgba(0,0,0,.22);transform:translateY(' + translateY + 'px);' + (touchDragging ? '' : 'transition:transform .2s;')"
          @touchstart.passive="onTouchStart($event)"
          @touchmove="onTouchMove($event)"
          @touchend="onTouchEnd()">
@@ -285,24 +260,25 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             </button>
         </div>
 
-        {{-- Tipo de entrega (siempre visible) --}}
+        {{-- Tipo de entrega --}}
         <div style="padding:10px 18px;border-bottom:var(--cart-border);flex-shrink:0;">
             @if($restaurant->accepts_delivery)
             <div style="display:flex;gap:8px;">
                 <button x-on:click="deliveryType = 'retiro'"
                         :style="deliveryType === 'retiro' ? 'background:var(--cart-chip-bg);color:var(--cart-chip-text);' : 'background:var(--cart-chip-idle-bg);color:var(--cart-chip-idle-text);'"
-                        style="flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:40px;">
-                    Retiro en local
+                        style="flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:44px;">
+                    🏪 Retiro en local
                 </button>
                 <button x-on:click="deliveryType = 'delivery'"
                         :style="deliveryType === 'delivery' ? 'background:var(--cart-chip-bg);color:var(--cart-chip-text);' : 'background:var(--cart-chip-idle-bg);color:var(--cart-chip-idle-text);'"
-                        style="flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:40px;">
-                    Delivery{{ $deliveryCost > 0 ? ' (+$' . number_format($deliveryCost, 0, ',', '.') . ')' : '' }}
+                        style="flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:44px;">
+                    🚚 Delivery{{ $deliveryCost > 0 ? ' (+$' . number_format($deliveryCost, 0, ',', '.') . ')' : '' }}
                 </button>
             </div>
             @else
-            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;background:var(--cart-chip-idle-bg);">
-                <span style="font-size:13px;font-weight:600;color:var(--cart-text);">Retiro en local</span>
+            <div style="display:flex;align-items:center;gap:7px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cart-text-muted);flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span style="font-size:13px;font-weight:500;color:var(--cart-text-muted);">Retiro en local</span>
             </div>
             @endif
         </div>
@@ -318,38 +294,43 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             </div>
 
             <template x-for="item in items" :key="item.key">
-                <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:var(--cart-border);">
+                <div style="padding:12px 0;border-bottom:var(--cart-border);">
 
-                    {{-- Thumbnail --}}
-                    <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--cart-chip-idle-bg);display:flex;align-items:center;justify-content:center;">
-                        <template x-if="item.image">
-                            <img :src="item.image" :alt="item.name" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        </template>
-                        <template x-if="!item.image">
-                            <span x-text="item.name.charAt(0).toUpperCase()" style="font-size:18px;font-weight:700;color:var(--cart-text-muted);line-height:1;"></span>
-                        </template>
-                    </div>
+                    {{-- Top row: foto + nombre + subtotal --}}
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
 
-                    {{-- Info + controles --}}
-                    <div style="flex:1;min-width:0;">
-                        <div x-text="item.name" style="font-size:13.5px;font-weight:600;color:var(--cart-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-                        <div x-show="item.variantName" x-text="item.variantName" style="font-size:11.5px;color:var(--cart-text-muted);margin-top:1px;"></div>
-                        <div style="display:flex;align-items:center;gap:7px;margin-top:6px;">
-                            <button x-on:click="removeItem(item.key)"
-                                    style="width:30px;height:30px;border-radius:7px;background:var(--cart-qty-bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--cart-text);font-weight:700;flex-shrink:0;line-height:1;">−</button>
-                            <span x-text="item.qty" style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:var(--cart-text);"></span>
-                            <button x-on:click="addItem(item.id, item.name, item.price, item.variantName, item.image)"
-                                    style="width:30px;height:30px;border-radius:7px;background:var(--cart-qty-active-bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--cart-qty-active-text);font-size:16px;font-weight:700;flex-shrink:0;line-height:1;">+</button>
+                        {{-- Foto 56×56 --}}
+                        <div style="width:56px;height:56px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--cart-surface);display:flex;align-items:center;justify-content:center;">
+                            <template x-if="item.image">
+                                <img :src="item.image" :alt="item.name" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            </template>
+                            <template x-if="!item.image">
+                                <span x-text="item.name.charAt(0).toUpperCase()" style="font-size:20px;font-weight:700;color:var(--cart-text-muted);line-height:1;"></span>
+                            </template>
                         </div>
+
+                        {{-- Nombre + variante + precio unitario --}}
+                        <div style="flex:1;min-width:0;">
+                            <div x-text="item.name" style="font-size:13.5px;font-weight:600;color:var(--cart-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+                            <div x-show="item.variantName" x-text="item.variantName" style="font-size:11.5px;color:var(--cart-text-muted);margin-top:1px;"></div>
+                            <div x-text="formatPrice(item.price)" style="font-size:11.5px;color:var(--cart-text-muted);margin-top:2px;"></div>
+                        </div>
+
+                        {{-- Subtotal --}}
+                        <div x-text="formatPrice(item.price * item.qty)" style="font-size:14px;font-weight:700;color:var(--cart-text);white-space:nowrap;flex-shrink:0;padding-top:1px;"></div>
                     </div>
 
-                    {{-- Subtotal + eliminar --}}
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
-                        <div x-text="formatPrice(item.price * item.qty)" style="font-size:13.5px;font-weight:700;color:var(--cart-text);white-space:nowrap;"></div>
+                    {{-- Controles: −, qty, +, basura — alineados a la derecha --}}
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:9px;">
+                        <button x-on:click="removeItem(item.key)"
+                                style="width:32px;height:32px;border-radius:8px;background:var(--cart-qty-bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--cart-text);font-weight:700;flex-shrink:0;line-height:1;">−</button>
+                        <span x-text="item.qty" style="font-size:13px;font-weight:700;min-width:22px;text-align:center;color:var(--cart-text);"></span>
+                        <button x-on:click="addItem(item.id, item.name, item.price, item.variantName, item.image)"
+                                style="width:32px;height:32px;border-radius:8px;background:var(--cart-qty-active-bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--cart-qty-active-text);font-size:17px;font-weight:700;flex-shrink:0;line-height:1;">+</button>
                         <button x-on:click="deleteItem(item.key)"
-                                style="width:26px;height:26px;border-radius:6px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#DC2626;opacity:.55;"
+                                style="width:32px;height:32px;border-radius:8px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--cart-text-muted);flex-shrink:0;opacity:.65;"
                                 title="Eliminar">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                         </button>
                     </div>
                 </div>
@@ -375,26 +356,27 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             </div>
         </div>
 
-        {{-- Footer: total + CTA --}}
+        {{-- Footer: desglose + CTA --}}
         <div style="padding:14px 18px 30px;border-top:var(--cart-border);flex-shrink:0;">
 
-            {{-- Desglose --}}
+            {{-- Desglose delivery --}}
             <template x-if="deliveryType === 'delivery' && {{ $deliveryCost }} > 0">
-                <div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                <div style="margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
                         <span style="font-size:13px;color:var(--cart-text-muted);">Subtotal</span>
                         <span x-text="formatPrice(subtotalPrice())" style="font-size:13px;color:var(--cart-text-muted);"></span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
                         <span style="font-size:13px;color:var(--cart-text-muted);">Despacho</span>
                         <span style="font-size:13px;color:var(--cart-text-muted);">{{ $deliveryCost > 0 ? '$' . number_format($deliveryCost, 0, ',', '.') : 'Gratis' }}</span>
                     </div>
                 </div>
             </template>
 
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                <span style="font-size:14px;font-weight:700;color:var(--cart-text);">Total</span>
-                <span x-text="formatPrice(totalPrice())" style="font-size:20px;font-weight:800;color:var(--cart-text);letter-spacing:-.02em;"></span>
+            {{-- Total — subordinado al botón --}}
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span style="font-size:13px;color:var(--cart-text-muted);">Total</span>
+                <span x-text="formatPrice(totalPrice())" style="font-size:15px;font-weight:700;color:var(--cart-text);letter-spacing:-.01em;"></span>
             </div>
 
             {{-- Aviso pedido mínimo --}}
@@ -404,14 +386,15 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             </div>
             @endif
 
-            {{-- CTA --}}
+            {{-- CTA principal --}}
             <button x-on:click="items.length > 0 && !belowMinOrder() && sendWhatsApp()"
-                    :style="!isOpen ? 'opacity:.45;pointer-events:none;filter:grayscale(1)' : (items.length === 0 || belowMinOrder() ? 'opacity:.4;cursor:not-allowed;' : 'opacity:1;cursor:pointer;')"
-                    style="width:100%;min-height:52px;padding:14px 16px;border-radius:12px;background:var(--cart-action-bg);color:var(--cart-action-text);border:none;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:-.01em;line-height:1.2;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-                    <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/>
-                </svg>
-                <span>Pedir por WhatsApp · <span x-text="formatPrice(totalPrice())"></span></span>
+                    :style="!isOpen ? 'opacity:.4;cursor:not-allowed;filter:grayscale(1);' : (items.length === 0 || belowMinOrder() ? 'opacity:.4;cursor:not-allowed;' : 'opacity:1;cursor:pointer;')"
+                    style="width:100%;min-height:56px;padding:14px 18px;border-radius:12px;background:var(--cart-accent);color:var(--cart-accent-text);border:none;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em;line-height:1.2;">
+                <span style="display:flex;align-items:center;gap:9px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+                    Pedir por WhatsApp
+                </span>
+                <span x-text="formatPrice(totalPrice())" style="font-weight:800;"></span>
             </button>
             <template x-if="!isOpen">
                 <p style="margin:6px 0 0;text-align:center;font-size:11px;color:var(--cart-text-muted);" x-text="closedText"></p>
@@ -429,7 +412,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
     <div x-on:click="showVariantModal = false; pendingItem = null;"
          style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
 
-    <div style="position:relative;width:100%;max-width:480px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;padding:20px 18px 36px;z-index:61;">
+    <div style="position:relative;width:100%;max-width:440px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;padding:20px 18px 36px;z-index:61;">
         <div style="font-size:16px;font-weight:700;color:var(--cart-text);margin-bottom:3px;" x-text="pendingItem ? pendingItem.name : ''"></div>
         <div style="font-size:13px;color:var(--cart-text-muted);margin-bottom:14px;">Elegí una opción</div>
 

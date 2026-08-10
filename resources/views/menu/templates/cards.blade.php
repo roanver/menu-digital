@@ -12,8 +12,9 @@ body{color:#111827}
     --cart-radius:18px;
     --cart-fab-bg:#4F46E5;
     --cart-fab-text:#fff;
-    --cart-action-bg:#25D366;
-    --cart-action-text:#fff;
+    --cart-accent:#25D366;
+    --cart-accent-text:#fff;
+    --cart-surface:#EEF2FF;
     --cart-chip-bg:#4F46E5;
     --cart-chip-text:#fff;
     --cart-chip-idle-bg:#EEF2FF;

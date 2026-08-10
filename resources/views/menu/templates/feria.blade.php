@@ -13,8 +13,9 @@ body{font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410}
     --cart-radius:14px;
     --cart-fab-bg:#191410;
     --cart-fab-text:#FFF6DE;
-    --cart-action-bg:#25D366;
-    --cart-action-text:#fff;
+    --cart-accent:#25D366;
+    --cart-accent-text:#fff;
+    --cart-surface:#FFE08A;
     --cart-chip-bg:#191410;
     --cart-chip-text:#FFF6DE;
     --cart-chip-idle-bg:#FFE08A;
