@@ -14,8 +14,15 @@ class EnsurePlanActive
         $user = $request->user();
 
         if ($user) {
-            $activeId   = session('active_restaurant_id') ?? $user->restaurant_id;
-            $restaurant = $activeId ? Restaurant::find($activeId) : null;
+            $activeId = session('active_restaurant_id') ?? $user->restaurant_id;
+            $restaurant = null;
+            if ($activeId) {
+                $restaurant = $user->restaurants()->find($activeId);
+                // Legacy: sin pivote pero el restaurant_id del usuario coincide
+                if (! $restaurant && (int) ($user->restaurant_id ?? 0) === (int) $activeId) {
+                    $restaurant = Restaurant::find($activeId);
+                }
+            }
 
             if ($restaurant && ! $restaurant->planIsActive()) {
                 $message = 'Tu plan ha vencido. Renueva para continuar usando MenuDigital.';

@@ -16,11 +16,6 @@ class SetActiveRestaurant
             return $next($request);
         }
 
-        // Superadmin impersonando un negocio
-        if ($user->role === 'super_admin' && session('superadmin_entry_restaurant_id')) {
-            return $next($request);
-        }
-
         $restaurants = $user->restaurants;
 
         if ($restaurants->isEmpty()) {

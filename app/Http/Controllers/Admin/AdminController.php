@@ -28,10 +28,24 @@ abstract class AdminController extends Controller
         // Negocio activo en sesión (multi-negocio)
         $activeId = session('active_restaurant_id');
         if ($activeId) {
-            return $this->restaurant = Restaurant::findOrFail($activeId);
+            $user = auth()->user();
+
+            // Verificar pertenencia por pivote
+            $restaurant = $user->restaurants()->find($activeId);
+            if ($restaurant) {
+                return $this->restaurant = $restaurant;
+            }
+
+            // Legacy: sin entrada en pivote, pero el restaurant_id del usuario coincide
+            if ((int) ($user->restaurant_id ?? 0) === (int) $activeId) {
+                return $this->restaurant = Restaurant::findOrFail($activeId);
+            }
+
+            // active_restaurant_id no pertenece a este usuario
+            abort(403);
         }
 
-        // Fallback legacy: relación directa users.restaurant_id
+        // Sin sesión activa: fallback legacy
         return $this->restaurant = auth()->user()->restaurant;
     }
 

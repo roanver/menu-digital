@@ -53,6 +53,12 @@ class User extends Authenticatable
             if ($member) {
                 return $member->pivot->role === 'owner';
             }
+            // Sin pivote: válido solo si coincide con el restaurant_id propio (legacy)
+            if ((int) ($this->restaurant_id ?? 0) === (int) $activeId) {
+                return $this->role === 'owner';
+            }
+            // activeId ajeno sin pivote — no es owner
+            return false;
         }
         return $this->role === 'owner';
     }
@@ -65,6 +71,12 @@ class User extends Authenticatable
             if ($member) {
                 return $member->pivot->role === 'staff';
             }
+            // Sin pivote: válido solo si coincide con el restaurant_id propio (legacy)
+            if ((int) ($this->restaurant_id ?? 0) === (int) $activeId) {
+                return $this->role === 'staff';
+            }
+            // activeId ajeno sin pivote — no es staff
+            return false;
         }
         return $this->role === 'staff';
     }
