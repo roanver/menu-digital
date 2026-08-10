@@ -84,7 +84,7 @@ class PostGeneratorController extends AdminController
 
         // If item has image, draw it
         if ($item->image) {
-            $contents = Storage::get($item->image);
+            $contents = Storage::disk('public')->get($item->image);
             $src = $contents ? @imagecreatefromstring($contents) : false;
             if ($src) {
                 $sw = imagesx($src);
@@ -140,7 +140,7 @@ class PostGeneratorController extends AdminController
 
         // Logo in bottom right if exists
         if ($restaurant->logo) {
-            $logoContents = Storage::get($restaurant->logo);
+            $logoContents = Storage::disk('public')->get($restaurant->logo);
             $logo = $logoContents ? @imagecreatefromstring($logoContents) : false;
             if ($logo) {
                 $logoResized = imagecreatetruecolor(100, 100);

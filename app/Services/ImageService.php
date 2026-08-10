@@ -47,7 +47,7 @@ class ImageService
         imagedestroy($image);
 
         $path = 'images/' . ((string) Str::uuid()) . '.webp';
-        Storage::put($path, $webpData);
+        Storage::disk('public')->put($path, $webpData);
 
         return $path;
     }
@@ -61,6 +61,6 @@ class ImageService
             return;
         }
 
-        Storage::delete($relativePath);
+        Storage::disk('public')->delete($relativePath);
     }
 }

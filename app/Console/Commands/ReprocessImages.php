@@ -14,7 +14,7 @@ class ReprocessImages extends Command
     {
         $maxWidth = (int) $this->option('max-width');
 
-        $files = Storage::files('images');
+        $files = Storage::disk('public')->files('images');
         $webpFiles = array_filter($files, fn ($f) => str_ends_with($f, '.webp'));
 
         if (empty($webpFiles)) {
@@ -29,7 +29,7 @@ class ReprocessImages extends Command
         $skipped   = 0;
 
         foreach ($webpFiles as $relativePath) {
-            $data  = Storage::get($relativePath);
+            $data  = Storage::disk('public')->get($relativePath);
             $image = $data ? imagecreatefromstring($data) : false;
 
             if ($image === false) {
@@ -54,7 +54,7 @@ class ReprocessImages extends Command
                 imagewebp($image, null, 80);
                 $webpData = ob_get_clean();
 
-                Storage::put($relativePath, $webpData);
+                Storage::disk('public')->put($relativePath, $webpData);
                 $processed++;
             } else {
                 $skipped++;
