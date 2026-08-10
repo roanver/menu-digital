@@ -12,8 +12,8 @@ body{color:#FAFAF9}
     --cart-radius:14px;
     --cart-fab-bg:#F59E0B;
     --cart-fab-text:#0C0A09;
-    --cart-accent:#25D366;
-    --cart-accent-text:#fff;
+    --cart-accent:#F59E0B;
+    --cart-accent-text:#0C0A09;
     --cart-surface:#1E1812;
     --cart-chip-bg:#F59E0B;
     --cart-chip-text:#0C0A09;

@@ -12,7 +12,7 @@ body{color:#F4F4F5}
     --cart-radius:16px;
     --cart-fab-bg:#6366F1;
     --cart-fab-text:#fff;
-    --cart-accent:#25D366;
+    --cart-accent:#6366F1;
     --cart-accent-text:#fff;
     --cart-surface:#1E1E28;
     --cart-chip-bg:#6366F1;

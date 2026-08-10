@@ -27,6 +27,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
         translateY: 0,
         isOpen: isOpen,
         closedText: closedText,
+        isDesktop: false,
 
         init() {
             if (!acceptsOrders) return;
@@ -34,6 +35,9 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             if (stored) {
                 try { this.items = JSON.parse(stored); } catch(e) { this.items = []; }
             }
+            this.isDesktop = window.innerWidth >= 768;
+            window.addEventListener('resize', () => { this.isDesktop = window.innerWidth >= 768; });
+            window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.cartOpen) this.cartOpen = false; });
         },
 
         save() {
@@ -215,14 +219,14 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
 </div>
 @endif
 
-{{-- Overlay --}}
+{{-- Overlay — cierra al tocar fuera --}}
 <div x-on:click="cartOpen = false"
      x-show="cartOpen"
      x-cloak
      style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:51;backdrop-filter:blur(3px);">
 </div>
 
-{{-- Cart Drawer --}}
+{{-- Cart — bottom sheet en móvil, popover en escritorio --}}
 <div x-show="cartOpen"
      x-cloak
      x-transition:enter="transition ease-out duration-260"
@@ -231,15 +235,19 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
      x-transition:leave="transition ease-in duration-210"
      x-transition:leave-start="transform translate-y-0"
      x-transition:leave-end="transform translate-y-full"
-     style="position:fixed;bottom:0;left:0;right:0;z-index:52;display:flex;justify-content:center;pointer-events:none;">
+     :style="isDesktop
+         ? 'position:fixed;bottom:90px;right:18px;z-index:52;pointer-events:none;'
+         : 'position:fixed;bottom:0;left:0;right:0;z-index:52;display:flex;justify-content:center;pointer-events:none;'">
 
-    <div :style="'pointer-events:auto;width:100%;max-width:440px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -6px 40px rgba(0,0,0,.22);transform:translateY(' + translateY + 'px);' + (touchDragging ? '' : 'transition:transform .2s;')"
-         @touchstart.passive="onTouchStart($event)"
-         @touchmove="onTouchMove($event)"
-         @touchend="onTouchEnd()">
+    <div :style="isDesktop
+             ? 'pointer-events:auto;width:400px;max-width:calc(100vw - 36px);background:var(--cart-bg);border:1px solid var(--cart-input-border);border-radius:16px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.30);position:relative;'
+             : ('pointer-events:auto;width:100%;max-width:440px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -6px 40px rgba(0,0,0,.22);transform:translateY(' + translateY + 'px);' + (touchDragging ? '' : 'transition:transform .2s;'))"
+         @touchstart.passive="!isDesktop && onTouchStart($event)"
+         @touchmove="!isDesktop && onTouchMove($event)"
+         @touchend="!isDesktop && onTouchEnd()">
 
-        {{-- Handle --}}
-        <div style="display:flex;justify-content:center;padding:10px 0 0;flex-shrink:0;cursor:grab;">
+        {{-- Handle — solo en móvil --}}
+        <div x-show="!isDesktop" style="display:flex;justify-content:center;padding:10px 0 0;flex-shrink:0;cursor:grab;">
             <div style="width:36px;height:4px;border-radius:2px;background:var(--cart-input-border);opacity:.7;"></div>
         </div>
 
@@ -373,7 +381,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
                 </div>
             </template>
 
-            {{-- Total — subordinado al botón --}}
+            {{-- Total --}}
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                 <span style="font-size:13px;color:var(--cart-text-muted);">Total</span>
                 <span x-text="formatPrice(totalPrice())" style="font-size:15px;font-weight:700;color:var(--cart-text);letter-spacing:-.01em;"></span>
@@ -399,6 +407,11 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             <template x-if="!isOpen">
                 <p style="margin:6px 0 0;text-align:center;font-size:11px;color:var(--cart-text-muted);" x-text="closedText"></p>
             </template>
+        </div>
+
+        {{-- Flecha conectora al botón FAB — solo en escritorio --}}
+        <div x-show="isDesktop" style="position:absolute;bottom:-9px;right:32px;width:18px;height:9px;overflow:hidden;pointer-events:none;">
+            <div style="width:13px;height:13px;background:var(--cart-bg);border-right:1px solid var(--cart-input-border);border-bottom:1px solid var(--cart-input-border);transform:rotate(45deg);margin:-6px auto 0;"></div>
         </div>
 
     </div>
