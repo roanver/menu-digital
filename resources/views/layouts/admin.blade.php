@@ -199,21 +199,6 @@
                 Apariencia
             </a>
 
-            {{-- ── DIFUSIÓN ── --}}
-            <div class="text-[9.5px] font-semibold text-[#C4C9D4] tracking-[.08em] uppercase px-[10px] pt-[14px] pb-[5px]">DIFUSIÓN</div>
-
-            {{-- QR --}}
-            @php $__active = request()->routeIs('admin.qr.*'); @endphp
-            <a href="{{ route('admin.qr.show') }}"
-               class="flex items-center gap-[10px] w-full px-[10px] py-[8px] rounded-[9px] border text-[13px] transition-colors no-underline mb-[2px]
-                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-bold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
-                <svg class="w-[16px] h-[16px] flex-none {{ $__active ? 'opacity-100' : 'opacity-60' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/>
-                    <rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/>
-                </svg>
-                QR
-            </a>
-
             {{-- Mesas --}}
             @php
                 $__maxT = config('plans.plans.'.$_plan.'.max_tables', 0);
@@ -229,6 +214,21 @@
                 Mesas
             </a>
             @endif
+
+            {{-- ── DIFUSIÓN ── --}}
+            <div class="text-[9.5px] font-semibold text-[#C4C9D4] tracking-[.08em] uppercase px-[10px] pt-[14px] pb-[5px]">DIFUSIÓN</div>
+
+            {{-- QR --}}
+            @php $__active = request()->routeIs('admin.qr.*'); @endphp
+            <a href="{{ route('admin.qr.show') }}"
+               class="flex items-center gap-[10px] w-full px-[10px] py-[8px] rounded-[9px] border text-[13px] transition-colors no-underline mb-[2px]
+                      {{ $__active ? 'bg-white border-[#E5E7EB] text-[#4F46E5] font-bold' : 'border-transparent text-[#4B5563] font-medium hover:bg-white/60' }}">
+                <svg class="w-[16px] h-[16px] flex-none {{ $__active ? 'opacity-100' : 'opacity-60' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/>
+                    <rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/>
+                </svg>
+                QR
+            </a>
 
             {{-- Pantallas --}}
             @php $__active = request()->routeIs('admin.screens.*'); @endphp
@@ -581,17 +581,6 @@
                 <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Apariencia</span>
             </a>
 
-            {{-- DIFUSIÓN --}}
-            <div class="text-[9.5px] font-semibold text-[#9CA3AF] tracking-[.08em] uppercase px-2 pt-4 pb-2">DIFUSIÓN</div>
-
-            {{-- QR --}}
-            @php $__a = request()->routeIs('admin.qr.*'); @endphp
-            <a href="{{ route('admin.qr.show') }}" @click="moreOpen = false"
-               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
-                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
-                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">QR</span>
-            </a>
-
             {{-- Mesas --}}
             @php $__maxTm = config('plans.plans.'.$_plan.'.max_tables', 0); @endphp
             @if(($_activeRestaurant?->type === 'restaurant' || !$_activeRestaurant?->type) && $__maxTm !== 0)
@@ -602,6 +591,17 @@
                 <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">Mesas</span>
             </a>
             @endif
+
+            {{-- DIFUSIÓN --}}
+            <div class="text-[9.5px] font-semibold text-[#9CA3AF] tracking-[.08em] uppercase px-2 pt-4 pb-2">DIFUSIÓN</div>
+
+            {{-- QR --}}
+            @php $__a = request()->routeIs('admin.qr.*'); @endphp
+            <a href="{{ route('admin.qr.show') }}" @click="moreOpen = false"
+               class="flex items-center gap-3 px-3 py-[11px] rounded-[12px] {{ $__a ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'text-[#374151] hover:bg-[#F9FAFB]' }} min-h-[44px]">
+                <svg class="w-[18px] h-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="2" height="2"/><rect x="19" y="15" width="2" height="2"/><rect x="15" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
+                <span class="text-[13px] {{ $__a ? 'font-semibold' : 'font-medium' }}">QR</span>
+            </a>
 
             {{-- Pantallas --}}
             @php $__a = request()->routeIs('admin.screens.*'); @endphp
