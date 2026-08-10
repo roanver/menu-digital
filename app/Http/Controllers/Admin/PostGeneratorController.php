@@ -8,6 +8,7 @@ use App\Services\GeminiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PostGeneratorController extends AdminController
@@ -83,31 +84,20 @@ class PostGeneratorController extends AdminController
 
         // If item has image, draw it
         if ($item->image) {
-            $path = storage_path('app/public/' . $item->image);
-            if (file_exists($path)) {
-                $src = null;
-                $mime = mime_content_type($path);
-                if ($mime === 'image/webp') {
-                    $src = @imagecreatefromwebp($path);
-                } elseif ($mime === 'image/jpeg') {
-                    $src = @imagecreatefromjpeg($path);
-                } elseif ($mime === 'image/png') {
-                    $src = @imagecreatefrompng($path);
-                }
+            $contents = Storage::get($item->image);
+            $src = $contents ? @imagecreatefromstring($contents) : false;
+            if ($src) {
+                $sw = imagesx($src);
+                $sh = imagesy($src);
+                imagecopyresampled($img, $src, 0, 0, 0, 0, 1080, 1080, $sw, $sh);
+                imagedestroy($src);
 
-                if ($src) {
-                    $sw = imagesx($src);
-                    $sh = imagesy($src);
-                    imagecopyresampled($img, $src, 0, 0, 0, 0, 1080, 1080, $sw, $sh);
-                    imagedestroy($src);
-
-                    // Dark overlay
-                    $overlay = imagecreatetruecolor(1080, 1080);
-                    $black = imagecolorallocatealpha($overlay, 0, 0, 0, 50);
-                    imagefill($overlay, 0, 0, $black);
-                    imagecopymerge($img, $overlay, 0, 0, 0, 0, 1080, 1080, 55);
-                    imagedestroy($overlay);
-                }
+                // Dark overlay
+                $overlay = imagecreatetruecolor(1080, 1080);
+                $black = imagecolorallocatealpha($overlay, 0, 0, 0, 50);
+                imagefill($overlay, 0, 0, $black);
+                imagecopymerge($img, $overlay, 0, 0, 0, 0, 1080, 1080, 55);
+                imagedestroy($overlay);
             }
         }
 
@@ -150,21 +140,14 @@ class PostGeneratorController extends AdminController
 
         // Logo in bottom right if exists
         if ($restaurant->logo) {
-            $logoPath = storage_path('app/public/' . $restaurant->logo);
-            if (file_exists($logoPath)) {
-                $logoMime = mime_content_type($logoPath);
-                $logo = null;
-                if ($logoMime === 'image/webp') $logo = @imagecreatefromwebp($logoPath);
-                elseif ($logoMime === 'image/jpeg') $logo = @imagecreatefromjpeg($logoPath);
-                elseif ($logoMime === 'image/png') $logo = @imagecreatefrompng($logoPath);
-
-                if ($logo) {
-                    $logoResized = imagecreatetruecolor(100, 100);
-                    imagecopyresampled($logoResized, $logo, 0, 0, 0, 0, 100, 100, imagesx($logo), imagesy($logo));
-                    imagecopy($img, $logoResized, 960, 960, 0, 0, 100, 100);
-                    imagedestroy($logo);
-                    imagedestroy($logoResized);
-                }
+            $logoContents = Storage::get($restaurant->logo);
+            $logo = $logoContents ? @imagecreatefromstring($logoContents) : false;
+            if ($logo) {
+                $logoResized = imagecreatetruecolor(100, 100);
+                imagecopyresampled($logoResized, $logo, 0, 0, 0, 0, 100, 100, imagesx($logo), imagesy($logo));
+                imagecopy($img, $logoResized, 960, 960, 0, 0, 100, 100);
+                imagedestroy($logo);
+                imagedestroy($logoResized);
             }
         }
 

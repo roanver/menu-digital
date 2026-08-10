@@ -56,7 +56,7 @@ class ScreenController extends AdminController
         ]);
 
         $bgImage = $request->hasFile('bg_image')
-            ? $request->file('bg_image')->store('screens', 'public')
+            ? $request->file('bg_image')->store('screens')
             : null;
 
         Screen::create([
@@ -110,13 +110,13 @@ class ScreenController extends AdminController
         $bgImage = $screen->bg_image;
 
         if ($request->boolean('remove_bg_image') && $bgImage) {
-            Storage::disk('public')->delete($bgImage);
+            Storage::delete($bgImage);
             $bgImage = null;
         } elseif ($request->hasFile('bg_image')) {
             if ($bgImage) {
-                Storage::disk('public')->delete($bgImage);
+                Storage::delete($bgImage);
             }
-            $bgImage = $request->file('bg_image')->store('screens', 'public');
+            $bgImage = $request->file('bg_image')->store('screens');
         }
 
         $screen->update([
@@ -141,7 +141,7 @@ class ScreenController extends AdminController
         $this->authorize($screen);
 
         if ($screen->bg_image) {
-            Storage::disk('public')->delete($screen->bg_image);
+            Storage::delete($screen->bg_image);
         }
 
         $screen->delete();

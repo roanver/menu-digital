@@ -60,6 +60,20 @@ return [
             'report' => false,
         ],
 
+        'r2' => [
+            'driver'                  => 's3',
+            'key'                     => env('R2_ACCESS_KEY_ID'),
+            'secret'                  => env('R2_SECRET_ACCESS_KEY'),
+            'region'                  => 'auto',
+            'bucket'                  => env('R2_BUCKET'),
+            'url'                     => env('R2_URL'),       // URL pública: dominio custom o pub-xxx.r2.dev
+            'endpoint'                => env('R2_ENDPOINT'),  // https://<account_id>.r2.cloudflarestorage.com
+            'use_path_style_endpoint' => false,
+            'visibility'              => 'public',
+            'throw'                   => false,
+            'report'                  => false,
+        ],
+
     ],
 
     /*

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ImageService
@@ -31,7 +32,7 @@ class ImageService
         $origH = imagesy($image);
 
         if ($origW > $maxWidth) {
-            $newH   = (int) round($origH * $maxWidth / $origW);
+            $newH    = (int) round($origH * $maxWidth / $origW);
             $resized = imagecreatetruecolor($maxWidth, $newH);
             imagealphablending($resized, false);
             imagesavealpha($resized, true);
@@ -40,19 +41,15 @@ class ImageService
             $image = $resized;
         }
 
-        $directory = storage_path('app/public/images');
-
-        if (! is_dir($directory)) {
-            mkdir($directory, 0755, true);
-        }
-
-        $filename = ((string) Str::uuid()) . '.webp';
-        $fullPath = $directory . '/' . $filename;
-
-        imagewebp($image, $fullPath, 80);
+        ob_start();
+        imagewebp($image, null, 80);
+        $webpData = ob_get_clean();
         imagedestroy($image);
 
-        return 'images/' . $filename;
+        $path = 'images/' . ((string) Str::uuid()) . '.webp';
+        Storage::put($path, $webpData);
+
+        return $path;
     }
 
     /**
@@ -64,10 +61,6 @@ class ImageService
             return;
         }
 
-        $fullPath = storage_path('app/public/' . $relativePath);
-
-        if (file_exists($fullPath)) {
-            unlink($fullPath);
-        }
+        Storage::delete($relativePath);
     }
 }
