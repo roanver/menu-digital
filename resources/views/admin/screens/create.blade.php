@@ -7,7 +7,7 @@
         Pantallas
     </a>
 
-    <form method="POST" action="{{ route('admin.screens.store') }}" class="space-y-4">
+    <form method="POST" action="{{ route('admin.screens.store') }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
 
         {{-- Datos --}}
@@ -44,6 +44,96 @@
                             <option value="portrait"  {{ old('orientation') === 'portrait'  ? 'selected' : '' }}>Vertical (cartel)</option>
                         </select>
                     </label>
+                </div>
+
+            </div>
+        </div>
+
+        {{-- Estilo visual --}}
+        @php
+        $themes = [
+            'dark'  => ['label' => 'Oscuro',  'bg' => '#111115', 'text' => '#F2F2F0', 'acc' => '#6366F1'],
+            'warm'  => ['label' => 'Cálido',  'bg' => '#1C0F08', 'text' => '#F5ECD7', 'acc' => '#F59E0B'],
+            'slate' => ['label' => 'Pizarra', 'bg' => '#0F172A', 'text' => '#E2E8F0', 'acc' => '#38BDF8'],
+            'chalk' => ['label' => 'Tiza',    'bg' => '#1E1B18', 'text' => '#F7F4F0', 'acc' => '#A3E635'],
+            'neon'  => ['label' => 'Neón',    'bg' => '#080812', 'text' => '#F0F0FF', 'acc' => '#EC4899'],
+        ];
+        $currentTheme = old('theme', 'dark');
+        $currentAccent = old('accent_color', '');
+        @endphp
+        <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden"
+             x-data="{
+                theme: '{{ $currentTheme }}',
+                customAccent: {{ $currentAccent ? 'true' : 'false' }},
+                accentVal: '{{ $currentAccent ?: '#6366F1' }}'
+             }">
+
+            {{-- hidden inputs siempre presentes --}}
+            <input type="hidden" name="theme" :value="theme">
+            <input type="hidden" name="accent_color" :value="customAccent ? accentVal : ''">
+
+            <div class="px-5 py-4 border-b border-[#F3F4F6]">
+                <div class="text-[13px] font-bold text-[#111827]">Estilo visual</div>
+            </div>
+            <div class="px-5 py-5 space-y-5">
+
+                {{-- Selector de tema --}}
+                <div>
+                    <span class="text-[12px] font-semibold text-[#374151] block mb-3">Tema de color</span>
+                    <div class="grid grid-cols-5 gap-2">
+                        @foreach($themes as $key => $t)
+                        <button type="button"
+                                x-on:click="theme = '{{ $key }}'"
+                                :class="theme === '{{ $key }}' ? 'ring-2 ring-[#4F46E5] ring-offset-2 scale-[1.03]' : 'ring-1 ring-[#E5E7EB] hover:ring-[#C7D2FE]'"
+                                class="rounded-[10px] overflow-hidden transition-all cursor-pointer focus:outline-none text-left">
+                            {{-- mini preview --}}
+                            <div style="background:{{ $t['bg'] }};padding:10px 9px 8px;">
+                                <div style="font-size:7.5px;font-weight:800;color:{{ $t['text'] }};opacity:.55;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;padding-left:6px;border-left:2px solid {{ $t['acc'] }};">PLATOS</div>
+                                <div style="display:flex;align-items:center;gap:3px;margin-bottom:3px;">
+                                    <div style="font-size:8.5px;color:{{ $t['text'] }};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Empanada</div>
+                                    <div style="font-size:9px;font-weight:800;color:{{ $t['acc'] }};">$2.500</div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:3px;">
+                                    <div style="font-size:8.5px;color:{{ $t['text'] }};flex:1;">Lomo</div>
+                                    <div style="font-size:9px;font-weight:800;color:{{ $t['acc'] }};">$8.900</div>
+                                </div>
+                            </div>
+                            <div style="background:#F9FAFB;padding:5px 8px;text-align:center;border-top:1px solid #E5E7EB;">
+                                <span style="font-size:11px;font-weight:600;color:#374151;">{{ $t['label'] }}</span>
+                            </div>
+                        </button>
+                        @endforeach
+                    </div>
+                    @error('theme')<p class="text-[11.5px] text-[#DC2626] mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                {{-- Color de acento --}}
+                <div>
+                    <label class="flex items-center gap-3 mb-3 cursor-pointer">
+                        <div class="relative flex-none">
+                            <input type="checkbox" x-model="customAccent" class="sr-only peer">
+                            <div class="w-[38px] h-[22px] bg-[#D1D5DB] rounded-full peer-checked:bg-[#4F46E5] transition-colors"></div>
+                            <div class="absolute top-[2px] left-[2px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_2px_rgba(16,24,40,.25)] transition-transform peer-checked:translate-x-[16px]"></div>
+                        </div>
+                        <div>
+                            <span class="text-[13px] font-semibold text-[#374151]">Color de acento personalizado</span>
+                            <p class="text-[11px] text-[#9CA3AF]">Para precios y etiqueta "Oferta". Por defecto usa el color del restaurante.</p>
+                        </div>
+                    </label>
+                    <div x-show="customAccent" x-cloak class="flex items-center gap-3 ml-[52px]">
+                        <input type="color" x-model="accentVal"
+                               class="w-10 h-10 rounded-[8px] border border-[#E5E7EB] cursor-pointer p-1 bg-white">
+                        <span class="font-mono text-[13px] text-[#6B7280]" x-text="accentVal"></span>
+                    </div>
+                </div>
+
+                {{-- Imagen de fondo --}}
+                <div>
+                    <span class="text-[12px] font-semibold text-[#374151] block mb-2">Imagen de fondo <span class="font-normal text-[#9CA3AF]">(opcional)</span></span>
+                    <input type="file" name="bg_image" accept="image/*"
+                           class="block w-full text-[13px] text-[#6B7280] file:mr-3 file:px-3 file:py-1.5 file:rounded-[8px] file:border file:border-[#E5E7EB] file:text-[12px] file:font-semibold file:text-[#374151] file:bg-white file:cursor-pointer hover:file:bg-[#F9FAFB] transition-colors">
+                    <p class="text-[11px] text-[#9CA3AF] mt-1.5">PNG, JPG o WEBP · Máx. 5 MB. Se aplica una capa oscura para que el texto sea legible.</p>
+                    @error('bg_image')<p class="text-[11.5px] text-[#DC2626] mt-1">{{ $message }}</p>@enderror
                 </div>
 
             </div>

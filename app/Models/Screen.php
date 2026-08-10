@@ -11,6 +11,7 @@ class Screen extends Model
     protected $fillable = [
         'restaurant_id', 'name', 'token', 'category_ids',
         'columns', 'orientation', 'show_images', 'show_promos_rotation', 'is_active',
+        'theme', 'accent_color', 'bg_image',
     ];
 
     protected function casts(): array

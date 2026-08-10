@@ -6,10 +6,19 @@ use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\Screen;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class BoardController extends Controller
 {
+    private const THEMES = [
+        'dark'  => ['bg' => '#111115', 'text' => '#F2F2F0'],
+        'warm'  => ['bg' => '#1C0F08', 'text' => '#F5ECD7'],
+        'slate' => ['bg' => '#0F172A', 'text' => '#E2E8F0'],
+        'chalk' => ['bg' => '#1E1B18', 'text' => '#F7F4F0'],
+        'neon'  => ['bg' => '#080812', 'text' => '#F0F0FF'],
+    ];
+
     public function show(string $token): View
     {
         $screen = Screen::where('token', $token)
@@ -31,14 +40,15 @@ class BoardController extends Controller
             || ($restaurant->subscription_ends_at
                 && now()->lt($restaurant->subscription_ends_at->addDays(7)));
 
-        // Compute board colors
-        $bgColor     = $this->ensureDark($restaurant->bg_color ?? '#0F1012');
-        $accentColor = $restaurant->primary_color ?? '#FFFFFF';
-        $textColor   = '#F2F2F0';
+        $theme       = self::THEMES[$screen->theme ?? 'dark'] ?? self::THEMES['dark'];
+        $bgColor     = $theme['bg'];
+        $textColor   = $theme['text'];
+        $accentColor = $screen->accent_color ?? $restaurant->primary_color ?? '#6366F1';
+        $bgImage     = $screen->bg_image ? Storage::url($screen->bg_image) : null;
 
         return view('board.show', compact(
             'screen', 'restaurant', 'categories', 'promos',
-            'gracePeriod', 'bgColor', 'accentColor', 'textColor'
+            'gracePeriod', 'bgColor', 'accentColor', 'textColor', 'bgImage'
         ));
     }
 
@@ -84,20 +94,5 @@ class BoardController extends Controller
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
-    }
-
-    /** Force a hex color to be dark enough for TV display. */
-    private function ensureDark(string $hex): string
-    {
-        $hex = ltrim($hex, '#');
-        if (strlen($hex) !== 6) return '#0F1012';
-
-        $r = hexdec(substr($hex, 0, 2));
-        $g = hexdec(substr($hex, 2, 2));
-        $b = hexdec(substr($hex, 4, 2));
-        $luminance = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
-
-        // If color is too light, use a dark default
-        return $luminance > 0.45 ? '#0F1012' : '#' . $hex;
     }
 }

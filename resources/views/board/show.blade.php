@@ -5,13 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ $restaurant->name }}</title>
 @vite(['resources/js/app.js'])
+@php
+$hasBgImage = (bool) $bgImage;
+@endphp
 <style>
+:root{
+    --bg:     {{ $bgColor }};
+    --text:   {{ $textColor }};
+    --accent: {{ $accentColor }};
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100vw;height:100vh;overflow:hidden;cursor:none;-webkit-font-smoothing:antialiased}
 body{
-    background:{{ $bgColor }};
-    color:{{ $textColor }};
+    background-color:var(--bg);
+    @if($hasBgImage)
+    background-image:url('{{ $bgImage }}');
+    background-size:cover;
+    background-position:center;
+    @endif
+    color:var(--text);
     font-family:'Inter',system-ui,-apple-system,sans-serif;
+}
+
+/* ─── Overlay oscuro sobre imagen de fondo ─── */
+.board-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.68);
+    z-index:0;pointer-events:none;
+    @if(!$hasBgImage)display:none;@endif
 }
 
 /* ─── Wrap con pixel-shift anti burn-in ─── */
@@ -19,19 +40,27 @@ body{
     width:100%;height:100%;
     display:flex;flex-direction:column;
     transition:transform 3s ease-in-out;
+    position:relative;z-index:1;
 }
 
 /* ─── Header ─── */
 .board-header{
     display:flex;align-items:center;gap:1.6vw;
     padding:1.2vh 2.5vw;
+    height:9vh;flex:none;
+    @if($hasBgImage)
+    background:rgba(0,0,0,.4);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    @else
     border-bottom:1px solid rgba(255,255,255,.07);
-    height:9vh;
-    flex:none;
+    @endif
 }
 .board-logo{
     width:5.5vh;height:5.5vh;
-    border-radius:.7vh;object-fit:cover;flex:none;
+    border-radius:.8vh;object-fit:cover;flex:none;
+    box-shadow:0 2px 8px rgba(0,0,0,.4);
 }
 .board-name{
     font-size:2.4vh;font-weight:700;
@@ -48,21 +77,23 @@ body{
 .promo-banner{
     display:flex;align-items:center;gap:2.5vw;
     padding:0 2.5vw;
-    height:14vh;
+    height:14vh;flex:none;overflow:hidden;
+    @if($hasBgImage)
+    background:rgba(0,0,0,.25);
+    @endif
     border-bottom:1px solid rgba(255,255,255,.06);
-    flex:none;
-    overflow:hidden;
 }
 .promo-tag{
     font-size:1vh;font-weight:800;
     letter-spacing:.12em;text-transform:uppercase;
-    background:{{ $accentColor }};color:#000;
+    background:var(--accent);color:#000;
     padding:.4vh 1vw;border-radius:.4vh;
     white-space:nowrap;flex:none;
 }
 .promo-image{
     width:10vh;height:10vh;
     object-fit:cover;border-radius:1vh;flex:none;
+    box-shadow:0 4px 12px rgba(0,0,0,.5);
 }
 .promo-name{
     font-size:3.6vh;font-weight:700;
@@ -81,14 +112,14 @@ body{
 .promo-price{
     font-size:5vh;font-weight:800;
     letter-spacing:-.03em;
-    color:{{ $accentColor }};
+    color:var(--accent);
     font-variant-numeric:tabular-nums;
 }
 
 /* ─── Body ─── */
 .board-body{
     flex:1;overflow:hidden;
-    padding:1.8vh 2vw;
+    padding:2vh 2.2vw;
     columns:{{ $screen->columns }};
     column-gap:2.5vw;
     column-fill:auto;
@@ -101,20 +132,20 @@ body{
     margin-bottom:2.8vh;
 }
 .cat-header{
-    font-size:1.3vh;font-weight:800;
+    font-size:1.25vh;font-weight:800;
     letter-spacing:.14em;text-transform:uppercase;
-    opacity:.35;
-    padding-bottom:.7vh;
-    border-bottom:1px solid rgba(255,255,255,.1);
-    margin-bottom:1.2vh;
+    color:var(--text);opacity:.7;
+    padding:.55vh 0 .55vh 1.1vw;
+    border-left:2.5px solid var(--accent);
+    margin-bottom:1.3vh;
 }
 
 /* ─── Item ─── */
 .item-row{
     display:flex;align-items:center;
     gap:1vw;
-    padding:.5vh 0;
-    border-bottom:1px solid rgba(255,255,255,.04);
+    padding:.52vh 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
 }
 .item-row:last-child{border-bottom:none}
 .item-thumb{
@@ -160,7 +191,7 @@ body{
     white-space:nowrap;flex:none;
 }
 
-/* ─── Indicador offline (punto discreto) ─── */
+/* ─── Indicador offline ─── */
 .offline-dot{
     position:fixed;bottom:1.5vh;right:1.5vw;
     width:5px;height:5px;border-radius:50%;
@@ -177,7 +208,7 @@ body{
     background:rgba(0,0,0,.6);
     font-size:1.1vh;color:rgba(255,255,255,.3);
     text-align:center;letter-spacing:.06em;
-    pointer-events:none;
+    pointer-events:none;z-index:200;
 }
 </style>
 </head>
@@ -185,6 +216,9 @@ body{
     x-data="boardApp()"
     x-init="init()"
 >
+
+<div class="board-overlay"></div>
+
 @php
 $promoData = $promos->map(fn($p) => [
     'name'           => $p->name,
@@ -243,7 +277,7 @@ $promoData = $promos->map(fn($p) => [
                 <div class="item-price-wrap">
                     @if($item->is_promo && $item->promo_price)
                     <span class="item-old-price">${{ number_format($item->price, 0, ',', '.') }}</span>
-                    <span class="item-price" style="color:{{ $accentColor }}">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
+                    <span class="item-price" style="color:var(--accent)">${{ number_format($item->promo_price, 0, ',', '.') }}</span>
                     @else
                     <span class="item-price">${{ number_format($item->price, 0, ',', '.') }}</span>
                     @endif
@@ -274,7 +308,6 @@ function boardApp() {
         promoIndex: 0,
         promos:     {{ $promoData }},
         token:      '{{ $screen->token }}',
-        clockTimer: null,
         clock:      '',
         shifts: [{x:0,y:0},{x:2,y:1},{x:-1,y:2},{x:1,y:-2},{x:-2,y:1},{x:0,y:3}],
         shiftIdx: 0,
@@ -283,18 +316,14 @@ function boardApp() {
         get currentPromo() { return this.promos[this.promoIndex] ?? null; },
 
         init() {
-            // Reloj
             this.tickClock();
             setInterval(() => this.tickClock(), 30000);
 
-            // Online / offline
             window.addEventListener('online',  () => this.isOnline = true);
             window.addEventListener('offline', () => this.isOnline = false);
 
-            // Polling de version
             this.startPolling();
 
-            // Rotación de promos
             @if($screen->show_promos_rotation && $promos->count() > 1)
             setInterval(() => {
                 this.promoIndex = (this.promoIndex + 1) % this.promos.length;
@@ -314,8 +343,8 @@ function boardApp() {
 
         startPolling() {
             const token = this.token;
-            const NORMAL = 12000;   // 12s entre polls
-            const MAX_BACKOFF = 2 * 60 * 1000; // máx 2 min en backoff
+            const NORMAL = 12000;
+            const MAX_BACKOFF = 2 * 60 * 1000;
             let delay = NORMAL;
 
             const attempt = async () => {
@@ -328,7 +357,7 @@ function boardApp() {
                         this.hash = hash;
                     } else if (this.hash !== hash) {
                         location.reload();
-                        return; // no seguir poling tras reload
+                        return;
                     }
                     delay = NORMAL;
                 } catch {
@@ -338,13 +367,11 @@ function boardApp() {
                 setTimeout(attempt, delay);
             };
 
-            // Primera consulta a los 3s de carga
             setTimeout(attempt, 3000);
         }
     };
 }
 
-// Registrar service worker para modo offline
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw-board.js', { scope: '/board/' });
 }

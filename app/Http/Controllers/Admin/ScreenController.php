@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Screen;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ScreenController extends AdminController
@@ -49,7 +50,14 @@ class ScreenController extends AdminController
             'show_images'          => ['nullable', 'boolean'],
             'show_promos_rotation' => ['nullable', 'boolean'],
             'is_active'            => ['nullable', 'boolean'],
+            'theme'                => ['required', 'in:dark,warm,slate,chalk,neon'],
+            'accent_color'         => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'bg_image'             => ['nullable', 'image', 'max:5120'],
         ]);
+
+        $bgImage = $request->hasFile('bg_image')
+            ? $request->file('bg_image')->store('screens', 'public')
+            : null;
 
         Screen::create([
             'restaurant_id'        => $restaurant->id,
@@ -60,6 +68,9 @@ class ScreenController extends AdminController
             'show_images'          => $request->boolean('show_images'),
             'show_promos_rotation' => $request->boolean('show_promos_rotation'),
             'is_active'            => $request->boolean('is_active', true),
+            'theme'                => $validated['theme'],
+            'accent_color'         => $validated['accent_color'] ?: null,
+            'bg_image'             => $bgImage,
         ]);
 
         return redirect()->route('admin.screens.index')
@@ -90,7 +101,23 @@ class ScreenController extends AdminController
             'show_images'          => ['nullable', 'boolean'],
             'show_promos_rotation' => ['nullable', 'boolean'],
             'is_active'            => ['nullable', 'boolean'],
+            'theme'                => ['required', 'in:dark,warm,slate,chalk,neon'],
+            'accent_color'         => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'bg_image'             => ['nullable', 'image', 'max:5120'],
+            'remove_bg_image'      => ['nullable', 'boolean'],
         ]);
+
+        $bgImage = $screen->bg_image;
+
+        if ($request->boolean('remove_bg_image') && $bgImage) {
+            Storage::disk('public')->delete($bgImage);
+            $bgImage = null;
+        } elseif ($request->hasFile('bg_image')) {
+            if ($bgImage) {
+                Storage::disk('public')->delete($bgImage);
+            }
+            $bgImage = $request->file('bg_image')->store('screens', 'public');
+        }
 
         $screen->update([
             'name'                 => $validated['name'],
@@ -100,6 +127,9 @@ class ScreenController extends AdminController
             'show_images'          => $request->boolean('show_images'),
             'show_promos_rotation' => $request->boolean('show_promos_rotation'),
             'is_active'            => $request->boolean('is_active'),
+            'theme'                => $validated['theme'],
+            'accent_color'         => $validated['accent_color'] ?: null,
+            'bg_image'             => $bgImage,
         ]);
 
         return redirect()->route('admin.screens.index')
@@ -109,6 +139,11 @@ class ScreenController extends AdminController
     public function destroy(Screen $screen): RedirectResponse
     {
         $this->authorize($screen);
+
+        if ($screen->bg_image) {
+            Storage::disk('public')->delete($screen->bg_image);
+        }
+
         $screen->delete();
 
         return redirect()->route('admin.screens.index')
