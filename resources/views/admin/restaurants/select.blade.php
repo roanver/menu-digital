@@ -24,7 +24,7 @@
 
     <div class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(16,24,40,.08)] p-6">
         <h1 class="text-[18px] font-bold text-[#111827] mb-1">Selecciona un negocio</h1>
-        <p class="text-[13px] text-[#6B7280] mb-6">Tenés acceso a varios negocios. ¿Cuál querés administrar ahora?</p>
+        <p class="text-[13px] text-[#6B7280] mb-6">Tienes acceso a varios negocios. ¿Cuál quieres administrar ahora?</p>
 
         <div class="space-y-2">
             @foreach($restaurants as $rest)

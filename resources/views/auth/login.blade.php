@@ -1,6 +1,6 @@
 <x-guest-layout
     title="Ingresar — MenuDigital"
-    description="Accedé a tu cuenta para actualizar la carta digital de tu restaurante."
+    description="Accede a tu cuenta para actualizar la carta digital de tu restaurante."
     robots="noindex,nofollow">
 
     @if(session('status'))
@@ -16,7 +16,7 @@
     @endif
 
     <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Hola de nuevo</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.5">Ingresá para administrar tu carta digital.</p>
+    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.5">Ingresa para administrar tu carta digital.</p>
 
     <form method="POST" action="{{ route('login') }}" style="display:flex;flex-direction:column;gap:14px">
         @csrf
@@ -59,7 +59,7 @@
         </button>
 
         <p style="text-align:center;font-size:13px;color:#6B6B60;margin:4px 0 0">
-            ¿Aún no tenés cuenta?
+            ¿Aún no tienes cuenta?
             <a href="{{ route('register') }}" style="font-weight:700;color:#C8452F">Crear una gratis</a>
         </p>
     </form>

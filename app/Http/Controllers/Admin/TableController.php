@@ -73,7 +73,7 @@ class TableController extends AdminController
         }
 
         if ($maxTables !== -1 && ($current + $count) > $maxTables) {
-            return back()->withErrors(['to' => "Tu plan permite hasta {$maxTables} mesas. Ya tenés {$current}."]);
+            return back()->withErrors(['to' => "Tu plan permite hasta {$maxTables} mesas. Ya tienes {$current}."]);
         }
 
         $maxOrder = $restaurant->tables()->max('order') ?? 0;
@@ -151,7 +151,7 @@ class TableController extends AdminController
         $this->authorizeTable($table);
 
         if ($table->nfcTag) {
-            return back()->withErrors(['table' => 'Desvinculá el chip NFC antes de eliminar la mesa.']);
+            return back()->withErrors(['table' => 'Desvincula el chip NFC antes de eliminar la mesa.']);
         }
 
         DB::transaction(function () use ($table) {

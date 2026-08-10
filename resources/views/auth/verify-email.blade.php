@@ -1,9 +1,9 @@
 <x-guest-layout
-    title="Verificá tu correo — MenuDigital"
+    title="Verifica tu correo — MenuDigital"
     robots="noindex,nofollow">
 
-    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Verificá tu correo</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.6">Te mandamos un link de verificación. Revisá tu bandeja de entrada y hacé clic en el link para activar tu cuenta.</p>
+    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Verifica tu correo</h1>
+    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.6">Te enviamos un link de verificación. Revisa tu bandeja de entrada y haz clic en el link para activar tu cuenta.</p>
 
     @if(session('status') == 'verification-link-sent')
     <div style="margin-bottom:20px;padding:11px 14px;border-radius:10px;background:#EEF5EE;border:1.5px solid #3E5A47;font-size:13px;font-weight:600;color:#16211C;">

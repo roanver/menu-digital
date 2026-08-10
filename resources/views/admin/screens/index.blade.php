@@ -43,7 +43,7 @@
         </div>
         <h2 class="text-[20px] font-bold mb-2">Pantallas digitales · Plan Pro</h2>
         <p class="text-[13.5px] text-indigo-200 max-w-[400px] mx-auto mb-6 leading-relaxed">
-            Mostrá tu carta en TVs o monitores del local. Se actualiza sola en menos de 30 segundos cuando cambiás un precio o marcás algo como agotado.
+            Muestra tu carta en TVs o monitores del local. Se actualiza sola en menos de 30 segundos cuando cambias un precio o marcas algo como agotado.
         </p>
         <a href="{{ route('admin.billing.show') }}"
            class="inline-flex items-center gap-2 bg-white text-[#4338CA] font-bold px-6 py-3 rounded-[12px] text-[13.5px] hover:bg-indigo-50 transition-colors">
@@ -59,7 +59,7 @@
             </svg>
         </div>
         <p class="text-[14px] font-semibold text-[#374151] mb-1">Sin pantallas configuradas</p>
-        <p class="text-[12.5px] text-[#9CA3AF] mb-5">Creá una pantalla y abrí la URL en tu TV Box.</p>
+        <p class="text-[12.5px] text-[#9CA3AF] mb-5">Crea una pantalla y abre la URL en tu TV Box.</p>
         <a href="{{ route('admin.screens.create') }}"
            class="inline-flex items-center gap-2 bg-[#4F46E5] text-white rounded-[10px] px-5 py-2.5 text-[13px] font-semibold hover:bg-[#4338CA] transition-colors">
             Crear primera pantalla
@@ -120,9 +120,9 @@
                      width="64" height="64" class="rounded-[6px] border border-[#E5E7EB]"
                      alt="QR {{ $screen->name }}">
                 <div>
-                    <p class="text-[12px] font-semibold text-[#374151] mb-0.5">Escaneá para abrir en el TV Box</p>
+                    <p class="text-[12px] font-semibold text-[#374151] mb-0.5">Escanea para abrir en el TV Box</p>
                     <p class="text-[11.5px] text-[#9CA3AF] leading-relaxed">
-                        En el TV Box: abrí Chrome → escaneá el QR o tipeá la URL → poné la pestaña en pantalla completa (F11).
+                        En el TV Box: abre Chrome → escanea el QR o escribe la URL → pon la pestaña en pantalla completa (F11).
                     </p>
                 </div>
                 <div class="ml-auto">

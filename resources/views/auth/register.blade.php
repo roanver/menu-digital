@@ -1,9 +1,9 @@
 <x-guest-layout
     title="Crear cuenta gratis — MenuDigital"
-    description="Publicá la carta digital de tu restaurante en 2 minutos. QR y NFC incluidos, sin comisión por venta."
+    description="Publica la carta digital de tu restaurante en 2 minutos. QR y NFC incluidos, sin comisión por venta."
     robots="noindex,nofollow">
 
-    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Creá tu carta digital</h1>
+    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Crea tu carta digital</h1>
     <p style="margin:0 0 20px;font-size:14px;color:#4A4A42;line-height:1.5">Dos minutos y tu menú queda publicado con QR incluido.</p>
 
     <form method="POST" action="{{ route('register') }}" style="display:flex;flex-direction:column;gap:13px">
@@ -29,7 +29,7 @@
                     onfocus="document.getElementById('slug-container').style.borderColor='#C8452F';document.getElementById('slug-container').style.boxShadow='0 0 0 3px rgba(200,69,47,.1)'"
                     onblur="document.getElementById('slug-container').style.borderColor='{{ $errors->has('restaurant_slug') ? '#C8452F' : '#16211C' }}';document.getElementById('slug-container').style.boxShadow='none'">
             </div>
-            <p style="margin-top:5px;font-size:11.5px;color:#6B6B60">Se genera automáticamente si lo dejás vacío.</p>
+            <p style="margin-top:5px;font-size:11.5px;color:#6B6B60">Se genera automáticamente si lo dejas vacío.</p>
             @error('restaurant_slug')<p style="margin-top:3px;font-size:12px;font-weight:600;color:#C8452F">{{ $message }}</p>@enderror
         </div>
 
@@ -66,7 +66,7 @@
         <input type="hidden" name="password_confirmation" id="pw_confirm">
 
         <p style="margin:2px 0 0;font-size:11.5px;line-height:1.55;color:#6B6B60">
-            Al crear la cuenta aceptás los <a href="#" style="color:#C8452F">Términos</a> y la <a href="#" style="color:#C8452F">Política de privacidad</a>.
+            Al crear la cuenta aceptas los <a href="#" style="color:#C8452F">Términos</a> y la <a href="#" style="color:#C8452F">Política de privacidad</a>.
         </p>
 
         <button type="submit"
@@ -77,7 +77,7 @@
         </button>
 
         <p style="text-align:center;font-size:13px;color:#6B6B60;margin:4px 0 0">
-            ¿Ya tenés cuenta?
+            ¿Ya tienes cuenta?
             <a href="{{ route('login') }}" style="font-weight:700;color:#C8452F">Ingresar</a>
         </p>
     </form>

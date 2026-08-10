@@ -43,7 +43,7 @@
         </div>
         <h2 class="text-[20px] font-bold mb-2">Gestión de mesas · Plan Básico o Pro</h2>
         <p class="text-[13.5px] text-indigo-200 max-w-[400px] mx-auto mb-6 leading-relaxed">
-            Creá un QR único por mesa. Tus clientes escanean y van directo al menú, y vos sabés cuántos escaneos tiene cada mesa.
+            Crea un QR único por mesa. Tus clientes escanean y van directo al menú, y puedes ver cuántos escaneos tiene cada mesa.
         </p>
         <a href="{{ route('admin.billing.show') }}"
            class="inline-flex items-center gap-2 bg-white text-[#4338CA] font-bold px-6 py-3 rounded-[12px] text-[13.5px] hover:bg-indigo-50 transition-colors">
@@ -198,7 +198,7 @@
                         </button>
                     </form>
                     @else
-                    <span title="Desvinculá el chip antes de eliminar"
+                    <span title="Desvincula el chip antes de eliminar"
                           class="inline-flex items-center text-[11.5px] font-semibold text-[#D1D5DB] rounded-[8px] px-2.5 py-1.5 cursor-not-allowed">
                         Eliminar
                     </span>

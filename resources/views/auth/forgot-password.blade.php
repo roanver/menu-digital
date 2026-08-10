@@ -2,8 +2,8 @@
     title="Recuperar contraseña — MenuDigital"
     robots="noindex,nofollow">
 
-    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Recuperá tu contraseña</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.5">Ingresá tu correo y te enviamos un link para crear una nueva.</p>
+    <h1 style="margin:0 0 6px;font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.08">Recupera tu contraseña</h1>
+    <p style="margin:0 0 24px;font-size:14px;color:#4A4A42;line-height:1.5">Ingresa tu correo y te enviamos un link para crear una nueva.</p>
 
     @if(session('status'))
     <div style="margin-bottom:16px;padding:11px 14px;border-radius:10px;background:#EEF5EE;border:1.5px solid #3E5A47;font-size:13px;font-weight:600;color:#16211C;">

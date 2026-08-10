@@ -427,7 +427,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
 
     <div style="position:relative;width:100%;max-width:440px;background:var(--cart-bg);border-top:var(--cart-drawer-border-top);border-radius:var(--cart-radius) var(--cart-radius) 0 0;padding:20px 18px 36px;z-index:61;">
         <div style="font-size:16px;font-weight:700;color:var(--cart-text);margin-bottom:3px;" x-text="pendingItem ? pendingItem.name : ''"></div>
-        <div style="font-size:13px;color:var(--cart-text-muted);margin-bottom:14px;">Elegí una opción</div>
+        <div style="font-size:13px;color:var(--cart-text-muted);margin-bottom:14px;">Elige una opción</div>
 
         <div style="display:flex;flex-direction:column;gap:8px;">
             <template x-for="variant in (pendingItem ? pendingItem.variants : [])" :key="variant.name">

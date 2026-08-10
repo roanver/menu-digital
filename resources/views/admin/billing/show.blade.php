@@ -441,7 +441,7 @@
                 </div>
                 <div>
                     <div style="font-size:15px;font-weight:700;color:#111827;" x-text="'Cambiar a plan ' + downgradeTargetName"></div>
-                    <div style="font-size:12px;color:#6B7280;margin-top:1px;">Revisá qué cambia antes de continuar</div>
+                    <div style="font-size:12px;color:#6B7280;margin-top:1px;">Revisa qué cambia antes de continuar</div>
                 </div>
             </div>
 
@@ -457,14 +457,14 @@
                         </template>
                     </ul>
                     <div style="font-size:11.5px;color:#92400E;margin-top:10px;padding-top:10px;border-top:1px solid #FDE68A;">
-                        Tus datos nunca se borran. Si volvés a subir de plan, todo se reactiva automáticamente.
+                        Tus datos nunca se borran. Si vuelves a subir de plan, todo se reactiva automáticamente.
                     </div>
                 </div>
             </template>
 
             <template x-if="downgradeWarnings.length === 0">
                 <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#166534;">
-                    No tenés datos que excedan los límites de este plan. El cambio no afecta tu contenido actual.
+                    No tienes datos que excedan los límites de este plan. El cambio no afecta tu contenido actual.
                 </div>
             </template>
 

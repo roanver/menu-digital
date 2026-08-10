@@ -7,7 +7,7 @@
 <meta name="description" content="Carta digital con QR y chip NFC para locales de comida. Te la dejamos instalada y andando. Puente Alto y alrededores.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MenuDigital — La carta de tu local, en el celular del cliente">
-<meta property="og:description" content="Te la dejamos instalada y andando. Vos la cambiás desde tu celular.">
+<meta property="og:description" content="Te la dejamos instalada y andando. Tú la manejas desde tu celular.">
 <meta property="og:site_name" content="MenuDigital">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,7 +99,7 @@ a:focus-visible,button:focus-visible{outline:2.5px solid var(--aji);outline-offs
       <h1 style="font-size:clamp(34px,8vw,52px)">La carta de tu local,<br>en el celular del cliente.</h1>
       <p style="font-size:17.5px;color:#4A4A42;margin:20px 0 0;max-width:38ch">
         Vamos a tu local, te dejamos el menú cargado y los códigos puestos en las mesas.
-        Después vos cambiás precios desde tu celular, en 10 segundos.
+        Después puedes cambiar precios desde tu celular, en 10 segundos.
       </p>
       <div style="display:flex;flex-direction:column;gap:11px;margin-top:28px;max-width:340px">
         <a href="https://wa.me/{{ $wsp }}?text={{ $wspMsg }}" class="btn btn-wsp">Pedir la mía por WhatsApp</a>
@@ -140,14 +140,14 @@ a:focus-visible,button:focus-visible{outline:2.5px solid var(--aji);outline-offs
 <section>
   <div class="wrap">
     <p class="eyebrow">Cómo es</p>
-    <h2 style="font-size:clamp(26px,6vw,36px);margin-top:10px">Tres pasos y quedaste.</h2>
+    <h2 style="font-size:clamp(26px,6vw,36px);margin-top:10px">Tres pasos y listo.</h2>
 
     <div class="cols" style="margin-top:34px">
       <div>
         <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--linea)">
           <span style="font-family:Fraunces,serif;font-size:26px;color:var(--oliva-cl);line-height:1">1</span>
           <div>
-            <h3 style="font-size:19px">Nos mandás una foto de tu carta</h3>
+            <h3 style="font-size:19px">Nos mandas una foto de tu carta</h3>
             <p class="sub">La de papel, la del pizarrón, la que tengas. Nosotros la cargamos entera.</p>
           </div>
         </div>
@@ -155,14 +155,14 @@ a:focus-visible,button:focus-visible{outline:2.5px solid var(--aji);outline-offs
           <span style="font-family:Fraunces,serif;font-size:26px;color:var(--oliva-cl);line-height:1">2</span>
           <div>
             <h3 style="font-size:19px">Vamos y te la dejamos puesta</h3>
-            <p class="sub">Un código en cada mesa y uno en la caja. Instalado y probado, con vos mirando.</p>
+            <p class="sub">Un código en cada mesa y uno en la caja. Instalado y probado, mientras lo ves.</p>
           </div>
         </div>
         <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)">
           <span style="font-family:Fraunces,serif;font-size:26px;color:var(--oliva-cl);line-height:1">3</span>
           <div>
-            <h3 style="font-size:19px">La manejás desde tu celular</h3>
-            <p class="sub">Subiste el precio del churrasco, se te acabó el lomo: lo cambiás y ya está en la mesa.</p>
+            <h3 style="font-size:19px">La manejas desde tu celular</h3>
+            <p class="sub">Subiste el precio del churrasco, se te acabó el lomo: lo cambias y ya está en la mesa.</p>
           </div>
         </div>
       </div>
