@@ -1,7 +1,31 @@
 @extends('layouts.menu')
 
 @push('head')
-<style>html,body{background:#0C0A09}body{color:#FAFAF9}</style>
+<style>
+html,body{background:#0C0A09}
+body{color:#FAFAF9}
+:root{
+    --cart-bg:#161210;
+    --cart-text:#FAFAF9;
+    --cart-text-muted:#A8A29E;
+    --cart-border:1px solid #292524;
+    --cart-radius:14px;
+    --cart-fab-bg:#F59E0B;
+    --cart-fab-text:#0C0A09;
+    --cart-action-bg:#25D366;
+    --cart-action-text:#fff;
+    --cart-chip-bg:#F59E0B;
+    --cart-chip-text:#0C0A09;
+    --cart-chip-idle-bg:rgba(255,255,255,.06);
+    --cart-chip-idle-text:#A8A29E;
+    --cart-qty-bg:rgba(255,255,255,.08);
+    --cart-qty-active-bg:#F59E0B;
+    --cart-qty-active-text:#0C0A09;
+    --cart-input-border:#292524;
+    --cart-input-focus:#F59E0B;
+    --cart-drawer-border-top:none;
+}
+</style>
 @endpush
 
 @section('body')
@@ -135,12 +159,13 @@
                                     @endif
                                 @endif
                                 @if($item->is_available && $restaurant->accepts_orders)
+                                    @php $__img = $item->image ? Storage::url($item->image) : ''; @endphp
                                     @if($item->variants->isNotEmpty())
-                                        @php $__variantData = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
-                                        <button x-on:click="openVariantModal({{ $__variantData }})"
+                                        @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
+                                        <button x-on:click="openVariantModal({{ $__vd }})"
                                                 style="width:28px;height:28px;border-radius:8px;background:linear-gradient(120deg,#F59E0B,#DC2626);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0C0A09;font-size:18px;font-weight:700;line-height:1;">+</button>
                                     @else
-                                        <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }})"
+                                        <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }}, '', '{{ $__img }}')"
                                                 style="width:28px;height:28px;border-radius:8px;background:linear-gradient(120deg,#F59E0B,#DC2626);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0C0A09;font-size:18px;font-weight:700;line-height:1;">+</button>
                                     @endif
                                 @endif
