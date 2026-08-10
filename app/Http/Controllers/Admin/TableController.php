@@ -12,7 +12,7 @@ class TableController extends AdminController
     public function index()
     {
         $restaurant = $this->restaurant();
-        $tables = $restaurant->tables()->with('nfcTag')->get();
+        $tables = $restaurant->tables()->with(['qrTag', 'nfcTag'])->get();
         $maxTables = config('plans.plans.' . $restaurant->plan . '.max_tables', 0);
         $freeChips = NfcTag::where('restaurant_id', $restaurant->id)
             ->where('type', 'menu')
@@ -43,7 +43,8 @@ class TableController extends AdminController
             RestaurantTable::create([
                 'restaurant_id' => $restaurant->id,
                 'name'          => $request->name,
-                'nfc_tag_id'    => $tag->id,
+                'qr_tag_id'     => $tag->id,
+                'nfc_tag_id'    => null,
                 'is_active'     => true,
                 'order'         => $maxOrder + 1,
             ]);
@@ -60,12 +61,12 @@ class TableController extends AdminController
             'to'   => 'required|integer|min:1|max:200|gte:from',
         ]);
 
-        $from = (int) $request->from;
-        $to   = (int) $request->to;
+        $from  = (int) $request->from;
+        $to    = (int) $request->to;
         $count = $to - $from + 1;
 
         $maxTables = config('plans.plans.' . $restaurant->plan . '.max_tables', 0);
-        $current = $restaurant->tables()->count();
+        $current   = $restaurant->tables()->count();
 
         if ($maxTables === 0) {
             return back()->withErrors(['to' => 'Tu plan no incluye mesas.']);
@@ -80,7 +81,7 @@ class TableController extends AdminController
         DB::transaction(function () use ($restaurant, $from, $to, &$maxOrder) {
             for ($i = $from; $i <= $to; $i++) {
                 $name = 'Mesa ' . $i;
-                $tag = NfcTag::create([
+                $tag  = NfcTag::create([
                     'code'          => NfcTag::generateCode(),
                     'type'          => 'menu',
                     'restaurant_id' => $restaurant->id,
@@ -91,7 +92,8 @@ class TableController extends AdminController
                 RestaurantTable::create([
                     'restaurant_id' => $restaurant->id,
                     'name'          => $name,
-                    'nfc_tag_id'    => $tag->id,
+                    'qr_tag_id'     => $tag->id,
+                    'nfc_tag_id'    => null,
                     'is_active'     => true,
                     'order'         => ++$maxOrder,
                 ]);
@@ -108,7 +110,10 @@ class TableController extends AdminController
 
         DB::transaction(function () use ($table, $request) {
             $table->update(['name' => $request->name]);
-            $table->nfcTag->update(['label' => $request->name]);
+            $table->qrTag->update(['label' => $request->name]);
+            if ($table->nfcTag) {
+                $table->nfcTag->update(['label' => $request->name]);
+            }
         });
 
         return back()->with('success', 'Mesa actualizada.');
@@ -117,9 +122,13 @@ class TableController extends AdminController
     public function toggleActive(RestaurantTable $table)
     {
         $this->authorizeTable($table);
-        $active = !$table->is_active;
+        $active = ! $table->is_active;
         $table->update(['is_active' => $active]);
-        $table->nfcTag->update(['is_active' => $active]);
+        $table->qrTag->update(['is_active' => $active]);
+        if ($table->nfcTag) {
+            $table->nfcTag->update(['is_active' => $active]);
+        }
+
         return back()->with('success', $active ? 'Mesa activada.' : 'Mesa desactivada.');
     }
 
@@ -141,12 +150,12 @@ class TableController extends AdminController
     {
         $this->authorizeTable($table);
 
-        if ($table->nfcTag->is_physical) {
+        if ($table->nfcTag) {
             return back()->withErrors(['table' => 'Desvinculá el chip NFC antes de eliminar la mesa.']);
         }
 
         DB::transaction(function () use ($table) {
-            $tag = $table->nfcTag;
+            $tag = $table->qrTag;
             $table->delete();
             $tag->delete();
         });
@@ -169,12 +178,8 @@ class TableController extends AdminController
             ->firstOrFail();
 
         DB::transaction(function () use ($table, $chip) {
-            $oldTag = $table->nfcTag;
             $table->update(['nfc_tag_id' => $chip->id]);
             $chip->update(['label' => $table->name, 'is_active' => $table->is_active]);
-            if (!$oldTag->is_physical) {
-                $oldTag->delete();
-            }
         });
 
         return back()->with('success', 'Chip vinculado a la mesa.');
@@ -184,31 +189,20 @@ class TableController extends AdminController
     {
         $this->authorizeTable($table);
 
-        if (!$table->nfcTag->is_physical) {
+        if (! $table->nfcTag) {
             return back()->withErrors(['table' => 'Esta mesa no tiene chip físico vinculado.']);
         }
 
-        DB::transaction(function () use ($table) {
-            $newTag = NfcTag::create([
-                'code'          => NfcTag::generateCode(),
-                'type'          => 'menu',
-                'restaurant_id' => $table->restaurant_id,
-                'label'         => $table->name,
-                'is_active'     => $table->is_active,
-                'is_physical'   => false,
-            ]);
-            $table->update(['nfc_tag_id' => $newTag->id]);
-            // chip stays, now free
-        });
+        $table->update(['nfc_tag_id' => null]);
 
-        return back()->with('success', 'Chip desvinculado. La mesa conserva su QR.');
+        return back()->with('success', 'Chip desvinculado. El QR de la mesa no cambia.');
     }
 
     public function downloadQr(RestaurantTable $table)
     {
         $this->authorizeTable($table);
-        $url = route('nfc.menu', $table->nfcTag->code);
-        $qr  = QrCode::format('png')->size(600)->margin(2)->generate($url);
+        $url      = route('nfc.menu', $table->qrTag->code);
+        $qr       = QrCode::format('png')->size(600)->margin(2)->generate($url);
         $filename = 'qr-' . str($table->name)->slug() . '.png';
 
         return response($qr, 200)
@@ -218,11 +212,11 @@ class TableController extends AdminController
 
     public function printAll()
     {
-        $restaurant = $this->restaurant();
-        $tables = $restaurant->tables()->with('nfcTag')->where('is_active', true)->get();
+        $restaurant   = $this->restaurant();
+        $tables       = $restaurant->tables()->with('qrTag')->where('is_active', true)->get();
 
         $tablesWithQr = $tables->map(function ($table) {
-            $url = route('nfc.menu', $table->nfcTag->code);
+            $url = route('nfc.menu', $table->qrTag->code);
             $qr  = QrCode::format('svg')->size(220)->margin(1)->generate($url);
             return ['table' => $table, 'qr' => $qr, 'url' => $url];
         });

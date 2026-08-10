@@ -119,11 +119,15 @@
 
     <div class="space-y-2" id="tables-sortable">
         @foreach($tables as $table)
-        @php $scans = $table->scansThisMonth(); @endphp
+        @php
+            $qrScans  = $table->qrScansThisMonth();
+            $nfcScans = $table->nfcScansThisMonth();
+        @endphp
         <div x-data="{ editing: false, name: '{{ addslashes($table->name) }}' }"
              data-id="{{ $table->id }}"
              class="bg-white border border-[#E5E7EB] rounded-[14px] shadow-[0_1px_3px_rgba(16,24,40,.04)] overflow-hidden">
 
+            {{-- Main row --}}
             <div class="flex items-center gap-3 px-4 py-3 flex-wrap sm:flex-nowrap">
 
                 {{-- Drag handle --}}
@@ -139,7 +143,7 @@
                             @if(!$table->is_active)
                             <span class="text-[10px] font-semibold text-[#9CA3AF] bg-[#F3F4F6] border border-[#E5E7EB] rounded-[5px] px-[6px] py-[1px]">Inactiva</span>
                             @endif
-                            @if($table->nfcTag->is_physical)
+                            @if($table->nfcTag)
                             <span class="text-[10px] font-semibold text-[#059669] bg-[#ECFDF5] border border-[#A7F3D0] rounded-[5px] px-[6px] py-[1px]">Chip NFC</span>
                             @endif
                         </div>
@@ -155,7 +159,11 @@
                         </form>
                     </template>
                     <div class="text-[11.5px] text-[#9CA3AF] mt-0.5" x-show="!editing">
-                        {{ $scans }} {{ $scans === 1 ? 'escaneo' : 'escaneos' }} este mes
+                        Este mes:
+                        {{ $qrScans }} por QR
+                        @if($table->nfcTag)
+                        · {{ $nfcScans }} por chip
+                        @endif
                     </div>
                 </div>
 
@@ -179,15 +187,8 @@
                         </button>
                     </form>
 
-                    {{-- Download QR --}}
-                    <a href="{{ route('admin.tables.qr', $table) }}"
-                       class="inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#4F46E5] bg-[#EEF2FF] hover:bg-[#E0E7FF] rounded-[8px] px-2.5 py-1.5 transition-colors">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                        QR
-                    </a>
-
                     {{-- Delete --}}
-                    @if(!$table->nfcTag->is_physical)
+                    @if(!$table->nfcTag)
                     <form method="POST" action="{{ route('admin.tables.destroy', $table) }}"
                           onsubmit="return confirm('¿Eliminar la mesa \"{{ addslashes($table->name) }}\"? Se borrará también su QR.')">
                         @csrf @method('DELETE')
@@ -206,31 +207,41 @@
                 </div>
             </div>
 
+            {{-- QR row --}}
+            <div class="border-t border-[#F3F4F6] bg-[#FAFAFA] px-4 py-2 flex items-center gap-3 flex-wrap">
+                <span class="text-[10.5px] font-bold text-[#9CA3AF] uppercase tracking-wide w-[28px] flex-none">QR</span>
+                <code class="text-[10.5px] text-[#6B7280] bg-white border border-[#E5E7EB] rounded-[5px] px-1.5 py-0.5 font-mono">{{ $table->qrTag->code }}</code>
+                <span class="text-[11px] text-[#9CA3AF]">{{ $qrScans }} {{ $qrScans === 1 ? 'escaneo' : 'escaneos' }} este mes</span>
+                <a href="{{ route('admin.tables.qr', $table) }}"
+                   class="ml-auto inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#4F46E5] bg-[#EEF2FF] hover:bg-[#E0E7FF] rounded-[7px] px-2.5 py-1 transition-colors">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Descargar QR
+                </a>
+            </div>
+
             {{-- NFC chip row --}}
-            <div class="border-t border-[#F9FAFB] bg-[#FAFAFA] px-4 py-2.5 flex items-center gap-3 flex-wrap">
-                @if($table->nfcTag->is_physical)
-                {{-- Physical chip linked --}}
-                <div class="flex items-center gap-2 flex-1 min-w-0">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><rect x="7" y="7" width="10" height="10" rx="1"/><line x1="7" y1="2" x2="7" y2="5"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="17" y1="2" x2="17" y2="5"/><line x1="7" y1="19" x2="7" y2="22"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="17" y1="19" x2="17" y2="22"/><line x1="2" y1="7" x2="5" y2="7"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="2" y1="17" x2="5" y2="17"/><line x1="19" y1="7" x2="22" y2="7"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="19" y1="17" x2="22" y2="17"/></svg>
-                    <span class="text-[12px] text-[#059669] font-semibold">Chip NFC vinculado</span>
-                    <code class="text-[10.5px] text-[#6B7280] bg-white border border-[#E5E7EB] rounded-[5px] px-1.5 py-0.5 font-mono">{{ $table->nfcTag->code }}</code>
-                </div>
+            <div class="border-t border-[#F3F4F6] bg-[#FAFAFA] px-4 py-2 flex items-center gap-3 flex-wrap">
+                <span class="text-[10.5px] font-bold text-[#9CA3AF] uppercase tracking-wide w-[28px] flex-none">NFC</span>
+
+                @if($table->nfcTag)
+                {{-- Chip vinculado --}}
+                <code class="text-[10.5px] text-[#6B7280] bg-white border border-[#E5E7EB] rounded-[5px] px-1.5 py-0.5 font-mono">{{ $table->nfcTag->code }}</code>
+                <span class="text-[11px] text-[#9CA3AF]">{{ $nfcScans }} {{ $nfcScans === 1 ? 'escaneo' : 'escaneos' }} este mes</span>
                 <form method="POST" action="{{ route('admin.tables.unlink-nfc', $table) }}"
-                      onsubmit="return confirm('¿Desvincular el chip NFC? La mesa conservará su QR.')">
+                      class="ml-auto"
+                      onsubmit="return confirm('¿Desvincular el chip NFC? El QR de la mesa no cambia.')">
                     @csrf
                     <button type="submit" class="text-[11.5px] font-semibold text-[#9CA3AF] hover:text-[#374151] transition-colors">
-                        Desvincular chip
+                        Desvincular
                     </button>
                 </form>
+
                 @else
-                {{-- No physical chip --}}
-                <div class="flex items-center gap-2 flex-1 min-w-0">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
-                    <span class="text-[12px] text-[#9CA3AF] font-medium">Sin chip NFC físico</span>
-                    <code class="text-[10.5px] text-[#6B7280] bg-white border border-[#E5E7EB] rounded-[5px] px-1.5 py-0.5 font-mono">{{ $table->nfcTag->code }}</code>
-                </div>
+                {{-- Sin chip --}}
+                <span class="text-[12px] text-[#9CA3AF]">Sin chip asignado</span>
+
                 @if($freeChips->count() > 0)
-                <div x-data="{ open: false }" class="relative">
+                <div x-data="{ open: false }" class="relative ml-auto">
                     <button @click="open = !open" type="button"
                             class="text-[11.5px] font-semibold text-[#4F46E5] hover:text-[#4338CA] transition-colors">
                         + Vincular chip
@@ -245,9 +256,7 @@
                             <button type="submit"
                                     class="w-full text-left px-4 py-2 text-[12px] text-[#374151] hover:bg-[#F9FAFB] font-medium">
                                 <span class="font-mono text-[10.5px] text-[#6B7280]">{{ $chip->code }}</span>
-                                @if($chip->label)
-                                · {{ $chip->label }}
-                                @endif
+                                @if($chip->label) · {{ $chip->label }} @endif
                             </button>
                         </form>
                         @endforeach

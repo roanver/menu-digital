@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NfcScan;
 use App\Models\NfcTag;
+use App\Models\RestaurantTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,9 +44,15 @@ class NfcRedirectController extends Controller
 
         $this->countScan($tag);
 
-        // Pasar label de mesa a sesión para que el carrito lo use
-        if ($tag->label) {
-            session(['nfc_table_label' => $tag->label]);
+        // Resolver nombre de mesa desde cualquiera de los dos FKs (QR o chip NFC)
+        $table = RestaurantTable::where('qr_tag_id', $tag->id)
+            ->orWhere('nfc_tag_id', $tag->id)
+            ->first();
+
+        $label = $table ? $table->name : $tag->label;
+
+        if ($label) {
+            session(['nfc_table_label' => $label]);
         } else {
             session()->forget('nfc_table_label');
         }
