@@ -64,8 +64,11 @@ body{font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410}
                 <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
                     @if($restaurant->welcome_message)
                         <span style="font-size:12px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->welcome_message }}</span>
-                    @else
-                        <span style="font-size:12px;font-weight:700;color:#191410;background:#7BE29B;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">Abierto</span>
+                    @endif
+                    @if($hasHours)
+                    <div style="position:relative;">
+                        <x-menu-hours :hasHours="$hasHours" :isOpen="$isOpen" :closesAt="$closesAt" :nextOpening="$nextOpening" :weekSchedule="$weekSchedule" :dark="false" />
+                    </div>
                     @endif
                     @if($restaurant->phone)
                         <span style="font-size:12px;font-weight:700;color:#191410;background:#fff;border:1.5px solid #191410;border-radius:999px;padding:3px 9px;">{{ $restaurant->phone }}</span>

@@ -59,10 +59,11 @@ body{color:#F4F4F5}
             <div style="flex:1;min-width:0;">
                 <h1 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.025em;">{{ $restaurant->name }}</h1>
                 <div style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
-                    <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#6EE7B7;">
-                        <span style="width:5px;height:5px;border-radius:50%;background:#34D399;box-shadow:0 0 8px #34D399;display:block;"></span>
-                        Abierto
-                    </span>
+                    @if($hasHours)
+                    <div style="position:relative;">
+                        <x-menu-hours :hasHours="$hasHours" :isOpen="$isOpen" :closesAt="$closesAt" :nextOpening="$nextOpening" :weekSchedule="$weekSchedule" :dark="true" />
+                    </div>
+                    @endif
                     @if($restaurant->address)
                         <span style="font-size:12px;color:#565664;">·</span>
                         <span style="font-size:12px;color:#8A8A99;">{{ $restaurant->address }}</span>

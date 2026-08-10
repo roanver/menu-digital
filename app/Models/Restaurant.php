@@ -81,52 +81,145 @@ class Restaurant extends Model
         return $this->hasMany(BusinessHour::class)->orderBy('day_of_week');
     }
 
+    private function isInTramo(string $hour, ?string $opens, ?string $closes): bool
+    {
+        if (!$opens || !$closes) return false;
+        if ($closes > $opens) {
+            return $hour >= $opens && $hour < $closes;
+        }
+        // wraps midnight
+        return $hour >= $opens || $hour < $closes;
+    }
+
+    private function wrapsIntoToday(string $hour, ?string $opens, ?string $closes): bool
+    {
+        if (!$opens || !$closes || $closes >= $opens) return false;
+        return $hour < $closes;
+    }
+
     public function isOpenNow(): bool
     {
-        $dayOfWeek = (int) now()->dayOfWeek; // 0=Sun…6=Sat
-        $hour      = now()->format('H:i:s');
+        if ($this->businessHours->isEmpty()) return true;
 
-        $bh = $this->businessHours()->where('day_of_week', $dayOfWeek)->first();
+        $now = now('America/Santiago');
+        $dayOfWeek = (int) $now->dayOfWeek;
+        $hour = $now->format('H:i:s');
 
-        if (! $bh) {
-            return true; // sin configurar → asumir abierto
+        // Check today's schedule
+        $bh = $this->businessHours->firstWhere('day_of_week', $dayOfWeek);
+        if ($bh && !$bh->is_closed) {
+            if ($this->isInTramo($hour, $bh->opens_at, $bh->closes_at)) return true;
+            if ($this->isInTramo($hour, $bh->opens_at_2, $bh->closes_at_2)) return true;
         }
-        if ($bh->is_closed) {
-            return false;
+
+        // Check if yesterday's schedule wraps past midnight into now
+        $yesterday = ($dayOfWeek + 6) % 7;
+        $bhY = $this->businessHours->firstWhere('day_of_week', $yesterday);
+        if ($bhY && !$bhY->is_closed) {
+            if ($this->wrapsIntoToday($hour, $bhY->opens_at, $bhY->closes_at)) return true;
+            if ($this->wrapsIntoToday($hour, $bhY->opens_at_2, $bhY->closes_at_2)) return true;
         }
 
-        $inFirst  = $bh->opens_at  && $bh->closes_at  && $hour >= $bh->opens_at  && $hour < $bh->closes_at;
-        $inSecond = $bh->opens_at_2 && $bh->closes_at_2 && $hour >= $bh->opens_at_2 && $hour < $bh->closes_at_2;
+        // If today has no record but some days do, treat today as open
+        if (!$bh) return true;
 
-        return $inFirst || $inSecond;
+        return false;
     }
 
     public function nextOpeningTime(): ?string
     {
-        $dayOfWeek = (int) now()->dayOfWeek;
-        $hour      = now()->format('H:i:s');
+        $now = now('America/Santiago');
+        $dayOfWeek = (int) $now->dayOfWeek;
+        $hour = $now->format('H:i:s');
 
-        $bh = $this->businessHours()->where('day_of_week', $dayOfWeek)->first();
+        $bh = $this->businessHours->firstWhere('day_of_week', $dayOfWeek);
 
-        if (! $bh || $bh->is_closed) {
-            // Look at next day(s)
-            for ($i = 1; $i <= 7; $i++) {
-                $nextDay = ($dayOfWeek + $i) % 7;
-                $next    = $this->businessHours()->where('day_of_week', $nextDay)->first();
-                if ($next && ! $next->is_closed && $next->opens_at) {
-                    return \App\Models\BusinessHour::dayName($nextDay) . ' ' . substr($next->opens_at, 0, 5);
-                }
+        // If open in first tramo and there's a second tramo later today
+        if ($bh && !$bh->is_closed) {
+            // between tramos: after closes_at and before opens_at_2
+            if ($bh->opens_at_2 && $bh->closes_at_2 && $hour >= $bh->closes_at && $hour < $bh->opens_at_2) {
+                return 'a las ' . substr($bh->opens_at_2, 0, 5);
             }
-            return null;
+            // before first tramo
+            if ($bh->opens_at && $hour < $bh->opens_at) {
+                return 'a las ' . substr($bh->opens_at, 0, 5);
+            }
         }
 
-        if ($bh->opens_at && $hour < $bh->opens_at) {
-            return 'hoy a las ' . substr($bh->opens_at, 0, 5);
+        // Look forward up to 7 days
+        $dayNames = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        for ($i = 1; $i <= 7; $i++) {
+            $nextDay = ($dayOfWeek + $i) % 7;
+            $next = $this->businessHours->firstWhere('day_of_week', $nextDay);
+            if ($next && !$next->is_closed && $next->opens_at) {
+                $time = 'a las ' . substr($next->opens_at, 0, 5);
+                if ($i === 1) return 'mañana ' . $time;
+                return 'el ' . $dayNames[$nextDay] . ' ' . $time;
+            }
         }
-        if ($bh->opens_at_2 && $hour < $bh->opens_at_2) {
-            return 'hoy a las ' . substr($bh->opens_at_2, 0, 5);
-        }
+
         return null;
+    }
+
+    public function hasHoursConfigured(): bool
+    {
+        return $this->businessHours->isNotEmpty();
+    }
+
+    public function closingTimeToday(): ?string
+    {
+        $now = now('America/Santiago');
+        $dayOfWeek = (int) $now->dayOfWeek;
+        $hour = $now->format('H:i:s');
+
+        // Check yesterday's midnight-wrap tramos first
+        $yesterday = ($dayOfWeek + 6) % 7;
+        $bhY = $this->businessHours->firstWhere('day_of_week', $yesterday);
+        if ($bhY && !$bhY->is_closed) {
+            if ($this->wrapsIntoToday($hour, $bhY->opens_at, $bhY->closes_at))
+                return substr($bhY->closes_at, 0, 5);
+            if ($this->wrapsIntoToday($hour, $bhY->opens_at_2, $bhY->closes_at_2))
+                return substr($bhY->closes_at_2, 0, 5);
+        }
+
+        $bh = $this->businessHours->firstWhere('day_of_week', $dayOfWeek);
+        if (!$bh || $bh->is_closed) return null;
+
+        if ($this->isInTramo($hour, $bh->opens_at, $bh->closes_at))
+            return substr($bh->closes_at, 0, 5);
+        if ($this->isInTramo($hour, $bh->opens_at_2, $bh->closes_at_2))
+            return substr($bh->closes_at_2, 0, 5);
+
+        return null;
+    }
+
+    public function weekScheduleForDisplay(): array
+    {
+        $now = now('America/Santiago');
+        $today = (int) $now->dayOfWeek;
+        $names = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        $schedule = [];
+
+        for ($d = 0; $d < 7; $d++) {
+            $bh = $this->businessHours->firstWhere('day_of_week', $d);
+            $tramos = [];
+            if ($bh && !$bh->is_closed) {
+                if ($bh->opens_at && $bh->closes_at)
+                    $tramos[] = [substr($bh->opens_at, 0, 5), substr($bh->closes_at, 0, 5)];
+                if ($bh->opens_at_2 && $bh->closes_at_2)
+                    $tramos[] = [substr($bh->opens_at_2, 0, 5), substr($bh->closes_at_2, 0, 5)];
+            }
+            $schedule[] = [
+                'day'         => $names[$d],
+                'day_of_week' => $d,
+                'is_today'    => $d === $today,
+                'is_closed'   => $bh ? (bool) $bh->is_closed : false,
+                'no_record'   => !$bh,
+                'tramos'      => $tramos,
+            ];
+        }
+
+        return $schedule;
     }
 
     /** Devuelve la config del vertical activo (config/verticals.php). */

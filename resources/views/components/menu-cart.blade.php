@@ -9,6 +9,7 @@
     $minOrder     = $restaurant->min_order ?? 0;
     $waTrackUrl   = route('wa.click');
     $csrfToken    = csrf_token();
+    $closedText   = (!$isOpen && $nextOpening) ? ('Cerrado · abre ' . $nextOpening) : 'Cerrado ahora';
 @endphp
 
 <style>
@@ -37,7 +38,7 @@
 </style>
 
 <script>
-function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCost, minOrder, tableLabel, waTrackUrl, csrfToken) {
+function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCost, minOrder, tableLabel, waTrackUrl, csrfToken, isOpen, closedText) {
     return {
         items: [],
         cartOpen: false,
@@ -49,6 +50,8 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
         touchStartY: 0,
         touchDragging: false,
         translateY: 0,
+        isOpen: isOpen,
+        closedText: closedText,
 
         init() {
             if (!acceptsOrders) return;
@@ -169,6 +172,7 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
         },
 
         sendWhatsApp() {
+            if (!isOpen) return;
             if (!whatsappNum) return;
             if (this.deliveryType === 'delivery' && !this.deliveryAddress.trim()) {
                 this.$refs.addressInput && this.$refs.addressInput.focus();
@@ -402,13 +406,16 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
 
             {{-- CTA --}}
             <button x-on:click="items.length > 0 && !belowMinOrder() && sendWhatsApp()"
-                    :style="(items.length === 0 || belowMinOrder()) ? 'opacity:.4;cursor:not-allowed;' : 'opacity:1;cursor:pointer;'"
+                    :style="!isOpen ? 'opacity:.45;pointer-events:none;filter:grayscale(1)' : (items.length === 0 || belowMinOrder() ? 'opacity:.4;cursor:not-allowed;' : 'opacity:1;cursor:pointer;')"
                     style="width:100%;min-height:52px;padding:14px 16px;border-radius:12px;background:var(--cart-action-bg);color:var(--cart-action-text);border:none;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:-.01em;line-height:1.2;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
                     <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/>
                 </svg>
                 <span>Pedir por WhatsApp · <span x-text="formatPrice(totalPrice())"></span></span>
             </button>
+            <template x-if="!isOpen">
+                <p style="margin:6px 0 0;text-align:center;font-size:11px;color:var(--cart-text-muted);" x-text="closedText"></p>
+            </template>
         </div>
 
     </div>

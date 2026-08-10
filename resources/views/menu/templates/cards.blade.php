@@ -75,10 +75,11 @@ body{color:#111827}
             </div>
         </div>
         <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-            <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#047857;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:999px;padding:4px 9px;">
-                <span style="width:5px;height:5px;border-radius:50%;background:#10B981;display:block;"></span>
-                Abierto
-            </span>
+            @if($hasHours)
+            <div style="position:relative;">
+                <x-menu-hours :hasHours="$hasHours" :isOpen="$isOpen" :closesAt="$closesAt" :nextOpening="$nextOpening" :weekSchedule="$weekSchedule" :dark="false" />
+            </div>
+            @endif
             @if($restaurant->phone)
                 <span style="font-size:12px;font-weight:600;color:#4B5563;background:#F3F4F6;border-radius:999px;padding:4px 9px;">{{ $restaurant->phone }}</span>
             @endif

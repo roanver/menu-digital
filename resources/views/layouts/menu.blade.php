@@ -34,7 +34,7 @@
     $whatsappNum = $restaurant->whatsapp ? preg_replace('/\D/', '', $restaurant->whatsapp) : null;
 @endphp
 
-<div x-data="menuCart('{{ $restaurant->slug }}', {{ $restaurant->accepts_orders ? 'true' : 'false' }}, '{{ $whatsappNum }}', {{ $restaurant->accepts_delivery ? 'true' : 'false' }}, {{ $restaurant->delivery_cost ?? 0 }}, {{ $restaurant->min_order ?? 0 }}, '{{ session("nfc_table_label", "") }}', '{{ route("wa.click") }}', '{{ csrf_token() }}')"
+<div x-data="menuCart('{{ $restaurant->slug }}', {{ $restaurant->accepts_orders ? 'true' : 'false' }}, '{{ $whatsappNum }}', {{ $restaurant->accepts_delivery ? 'true' : 'false' }}, {{ $restaurant->delivery_cost ?? 0 }}, {{ $restaurant->min_order ?? 0 }}, '{{ session("nfc_table_label", "") }}', '{{ route("wa.click") }}', '{{ csrf_token() }}', {{ json_encode((bool)($isOpen ?? true)) }}, {{ json_encode($closedText ?? 'Cerrado ahora') }})"
      style="min-height:100vh;min-height:100dvh;">
 
     @yield('body')

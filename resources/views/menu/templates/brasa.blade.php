@@ -62,6 +62,11 @@ body{color:#FAFAF9}
                 @endif
                 <span style="width:44px;height:1px;background:linear-gradient(90deg,#78350F,transparent);display:block;"></span>
             </div>
+            @if($hasHours)
+            <div style="position:relative;display:flex;justify-content:center;margin-top:10px;">
+                <x-menu-hours :hasHours="$hasHours" :isOpen="$isOpen" :closesAt="$closesAt" :nextOpening="$nextOpening" :weekSchedule="$weekSchedule" :dark="true" />
+            </div>
+            @endif
         </div>
 
         {{-- Featured hero --}}

@@ -36,6 +36,9 @@ class MenuController extends Controller
         $restaurant->loadMissing('businessHours');
         $isOpen      = $restaurant->isOpenNow();
         $nextOpening = $isOpen ? null : $restaurant->nextOpeningTime();
+        $hasHours    = $restaurant->hasHoursConfigured();
+        $closesAt    = ($hasHours && $isOpen) ? $restaurant->closingTimeToday() : null;
+        $weekSchedule = $hasHours ? $restaurant->weekScheduleForDisplay() : [];
 
         $template = $restaurant->template ?: 'minimal';
 
@@ -55,6 +58,6 @@ class MenuController extends Controller
             ] : null,
         ];
 
-        return view("menu.templates.{$template}", compact('restaurant', 'categories', 'isOpen', 'nextOpening', 'jsonLd'));
+        return view("menu.templates.{$template}", compact('restaurant', 'categories', 'isOpen', 'nextOpening', 'hasHours', 'closesAt', 'weekSchedule', 'jsonLd'));
     }
 }

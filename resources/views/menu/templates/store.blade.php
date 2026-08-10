@@ -55,6 +55,11 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
         @if($restaurant->welcome_message)
             <p style="margin:10px 0 0;font-size:14px;color:#555;line-height:1.55;">{{ $restaurant->welcome_message }}</p>
         @endif
+        @if($hasHours)
+        <div style="position:relative;display:flex;justify-content:center;margin-top:10px;">
+            <x-menu-hours :hasHours="$hasHours" :isOpen="$isOpen" :closesAt="$closesAt" :nextOpening="$nextOpening" :weekSchedule="$weekSchedule" :dark="false" />
+        </div>
+        @endif
     </div>
 
     {{-- Category nav --}}
@@ -192,7 +197,7 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
     @else
     <div style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;padding:0 20px 20px;pointer-events:none;z-index:10;">
         <div style="display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:999px;background:#F0F0EE;color:#555;font-size:13px;font-weight:600;letter-spacing:.02em;pointer-events:auto;">
-            Cerrado ahora{{ $nextOpening ? ' · abre el ' . $nextOpening : '' }}
+            Cerrado ahora{{ $nextOpening ? ' · abre ' . $nextOpening : '' }}
         </div>
     </div>
     @endif

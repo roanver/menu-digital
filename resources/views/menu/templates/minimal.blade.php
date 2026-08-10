@@ -57,6 +57,11 @@ body{color:#1C1917}
         @if($restaurant->phone)
             <div style="margin-top:14px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#A8A29E;">{{ $restaurant->phone }}</div>
         @endif
+        @if($hasHours)
+        <div style="position:relative;display:flex;justify-content:center;margin-top:10px;">
+            <x-menu-hours :hasHours="$hasHours" :isOpen="$isOpen" :closesAt="$closesAt" :nextOpening="$nextOpening" :weekSchedule="$weekSchedule" :dark="false" />
+        </div>
+        @endif
     </div>
 
     {{-- Category nav --}}
@@ -157,7 +162,7 @@ body{color:#1C1917}
     @else
     <div style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;padding:0 20px 20px;pointer-events:none;z-index:10;">
         <div style="display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;background:#F3F4F6;color:#374151;font-size:12px;font-weight:600;letter-spacing:.04em;pointer-events:auto;">
-            Cerrado ahora{{ $nextOpening ? ' · abre el ' . $nextOpening : '' }}
+            Cerrado ahora{{ $nextOpening ? ' · abre ' . $nextOpening : '' }}
         </div>
     </div>
     @endif
