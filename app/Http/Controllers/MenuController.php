@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class MenuController extends Controller
@@ -31,6 +32,16 @@ class MenuController extends Controller
                 ->with(['menuItems' => fn ($q) => $q->with('variants')->orderBy('sort_order')])
                 ->get();
         });
+
+        // Si la caché devuelve un objeto corrupto (incomplete class por despliegue parcial),
+        // lo descartamos y hacemos la query fresca.
+        if (! ($categories instanceof Collection)) {
+            Cache::forget($cacheKey);
+            $categories = $restaurant->categories()
+                ->where('is_active', true)
+                ->with(['menuItems' => fn ($q) => $q->with('variants')->orderBy('sort_order')])
+                ->get();
+        }
 
         // Estado abierto/cerrado: NO se cachea (cambia cada minuto)
         $restaurant->loadMissing('businessHours');

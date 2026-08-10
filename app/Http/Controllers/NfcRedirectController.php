@@ -44,10 +44,15 @@ class NfcRedirectController extends Controller
 
         $this->countScan($tag);
 
-        // Resolver nombre de mesa desde cualquiera de los dos FKs (QR o chip NFC)
-        $table = RestaurantTable::where('qr_tag_id', $tag->id)
-            ->orWhere('nfc_tag_id', $tag->id)
-            ->first();
+        // Resolver nombre de mesa desde cualquiera de los dos FKs (QR o chip NFC).
+        // Try/catch: si la columna qr_tag_id aún no existe (migración pendiente), cae al NFC legacy.
+        try {
+            $table = RestaurantTable::where('qr_tag_id', $tag->id)
+                ->orWhere('nfc_tag_id', $tag->id)
+                ->first();
+        } catch (\Exception $e) {
+            $table = RestaurantTable::where('nfc_tag_id', $tag->id)->first();
+        }
 
         $label = $table ? $table->name : $tag->label;
 
