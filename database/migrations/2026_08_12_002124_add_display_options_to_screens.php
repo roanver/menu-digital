@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('screens', function (Blueprint $table) {
-            $table->char('density', 15)->default('comfortable');
+            $table->string('density', 15)->default('comfortable');
             $table->boolean('show_descriptions')->default(false);
             $table->boolean('show_out_of_stock')->default(true);
-            $table->char('out_of_stock_style', 12)->default('dimmed');
+            $table->string('out_of_stock_style', 12)->default('dimmed');
             $table->boolean('show_logo')->default(true);
             $table->unsignedTinyInteger('page_seconds')->default(15);
             $table->string('footer_message', 200)->nullable();

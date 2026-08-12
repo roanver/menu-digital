@@ -1,9 +1,7 @@
 <x-admin-layout>
 
 @php
-    use Carbon\Carbon;
-
-    $now = Carbon::now();
+    $now = now();
 
     $isFree   = $restaurant->plan === 'free';
     $inTrial  = !$isFree && $restaurant->trial_ends_at && $now->lt($restaurant->trial_ends_at);
