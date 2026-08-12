@@ -273,14 +273,18 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             @if($restaurant->accepts_delivery)
             <div style="display:flex;gap:8px;">
                 <button x-on:click="deliveryType = 'retiro'"
-                        :style="deliveryType === 'retiro' ? 'background:var(--cart-chip-bg);color:var(--cart-chip-text);' : 'background:var(--cart-chip-idle-bg);color:var(--cart-chip-idle-text);'"
-                        style="flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:44px;">
-                    🏪 Retiro en local
+                        :style="deliveryType === 'retiro' ? 'background:var(--cart-accent);color:var(--cart-accent-text);border:2px solid var(--cart-accent);' : 'background:transparent;color:var(--cart-text-muted);border:2px solid var(--cart-input-border);'"
+                        style="flex:1;padding:9px 6px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:44px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                    <svg x-show="deliveryType === 'retiro'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Retiro en local
                 </button>
                 <button x-on:click="deliveryType = 'delivery'"
-                        :style="deliveryType === 'delivery' ? 'background:var(--cart-chip-bg);color:var(--cart-chip-text);' : 'background:var(--cart-chip-idle-bg);color:var(--cart-chip-idle-text);'"
-                        style="flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:44px;">
-                    🚚 Delivery{{ $deliveryCost > 0 ? ' (+$' . number_format($deliveryCost, 0, ',', '.') . ')' : '' }}
+                        :style="deliveryType === 'delivery' ? 'background:var(--cart-accent);color:var(--cart-accent-text);border:2px solid var(--cart-accent);' : 'background:transparent;color:var(--cart-text-muted);border:2px solid var(--cart-input-border);'"
+                        style="flex:1;padding:9px 6px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:700;transition:all .15s;min-height:44px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                    <svg x-show="deliveryType === 'delivery'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    Delivery{{ $deliveryCost > 0 ? ' (+$' . number_format($deliveryCost, 0, ',', '.') . ')' : '' }}
                 </button>
             </div>
             @else
@@ -395,8 +399,8 @@ function menuCart(slug, acceptsOrders, whatsappNum, acceptsDelivery, deliveryCos
             @endif
 
             {{-- CTA principal --}}
-            <button x-on:click="items.length > 0 && !belowMinOrder() && sendWhatsApp()"
-                    :style="!isOpen ? 'opacity:.4;cursor:not-allowed;filter:grayscale(1);' : (items.length === 0 || belowMinOrder() ? 'opacity:.4;cursor:not-allowed;' : 'opacity:1;cursor:pointer;')"
+            <button x-on:click="isOpen && items.length > 0 && !belowMinOrder() && sendWhatsApp()"
+                    :style="(!isOpen || items.length === 0 || belowMinOrder()) ? 'opacity:.5;cursor:not-allowed;' : 'opacity:1;cursor:pointer;'"
                     style="width:100%;min-height:56px;padding:14px 18px;border-radius:12px;background:var(--cart-accent);color:var(--cart-accent-text);border:none;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em;line-height:1.2;">
                 <span style="display:flex;align-items:center;gap:9px;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.7-5A8.4 8.4 0 1 1 21 11.5Z"/></svg>

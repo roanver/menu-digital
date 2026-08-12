@@ -28,31 +28,15 @@ class TableController extends AdminController
         DB::transaction(function () use ($restaurant, $request) {
             $maxOrder = $restaurant->tables()->max('order') ?? 0;
 
-            $qrTag = NfcTag::create([
-                'code'          => NfcTag::generateCode(),
-                'type'          => 'menu',
-                'restaurant_id' => $restaurant->id,
-                'label'         => $request->name,
-                'is_active'     => true,
-                'is_physical'   => false,
-            ]);
-
-            $nfcTag = NfcTag::create([
-                'code'          => NfcTag::generateCode(),
-                'type'          => 'menu',
-                'restaurant_id' => $restaurant->id,
-                'label'         => $request->name,
-                'is_active'     => true,
-                'is_physical'   => false,
-            ]);
+            ['qr' => $qrTag, 'nfc' => $nfcTag] = NfcTag::createTablePair($restaurant->id, $request->name);
 
             RestaurantTable::create([
-                'restaurant_id'   => $restaurant->id,
-                'name'            => $request->name,
-                'qr_tag_id'       => $qrTag->id,
-                'nfc_tag_id'      => $nfcTag->id,
-                'is_active'       => true,
-                'order'           => $maxOrder + 1,
+                'restaurant_id'    => $restaurant->id,
+                'name'             => $request->name,
+                'qr_tag_id'        => $qrTag->id,
+                'nfc_tag_id'       => $nfcTag->id,
+                'is_active'        => true,
+                'order'            => $maxOrder + 1,
                 'nfc_chip_written' => false,
             ]);
         });
@@ -89,23 +73,7 @@ class TableController extends AdminController
             for ($i = $from; $i <= $to; $i++) {
                 $name = 'Mesa ' . $i;
 
-                $qrTag = NfcTag::create([
-                    'code'          => NfcTag::generateCode(),
-                    'type'          => 'menu',
-                    'restaurant_id' => $restaurant->id,
-                    'label'         => $name,
-                    'is_active'     => true,
-                    'is_physical'   => false,
-                ]);
-
-                $nfcTag = NfcTag::create([
-                    'code'          => NfcTag::generateCode(),
-                    'type'          => 'menu',
-                    'restaurant_id' => $restaurant->id,
-                    'label'         => $name,
-                    'is_active'     => true,
-                    'is_physical'   => false,
-                ]);
+                ['qr' => $qrTag, 'nfc' => $nfcTag] = NfcTag::createTablePair($restaurant->id, $name);
 
                 RestaurantTable::create([
                     'restaurant_id'    => $restaurant->id,
