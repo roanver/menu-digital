@@ -6,13 +6,18 @@
         Categorías
     </a>
 
+    {{-- Form de eliminación separado, sin elementos visibles --}}
+    <form id="delete-form" method="POST" action="{{ route('admin.categories.destroy', $category) }}">
+        @csrf @method('DELETE')
+    </form>
+
     <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden">
         <div class="px-5 py-4 border-b border-[#F3F4F6]">
             <h2 class="text-[14px] font-bold text-[#111827]">Editar categoría</h2>
             <p class="text-[12px] text-[#9CA3AF] mt-0.5">Actualiza el nombre o visibilidad de esta categoría.</p>
         </div>
 
-        <form method="POST" action="{{ route('admin.categories.update', $category) }}">
+        <form id="edit-form" method="POST" action="{{ route('admin.categories.update', $category) }}">
             @csrf
             @method('PATCH')
             <input type="hidden" name="is_active" value="0">
@@ -45,15 +50,13 @@
             </div>
 
             <div class="px-5 py-4 bg-[#F9FAFB] border-t border-[#F3F4F6] flex items-center justify-between gap-2">
-                <!-- Eliminar (izquierda) -->
-                <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" onsubmit="return confirm('¿Eliminar esta categoría y todos sus items?')">
-                    @csrf @method('DELETE')
-                    <button type="submit"
-                            class="inline-flex items-center gap-1.5 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-[12px] py-[9px] text-[12.5px] font-semibold transition-colors">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                        Eliminar
-                    </button>
-                </form>
+                <!-- Eliminar (izquierda) — referencia al form externo via atributo form= -->
+                <button type="submit" form="delete-form"
+                        onclick="return confirm('¿Eliminar esta categoría y todos sus items?')"
+                        class="inline-flex items-center gap-1.5 bg-white hover:bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] rounded-[10px] px-[12px] py-[9px] text-[12.5px] font-semibold transition-colors">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    Eliminar
+                </button>
 
                 <div class="flex items-center gap-2">
                     <a href="{{ route('admin.categories.index') }}"

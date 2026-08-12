@@ -103,7 +103,7 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
                             <div style="position:relative;aspect-ratio:1/1;background:#F3F3F0;overflow:hidden;">
                                 @if($item->image)
                                     <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
-                                         loading="lazy" decoding="async"
+                                         loading="lazy" decoding="async" width="200" height="200"
                                          style="width:100%;height:100%;object-fit:cover;display:block;">
                                 @else
                                     <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
