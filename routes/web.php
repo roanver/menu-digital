@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\BusinessHoursController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SuperAdminController;
+use App\Http\Controllers\KitActivationController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MenuJsonController;
 use App\Http\Controllers\NfcRedirectController;
@@ -146,6 +147,16 @@ require __DIR__.'/auth.php';
 
 // WhatsApp click tracking (fire and forget)
 Route::post('/wa-click', [WhatsappClickController::class, 'track'])->middleware('throttle:120,1')->name('wa.click');
+
+// Kit activation flow
+Route::get('/activar/{token}', [KitActivationController::class, 'show'])->middleware('throttle:30,1')->name('kit.show');
+Route::middleware('guest')->group(function () {
+    Route::get('/activar/{token}/register',  [KitActivationController::class, 'showRegister'])->name('kit.register.form');
+    Route::post('/activar/{token}/register', [KitActivationController::class, 'processRegister'])->middleware('throttle:5,1')->name('kit.register');
+    Route::get('/activar/{token}/login',     [KitActivationController::class, 'showLogin'])->name('kit.login.form');
+    Route::post('/activar/{token}/login',    [KitActivationController::class, 'processLogin'])->middleware('throttle:5,1')->name('kit.login');
+});
+Route::post('/activar/{token}/activate', [KitActivationController::class, 'activate'])->middleware(['auth', 'throttle:10,1'])->name('kit.activate');
 
 // NFC public redirects (before the wildcard /{slug})
 Route::get('/r/{code}', [NfcRedirectController::class, 'review'])->middleware('throttle:120,1')->name('nfc.review');

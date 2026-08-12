@@ -10,15 +10,52 @@
     $__paidEnds  = $__inPaid ? $restaurant->subscription_ends_at->format('d/m/Y') : null;
     $__totalScans = array_sum(array_column($days, 'total'));
 
-    // Checklist progress
-    $steps = [
-        (bool)$restaurant->logo,
-        $categoriesCount > 0,
-        $itemsCount > 0,
-        false,
-    ];
+    // Checklist diferenciado por path
+    if ($hasKit) {
+        // Path kit: mesas configuradas (siempre done), logo, cats, items
+        $steps = [true, (bool)$restaurant->logo, $categoriesCount > 0, $itemsCount > 0];
+    } else {
+        // Path sin kit: logo, cats, items, imprimir QR
+        $steps = [(bool)$restaurant->logo, $categoriesCount > 0, $itemsCount > 0, false];
+    }
     $completedSteps = count(array_filter($steps));
 @endphp
+
+{{-- Banner de bienvenida post-activación de kit --}}
+@if(session('kit_activated'))
+@php
+    $__kr = session('kit_result', []);
+    $__created = $__kr['tables_created'] ?? 0;
+    $__matched = $__kr['tables_matched'] ?? 0;
+    $__hasRev  = $__kr['has_review'] ?? false;
+    $__totalTables = $__created + $__matched;
+@endphp
+<div class="rounded-[14px] mb-4 px-5 py-4 flex items-start gap-4" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac">
+    <div class="w-[40px] h-[40px] rounded-[11px] bg-emerald-500 flex items-center justify-center flex-none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="flex-1 min-w-0">
+        <div class="text-[14px] font-bold text-emerald-900 mb-1">¡Kit activado! Bienvenido a MenuDigital</div>
+        <div class="text-[13px] text-emerald-800 space-y-0.5">
+            @if($__totalTables > 0)
+            <div>
+                @if($__matched > 0 && $__created > 0)
+                    Se vincularon {{ $__matched }} {{ $__matched === 1 ? 'mesa existente' : 'mesas existentes' }} y se crearon {{ $__created }} nuevas.
+                @elseif($__matched > 0)
+                    Se vincularon {{ $__matched }} {{ $__matched === 1 ? 'mesa existente' : 'mesas existentes' }} con los chips del kit.
+                @else
+                    Se configuraron {{ $__created }} {{ $__created === 1 ? 'mesa' : 'mesas' }} listas para usar.
+                @endif
+                @if($__hasRev)
+                    El chip de reseñas también quedó activo.
+                @endif
+            </div>
+            @endif
+            <div>Tu próximo paso: <a href="{{ route('admin.categories.create') }}" class="font-semibold underline">carga tu carta</a> para que tus clientes puedan verla desde las mesas.</div>
+        </div>
+    </div>
+</div>
+@endif
 
 {{-- Hero Banner --}}
 <div class="rounded-[18px] mb-5 overflow-hidden" style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 55%,#4338ca 100%)">
@@ -222,6 +259,19 @@
 
             <ul class="space-y-[13px]">
 
+                @if($hasKit)
+                {{-- PASO 1 KIT: Mesas configuradas (siempre done) --}}
+                <li class="flex items-start gap-3">
+                    <span class="mt-[1px] flex-none w-[20px] h-[20px] rounded-full bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-center">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    <div class="flex-1">
+                        <span class="text-[13px] text-[#047857] font-semibold line-through decoration-[#6EE7B7]">Mesas con QR/NFC configuradas</span>
+                        <div class="text-[11.5px] text-[#6B7280]">{{ $tableCount }} {{ $tableCount === 1 ? 'mesa activa' : 'mesas activas' }} desde el kit</div>
+                    </div>
+                </li>
+                @endif
+
                 {{-- Logo --}}
                 <li class="flex items-start gap-3">
                     @if($restaurant->logo)
@@ -236,7 +286,7 @@
                     <div class="flex-1">
                         <div class="text-[13px] text-[#111827] font-semibold">Subir logo</div>
                         <div class="text-[11.5px] text-[#9CA3AF]">Aparecerá en la cabecera del menú</div>
-                        <a href="{{ route('admin.restaurant.edit') }}" class="text-[11.5px] font-semibold text-[#4F46E5] hover:underline">Ir a Mi Restaurante →</a>
+                        <a href="{{ route('admin.restaurant.edit') }}" class="text-[11.5px] font-semibold text-[#4F46E5] hover:underline">Ir a Mi Negocio →</a>
                     </div>
                     @endif
                 </li>
@@ -279,7 +329,8 @@
                     @endif
                 </li>
 
-                {{-- Apariencia --}}
+                @if($hasKit)
+                {{-- PASO 4 KIT: Apariencia --}}
                 <li class="flex items-start gap-3">
                     <span class="mt-[1px] flex-none w-[20px] h-[20px] rounded-full border-2 border-dashed border-[#D1D5DB] flex items-center justify-center"></span>
                     <div class="flex-1">
@@ -288,6 +339,17 @@
                         <a href="{{ route('admin.appearance.edit') }}" class="text-[11.5px] font-semibold text-[#4F46E5] hover:underline">Ir a Apariencia →</a>
                     </div>
                 </li>
+                @else
+                {{-- PASO 4 SIN KIT: Imprimir QR --}}
+                <li class="flex items-start gap-3">
+                    <span class="mt-[1px] flex-none w-[20px] h-[20px] rounded-full border-2 border-dashed border-[#D1D5DB] flex items-center justify-center"></span>
+                    <div class="flex-1">
+                        <div class="text-[13px] text-[#111827] font-semibold">Imprimir QR para tus mesas</div>
+                        <div class="text-[11.5px] text-[#9CA3AF]">Descarga y pega el QR en cada mesa</div>
+                        <a href="{{ route('admin.qr.show') }}" class="text-[11.5px] font-semibold text-[#4F46E5] hover:underline">Descargar QR →</a>
+                    </div>
+                </li>
+                @endif
 
             </ul>
         </div>

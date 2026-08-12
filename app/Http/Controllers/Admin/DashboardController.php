@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
+use App\Models\Kit;
 use App\Models\MenuItem;
 use App\Models\NfcScan;
 use App\Models\NfcTag;
@@ -64,6 +65,9 @@ class DashboardController extends AdminController
             ->whereMonth('date', now()->month)
             ->sum('count');
 
+        $hasKit     = Kit::where('restaurant_id', $restaurant->id)->where('status', 'activado')->exists();
+        $tableCount = $restaurant->tables()->count();
+
         $tableScans = collect();
         if (config('plans.plans.'.$restaurant->plan.'.max_tables', 0) !== 0) {
             $tableScans = $restaurant->tables()
@@ -80,7 +84,7 @@ class DashboardController extends AdminController
         return view('admin.dashboard', compact(
             'restaurant', 'categoriesCount', 'itemsCount',
             'days', 'last7', 'prev7', 'scanDelta', 'monthTotal', 'tagBreakdown',
-            'waClicksMonth', 'tableScans'
+            'waClicksMonth', 'tableScans', 'hasKit', 'tableCount'
         ));
     }
 }

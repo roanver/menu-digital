@@ -28,17 +28,35 @@ class TableController extends AdminController
         DB::transaction(function () use ($restaurant, $request) {
             $maxOrder = $restaurant->tables()->max('order') ?? 0;
 
-            ['qr' => $qrTag, 'nfc' => $nfcTag] = NfcTag::createTablePair($restaurant->id, $request->name);
+            $orphan = $this->findOrphanKitPair($restaurant->id);
 
-            RestaurantTable::create([
-                'restaurant_id'    => $restaurant->id,
-                'name'             => $request->name,
-                'qr_tag_id'        => $qrTag->id,
-                'nfc_tag_id'       => $nfcTag->id,
-                'is_active'        => true,
-                'order'            => $maxOrder + 1,
-                'nfc_chip_written' => false,
-            ]);
+            if ($orphan) {
+                [$qrTag, $nfcTag] = $orphan;
+                $qrTag->update(['label' => $request->name]);
+                $nfcTag->update(['label' => $request->name]);
+
+                RestaurantTable::create([
+                    'restaurant_id'    => $restaurant->id,
+                    'name'             => $request->name,
+                    'qr_tag_id'        => $qrTag->id,
+                    'nfc_tag_id'       => $nfcTag->id,
+                    'is_active'        => true,
+                    'order'            => $maxOrder + 1,
+                    'nfc_chip_written' => true,
+                ]);
+            } else {
+                ['qr' => $qrTag, 'nfc' => $nfcTag] = NfcTag::createTablePair($restaurant->id, $request->name);
+
+                RestaurantTable::create([
+                    'restaurant_id'    => $restaurant->id,
+                    'name'             => $request->name,
+                    'qr_tag_id'        => $qrTag->id,
+                    'nfc_tag_id'       => $nfcTag->id,
+                    'is_active'        => true,
+                    'order'            => $maxOrder + 1,
+                    'nfc_chip_written' => false,
+                ]);
+            }
         });
 
         return back()->with('success', 'Mesa creada.');
@@ -71,19 +89,36 @@ class TableController extends AdminController
 
         DB::transaction(function () use ($restaurant, $from, $to, &$maxOrder) {
             for ($i = $from; $i <= $to; $i++) {
-                $name = 'Mesa ' . $i;
+                $name   = 'Mesa ' . $i;
+                $orphan = $this->findOrphanKitPair($restaurant->id);
 
-                ['qr' => $qrTag, 'nfc' => $nfcTag] = NfcTag::createTablePair($restaurant->id, $name);
+                if ($orphan) {
+                    [$qrTag, $nfcTag] = $orphan;
+                    $qrTag->update(['label' => $name]);
+                    $nfcTag->update(['label' => $name]);
 
-                RestaurantTable::create([
-                    'restaurant_id'    => $restaurant->id,
-                    'name'             => $name,
-                    'qr_tag_id'        => $qrTag->id,
-                    'nfc_tag_id'       => $nfcTag->id,
-                    'is_active'        => true,
-                    'order'            => ++$maxOrder,
-                    'nfc_chip_written' => false,
-                ]);
+                    RestaurantTable::create([
+                        'restaurant_id'    => $restaurant->id,
+                        'name'             => $name,
+                        'qr_tag_id'        => $qrTag->id,
+                        'nfc_tag_id'       => $nfcTag->id,
+                        'is_active'        => true,
+                        'order'            => ++$maxOrder,
+                        'nfc_chip_written' => true,
+                    ]);
+                } else {
+                    ['qr' => $qrTag, 'nfc' => $nfcTag] = NfcTag::createTablePair($restaurant->id, $name);
+
+                    RestaurantTable::create([
+                        'restaurant_id'    => $restaurant->id,
+                        'name'             => $name,
+                        'qr_tag_id'        => $qrTag->id,
+                        'nfc_tag_id'       => $nfcTag->id,
+                        'is_active'        => true,
+                        'order'            => ++$maxOrder,
+                        'nfc_chip_written' => false,
+                    ]);
+                }
             }
         });
 
@@ -195,5 +230,41 @@ class TableController extends AdminController
         if ($table->restaurant_id !== $this->restaurant()->id) {
             abort(403);
         }
+    }
+
+    /**
+     * Busca un par de tags de kit (QR + NFC) asignados al negocio pero sin mesa.
+     * Ocurre cuando se elimina una mesa manualmente o en casos de migración parcial.
+     * Retorna [qrTag, nfcTag] o null si no hay huérfanos.
+     *
+     * @return array{0: NfcTag, 1: NfcTag}|null
+     */
+    private function findOrphanKitPair(int $restaurantId): ?array
+    {
+        $first = NfcTag::where('restaurant_id', $restaurantId)
+            ->where('type', 'menu')
+            ->whereNotNull('kit_id')
+            ->whereDoesntHave('table')
+            ->orderBy('id')
+            ->first();
+
+        if (! $first) {
+            return null;
+        }
+
+        $second = NfcTag::where('restaurant_id', $restaurantId)
+            ->where('type', 'menu')
+            ->where('kit_id', $first->kit_id)
+            ->where('slot_label', $first->slot_label)
+            ->whereDoesntHave('table')
+            ->where('id', '!=', $first->id)
+            ->orderBy('id')
+            ->first();
+
+        if (! $second) {
+            return null;
+        }
+
+        return [$first, $second];
     }
 }

@@ -32,9 +32,19 @@ class NfcRedirectController extends Controller
     // GET /m/{code} → redirect a /{slug}
     public function menu(string $code): RedirectResponse|Response
     {
-        $tag = NfcTag::with('restaurant')->where('code', $code)->where('type', 'menu')->first();
+        $tag = NfcTag::with(['restaurant', 'kit'])->where('code', $code)->where('type', 'menu')->first();
 
-        if (!$tag || !$tag->restaurant) {
+        if (!$tag) {
+            return response()->view('nfc.not-found', [], 404);
+        }
+
+        // Chip de kit todavía no activado — primera impresión del producto
+        if (!$tag->restaurant_id && $tag->kit_id) {
+            $kitToken = $tag->kit?->token;
+            return response()->view('nfc.pending-activation', ['kitToken' => $kitToken], 200);
+        }
+
+        if (!$tag->restaurant) {
             return response()->view('nfc.not-found', [], 404);
         }
 

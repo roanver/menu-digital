@@ -57,6 +57,30 @@ class KitActivationController extends Controller
         ]);
     }
 
+    // GET /activar/{token}/register  (solo guest)
+    public function showRegister(string $token): Response
+    {
+        $kit = Kit::where('token', $token)->first();
+
+        if (! $kit || $kit->status === 'activado') {
+            return redirect()->route('kit.show', $token);
+        }
+
+        return response()->view('kit.register', ['token' => $token]);
+    }
+
+    // GET /activar/{token}/login  (solo guest)
+    public function showLogin(string $token): Response
+    {
+        $kit = Kit::where('token', $token)->first();
+
+        if (! $kit || $kit->status === 'activado') {
+            return redirect()->route('kit.show', $token);
+        }
+
+        return response()->view('kit.login', ['token' => $token]);
+    }
+
     // POST /activar/{token}/register  (solo guest)
     public function processRegister(Request $request, string $token): RedirectResponse
     {
@@ -77,9 +101,10 @@ class KitActivationController extends Controller
 
         $restaurant = null;
         $user       = null;
+        $kitResult  = [];
 
         try {
-            DB::transaction(function () use ($data, $slug, $kit, &$restaurant, &$user) {
+            DB::transaction(function () use ($data, $slug, $kit, &$restaurant, &$user, &$kitResult) {
                 $restaurant = Restaurant::create([
                     'name'      => $data['restaurant_name'],
                     'slug'      => $slug,
@@ -95,7 +120,7 @@ class KitActivationController extends Controller
                     'role'          => 'owner',
                 ]);
 
-                $this->runActivation($kit, $restaurant->id);
+                $kitResult = $this->runActivation($kit, $restaurant->id);
             });
         } catch (\RuntimeException $e) {
             if ($e->getMessage() === 'already_activated') {
@@ -109,7 +134,9 @@ class KitActivationController extends Controller
         $request->session()->regenerate();
         session(['active_restaurant_id' => $restaurant->id]);
 
-        return redirect()->route('admin.dashboard')->with('kit_activated', true);
+        return redirect()->route('admin.dashboard')
+            ->with('kit_activated', true)
+            ->with('kit_result', $kitResult);
     }
 
     // POST /activar/{token}/login  (solo guest)
@@ -157,9 +184,11 @@ class KitActivationController extends Controller
             }
         }
 
+        $kitResult = [];
+
         try {
-            DB::transaction(function () use ($kit, $restaurant) {
-                $this->runActivation($kit, $restaurant->id);
+            DB::transaction(function () use ($kit, $restaurant, &$kitResult) {
+                $kitResult = $this->runActivation($kit, $restaurant->id);
             });
         } catch (\RuntimeException $e) {
             if ($e->getMessage() === 'already_activated') {
@@ -171,13 +200,16 @@ class KitActivationController extends Controller
 
         session(['active_restaurant_id' => $restaurant->id]);
 
-        return redirect()->route('admin.dashboard')->with('kit_activated', true);
+        return redirect()->route('admin.dashboard')
+            ->with('kit_activated', true)
+            ->with('kit_result', $kitResult);
     }
 
     // -----------------------------------------------------------------
     // Lógica de activación (siempre dentro de una transacción abierta)
+    // Retorna ['tables_created' => int, 'tables_matched' => int, 'has_review' => bool]
     // -----------------------------------------------------------------
-    private function runActivation(Kit $kit, int $restaurantId): void
+    private function runActivation(Kit $kit, int $restaurantId): array
     {
         // Bloqueo a nivel de fila — previene dos activaciones simultáneas
         $fresh = Kit::lockForUpdate()->findOrFail($kit->id);
@@ -189,12 +221,20 @@ class KitActivationController extends Controller
         $tags     = $fresh->nfcTags()->orderBy('id')->get()->groupBy('slot_label');
         $maxOrder = RestaurantTable::where('restaurant_id', $restaurantId)->max('order') ?? 0;
 
+        $tablesCreated = 0;
+        $tablesMatched = 0;
+        $hasReview     = false;
+
+        // Mesas existentes del restaurante para match por nombre
+        $existingTables = RestaurantTable::where('restaurant_id', $restaurantId)->get()->keyBy(fn($t) => mb_strtolower(trim($t->name)));
+
         foreach ($tags as $slotLabel => $slotTags) {
             if ($slotLabel === 'Reseñas') {
                 // Tag de letrero: asignar negocio pero sin crear mesa
                 foreach ($slotTags as $tag) {
                     $tag->update(['restaurant_id' => $restaurantId, 'is_active' => true]);
                 }
+                $hasReview = true;
                 continue;
             }
 
@@ -204,20 +244,33 @@ class KitActivationController extends Controller
             $nfcTag = $sorted->get(1);
 
             $qrTag->update(['restaurant_id' => $restaurantId, 'label' => $slotLabel, 'is_active' => true]);
-
             if ($nfcTag) {
                 $nfcTag->update(['restaurant_id' => $restaurantId, 'label' => $slotLabel, 'is_active' => true]);
             }
 
-            RestaurantTable::create([
-                'restaurant_id'    => $restaurantId,
-                'name'             => $slotLabel,
-                'qr_tag_id'        => $qrTag->id,
-                'nfc_tag_id'       => $nfcTag?->id,
-                'is_active'        => true,
-                'order'            => ++$maxOrder,
-                'nfc_chip_written' => true, // los chips vienen pregrabados de fábrica
-            ]);
+            // Buscar mesa existente con el mismo nombre (ej: "Mesa 1")
+            $existing = $existingTables[mb_strtolower(trim($slotLabel))] ?? null;
+
+            if ($existing) {
+                // Vincular los tags al registro de mesa existente
+                $existing->update([
+                    'qr_tag_id'        => $qrTag->id,
+                    'nfc_tag_id'       => $nfcTag?->id,
+                    'nfc_chip_written' => true,
+                ]);
+                $tablesMatched++;
+            } else {
+                RestaurantTable::create([
+                    'restaurant_id'    => $restaurantId,
+                    'name'             => $slotLabel,
+                    'qr_tag_id'        => $qrTag->id,
+                    'nfc_tag_id'       => $nfcTag?->id,
+                    'is_active'        => true,
+                    'order'            => ++$maxOrder,
+                    'nfc_chip_written' => true,
+                ]);
+                $tablesCreated++;
+            }
         }
 
         $fresh->update([
@@ -231,6 +284,12 @@ class KitActivationController extends Controller
             'plan'                 => 'basico',
             'subscription_ends_at' => now()->addMonths(2),
         ]);
+
+        return [
+            'tables_created' => $tablesCreated,
+            'tables_matched' => $tablesMatched,
+            'has_review'     => $hasReview,
+        ];
     }
 
     // -----------------------------------------------------------------
