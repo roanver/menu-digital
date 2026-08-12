@@ -8,6 +8,7 @@ use App\Models\Screen;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BoardController extends Controller
 {
@@ -46,9 +47,15 @@ class BoardController extends Controller
         $accentColor = $screen->accent_color ?? $restaurant->primary_color ?? '#6366F1';
         $bgImage     = $screen->bg_image ? Storage::url($screen->bg_image) : null;
 
+        $menuQrSvg = null;
+        if ($screen->show_qr && $restaurant->slug) {
+            $menuUrl   = route('menu.show', $restaurant->slug);
+            $menuQrSvg = (string) QrCode::format('svg')->size(140)->margin(1)->color(255, 255, 255)->backgroundColor(0, 0, 0, 0)->generate($menuUrl);
+        }
+
         return view('board.show', compact(
             'screen', 'restaurant', 'categories', 'promos',
-            'gracePeriod', 'bgColor', 'accentColor', 'textColor', 'bgImage'
+            'gracePeriod', 'bgColor', 'accentColor', 'textColor', 'bgImage', 'menuQrSvg'
         ));
     }
 
@@ -88,11 +95,19 @@ class BoardController extends Controller
 
     private function loadCategories(Screen $screen, int $restaurantId)
     {
+        $showOutOfStock = $screen->show_out_of_stock ?? true;
+
         return Category::where('restaurant_id', $restaurantId)
             ->when($screen->category_ids, fn ($q) => $q->whereIn('id', $screen->category_ids))
-            ->with(['menuItems' => fn ($q) => $q->orderBy('sort_order')->orderBy('id')])
+            ->with(['menuItems' => fn ($q) => $q
+                ->when(! $showOutOfStock, fn ($q2) => $q2->where('is_available', true))
+                ->orderBy('sort_order')
+                ->orderBy('id')
+            ])
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get();
+            ->get()
+            ->filter(fn ($c) => $c->menuItems->isNotEmpty())
+            ->values();
     }
 }

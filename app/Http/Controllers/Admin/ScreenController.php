@@ -53,6 +53,14 @@ class ScreenController extends AdminController
             'theme'                => ['required', 'in:dark,warm,slate,chalk,neon'],
             'accent_color'         => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'bg_image'             => ['nullable', 'image', 'max:5120'],
+            'density'              => ['nullable', 'in:comfortable,compact'],
+            'show_descriptions'    => ['nullable', 'boolean'],
+            'show_out_of_stock'    => ['nullable', 'boolean'],
+            'out_of_stock_style'   => ['nullable', 'in:dimmed,strikethrough'],
+            'show_logo'            => ['nullable', 'boolean'],
+            'page_seconds'         => ['nullable', 'integer', 'min:5', 'max:120'],
+            'footer_message'       => ['nullable', 'string', 'max:200'],
+            'show_qr'              => ['nullable', 'boolean'],
         ]);
 
         $bgImage = $request->hasFile('bg_image')
@@ -71,6 +79,14 @@ class ScreenController extends AdminController
             'theme'                => $validated['theme'],
             'accent_color'         => $validated['accent_color'] ?: null,
             'bg_image'             => $bgImage,
+            'density'              => $validated['density'] ?? 'comfortable',
+            'show_descriptions'    => $request->boolean('show_descriptions'),
+            'show_out_of_stock'    => $request->boolean('show_out_of_stock', true),
+            'out_of_stock_style'   => $validated['out_of_stock_style'] ?? 'dimmed',
+            'show_logo'            => $request->boolean('show_logo', true),
+            'page_seconds'         => $validated['page_seconds'] ?? 15,
+            'footer_message'       => $validated['footer_message'] ?: null,
+            'show_qr'              => $request->boolean('show_qr'),
         ]);
 
         return redirect()->route('admin.screens.index')
@@ -105,6 +121,14 @@ class ScreenController extends AdminController
             'accent_color'         => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'bg_image'             => ['nullable', 'image', 'max:5120'],
             'remove_bg_image'      => ['nullable', 'boolean'],
+            'density'              => ['nullable', 'in:comfortable,compact'],
+            'show_descriptions'    => ['nullable', 'boolean'],
+            'show_out_of_stock'    => ['nullable', 'boolean'],
+            'out_of_stock_style'   => ['nullable', 'in:dimmed,strikethrough'],
+            'show_logo'            => ['nullable', 'boolean'],
+            'page_seconds'         => ['nullable', 'integer', 'min:5', 'max:120'],
+            'footer_message'       => ['nullable', 'string', 'max:200'],
+            'show_qr'              => ['nullable', 'boolean'],
         ]);
 
         $bgImage = $screen->bg_image;
@@ -130,6 +154,14 @@ class ScreenController extends AdminController
             'theme'                => $validated['theme'],
             'accent_color'         => $validated['accent_color'] ?: null,
             'bg_image'             => $bgImage,
+            'density'              => $validated['density'] ?? $screen->density,
+            'show_descriptions'    => $request->boolean('show_descriptions'),
+            'show_out_of_stock'    => $request->boolean('show_out_of_stock', true),
+            'out_of_stock_style'   => $validated['out_of_stock_style'] ?? $screen->out_of_stock_style,
+            'show_logo'            => $request->boolean('show_logo', true),
+            'page_seconds'         => $validated['page_seconds'] ?? $screen->page_seconds,
+            'footer_message'       => $validated['footer_message'] ?: null,
+            'show_qr'              => $request->boolean('show_qr'),
         ]);
 
         return redirect()->route('admin.screens.index')

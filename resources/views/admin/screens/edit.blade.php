@@ -179,9 +179,9 @@
             <div class="text-[13px] font-bold text-[#111827]">Opciones</div>
 
             @foreach([
-                ['show_images',          'Mostrar imágenes',   'Muestra la foto miniatura de cada producto'],
-                ['show_promos_rotation', 'Rotación de promos', 'Banner destacado que rota los platos en promoción cada 15 s'],
-                ['is_active',            'Pantalla activa',    'La URL funciona y muestra el menú'],
+                ['show_images',          'Mostrar imágenes',       'Muestra la foto de cada producto (mín. 20% del ancho de celda)'],
+                ['show_promos_rotation', 'Rotación de promos',     'Banner destacado que rota los platos en promoción'],
+                ['is_active',            'Pantalla activa',        'La URL funciona y muestra el menú'],
             ] as [$field, $label, $help])
             <label class="flex items-center gap-4 cursor-pointer p-3.5 bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] hover:border-[#C7D2FE] transition-colors">
                 <div class="relative flex-none">
@@ -197,6 +197,93 @@
                 </div>
             </label>
             @endforeach
+        </div>
+
+        {{-- Visualización avanzada --}}
+        @php $ooActive = old('show_out_of_stock', $screen->show_out_of_stock ? '1' : '1') == '1'; @endphp
+        <div class="bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_1px_3px_rgba(16,24,40,.05)] overflow-hidden"
+             x-data="{ ooActive: {{ $ooActive ? 'true' : 'false' }} }">
+            <div class="px-5 py-4 border-b border-[#F3F4F6]">
+                <div class="text-[13px] font-bold text-[#111827]">Visualización</div>
+                <p class="text-[11px] text-[#9CA3AF] mt-0.5">Opciones del render de TV</p>
+            </div>
+            <div class="px-5 py-5 space-y-4">
+
+                {{-- Densidad --}}
+                <div class="flex flex-col gap-[6px]">
+                    <span class="text-[12px] font-semibold text-[#374151]">Densidad</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        @foreach(['comfortable' => 'Cómoda (filas altas)', 'compact' => 'Compacta (más items)'] as $val => $lbl)
+                        <label class="flex items-center gap-2 p-3 border border-[#E5E7EB] rounded-[9px] cursor-pointer hover:border-[#C7D2FE] transition-colors has-[:checked]:border-[#4F46E5] has-[:checked]:bg-[#EEF2FF]">
+                            <input type="radio" name="density" value="{{ $val }}" {{ old('density', $screen->density ?? 'comfortable') === $val ? 'checked' : '' }} class="accent-[#4F46E5]">
+                            <span class="text-[12.5px] text-[#374151]">{{ $lbl }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Toggles simples --}}
+                @foreach([
+                    ['show_descriptions', 'Mostrar descripciones',   'Muestra una línea de descripción debajo del nombre'],
+                    ['show_logo',         'Mostrar logo en cabecera', 'Logo del restaurante en la barra superior'],
+                    ['show_qr',           'QR de la carta en el pie', 'Pequeño QR que abre la carta en el celular del cliente'],
+                ] as [$field, $label, $help])
+                <label class="flex items-center gap-4 cursor-pointer p-3.5 bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] hover:border-[#C7D2FE] transition-colors">
+                    <div class="relative flex-none">
+                        <input type="hidden" name="{{ $field }}" value="0">
+                        <input type="checkbox" name="{{ $field }}" value="1" class="sr-only peer"
+                               {{ old($field, $screen->{$field} ? '1' : '0') == '1' ? 'checked' : '' }}>
+                        <div class="w-[40px] h-[23px] bg-[#D1D5DB] rounded-full peer-checked:bg-[#4F46E5] transition-colors"></div>
+                        <div class="absolute top-[2.5px] left-[2.5px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_2px_rgba(16,24,40,.3)] transition-transform peer-checked:translate-x-[17px]"></div>
+                    </div>
+                    <div>
+                        <span class="text-[13px] font-semibold text-[#111827]">{{ $label }}</span>
+                        <p class="text-[11.5px] text-[#9CA3AF]">{{ $help }}</p>
+                    </div>
+                </label>
+                @endforeach
+
+                {{-- Agotados --}}
+                <div>
+                    <label class="flex items-center gap-4 cursor-pointer p-3.5 bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] hover:border-[#C7D2FE] transition-colors">
+                        <div class="relative flex-none">
+                            <input type="hidden" name="show_out_of_stock" value="0">
+                            <input type="checkbox" name="show_out_of_stock" value="1" class="sr-only peer"
+                                   x-model="ooActive" {{ old('show_out_of_stock', $screen->show_out_of_stock ? '1' : '0') == '1' ? 'checked' : '' }}>
+                            <div class="w-[40px] h-[23px] bg-[#D1D5DB] rounded-full peer-checked:bg-[#4F46E5] transition-colors"></div>
+                            <div class="absolute top-[2.5px] left-[2.5px] w-[18px] h-[18px] bg-white rounded-full shadow-[0_1px_2px_rgba(16,24,40,.3)] transition-transform peer-checked:translate-x-[17px]"></div>
+                        </div>
+                        <div>
+                            <span class="text-[13px] font-semibold text-[#111827]">Mostrar productos agotados</span>
+                            <p class="text-[11.5px] text-[#9CA3AF]">Si está desactivado, los agotados no aparecen</p>
+                        </div>
+                    </label>
+                    <div x-show="ooActive" x-transition class="mt-2 ml-[56px] flex gap-2">
+                        @foreach(['dimmed' => 'Atenuados', 'strikethrough' => 'Tachados'] as $val => $lbl)
+                        <label class="flex items-center gap-1.5 text-[12px] text-[#374151] cursor-pointer">
+                            <input type="radio" name="out_of_stock_style" value="{{ $val }}" {{ old('out_of_stock_style', $screen->out_of_stock_style ?? 'dimmed') === $val ? 'checked' : '' }} class="accent-[#4F46E5]">
+                            {{ $lbl }}
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Segundos de rotación --}}
+                <label class="flex flex-col gap-[6px]">
+                    <span class="text-[12px] font-semibold text-[#374151]">Segundos entre páginas <span class="font-normal text-[#9CA3AF]">(si hay paginación)</span></span>
+                    <input type="number" name="page_seconds" value="{{ old('page_seconds', $screen->page_seconds ?? 15) }}" min="5" max="120" step="1"
+                           class="w-[120px] px-3 py-[9px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none">
+                </label>
+
+                {{-- Franja inferior --}}
+                <label class="flex flex-col gap-[6px]">
+                    <span class="text-[12px] font-semibold text-[#374151]">Mensaje en el pie <span class="font-normal text-[#9CA3AF]">(opcional)</span></span>
+                    <input type="text" name="footer_message" value="{{ old('footer_message', $screen->footer_message) }}" maxlength="200"
+                           class="w-full px-3 py-[10px] border border-[#E5E7EB] rounded-[10px] text-[14px] text-[#111827] focus:border-[#4F46E5] focus:shadow-[0_0_0_3px_rgba(79,70,229,.14)] focus:outline-none placeholder:text-[#9CA3AF]"
+                           placeholder="Ej: Pide por WhatsApp +569 9999 9999 · Promo de la casa">
+                </label>
+
+            </div>
         </div>
 
         <div class="flex items-center justify-between gap-2 pt-1">
