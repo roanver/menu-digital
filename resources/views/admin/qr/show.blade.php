@@ -1,4 +1,5 @@
 <x-admin-layout>
+@php $__hasKit = $restaurant->kits()->where('status', 'activado')->exists(); @endphp
 <div class="max-w-[780px]">
 
     <div class="grid grid-cols-1 md:grid-cols-[340px_1fr] gap-5 items-start">
@@ -100,7 +101,8 @@
                 </div>
             </div>
 
-            <!-- NFC Tip -->
+            @if($__hasKit)
+            <!-- NFC Tip (kit activo — instrucciones técnicas) -->
             <div class="rounded-[16px] p-5" style="background:linear-gradient(135deg,#1e1b4b,#312e81)">
                 <div class="flex items-start gap-3">
                     <div class="w-[36px] h-[36px] rounded-[10px] bg-white/15 flex items-center justify-center flex-none">
@@ -109,12 +111,27 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-[13px] font-bold text-white">Tip: Chip NFC en la mesa</p>
-                        <p class="text-[12px] text-indigo-200 mt-1">Configura un chip NFC apuntando a:</p>
-                        <p class="text-[12px] font-semibold text-indigo-100 mt-1 break-all font-mono">{{ $url }}</p>
+                        <p class="text-[13px] font-bold text-white">Chips NFC del kit</p>
+                        <p class="text-[12px] text-indigo-200 mt-1">Los chips de tu kit ya vienen grabados con el link de cada mesa. Puedes ver el link de cada chip en <a href="{{ route('admin.tables.index') }}" class="underline text-indigo-100">Mesas</a>.</p>
                     </div>
                 </div>
             </div>
+            @else
+            <!-- Kit upsell (sin kit) -->
+            <div class="rounded-[16px] p-5" style="background:linear-gradient(135deg,#1e1b4b,#312e81)">
+                <div class="flex items-start gap-3">
+                    <div class="w-[36px] h-[36px] rounded-[10px] bg-white/15 flex items-center justify-center flex-none">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 8.32a7.43 7.43 0 0 1 0 7.36M9.46 6.21a11.76 11.76 0 0 1 0 11.58M12.91 4.1a15.91 15.91 0 0 1 .01 15.8M16.37 2a20.16 20.16 0 0 1 0 20"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[13px] font-bold text-white">¿Quieres que abra solo al acercar el celular?</p>
+                        <p class="text-[12px] text-indigo-200 mt-1 leading-relaxed">Con el kit físico, cada mesa tiene un chip NFC pregrabado. Tus clientes no necesitan escanear nada — solo acercan el celular y el menú se abre.</p>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
 
     </div>

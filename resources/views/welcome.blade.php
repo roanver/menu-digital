@@ -75,9 +75,9 @@ html { scroll-behavior: smooth; }
         <svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m5.8 14.06c-.25.7-1.44 1.34-1.98 1.39-.54.05-1.05.24-3.53-.98-2.48-1.22-4.04-3.77-4.16-3.94-.12-.17-.98-1.31-.98-2.5s.62-1.77.85-2.01c.23-.25.5-.31.66-.31s.34.01.49.01c.16 0 .37-.06.57.44.2.5.7 1.73.76 1.85.06.13.1.28.01.45-.09.17-.35.5-.51.67-.16.17-.26.24-.1.5.16.25.71 1.17 1.53 1.9 1.05.94 1.79 1.14 2.04 1.27.25.12.4.1.55-.06.15-.17.63-.73.8-.98.17-.25.34-.2.57-.12.23.09 1.45.69 1.7.81.25.13.41.19.47.29.06.11.06.63-.19 1.33" /></svg>
         Pedir la mía por WhatsApp
       </a>
-      <a href="/{{ $demo }}" style="display: inline-flex; align-items: center; gap: 8px; background: #FFFDF9; color: #12201A; font-size: 16px; font-weight: 600; padding: 15px 24px; border-radius: 12px; border: 1px solid rgba(18,32,26,0.16); box-shadow: 0 1px 2px rgba(18,32,26,0.05); text-decoration: none; transition: border-color 150ms ease" onmouseover="this.style.borderColor='rgba(18,32,26,0.4)'" onmouseout="this.style.borderColor='rgba(18,32,26,0.16)'">Ver una carta de verdad</a>
+      <a href="{{ route('register') }}" style="display: inline-flex; align-items: center; gap: 8px; background: #FFFDF9; color: #12201A; font-size: 15px; font-weight: 600; padding: 13px 22px; border-radius: 12px; border: 1px solid rgba(18,32,26,0.16); box-shadow: 0 1px 2px rgba(18,32,26,0.05); text-decoration: none; transition: border-color 150ms ease" onmouseover="this.style.borderColor='rgba(18,32,26,0.4)'" onmouseout="this.style.borderColor='rgba(18,32,26,0.16)'">Probarlo gratis</a>
     </div>
-    <p style="font-size: 13.5px; color: #6C7C71; margin: 0">Sin contrato. Sin comisión por venta. Instalación incluida.</p>
+    <p style="font-size: 13.5px; color: #6C7C71; margin: 0">Sin contrato. Sin comisión por venta. <a href="/{{ $demo }}" style="color:#46564C;text-decoration:underline;text-underline-offset:2px">Ver demo</a>.</p>
   </div>
 
   <!-- Columna derecha: foto + teléfono + placa QR -->

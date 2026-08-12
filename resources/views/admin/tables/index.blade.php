@@ -1,7 +1,8 @@
 <x-admin-layout>
 @php
     $maxTables = $maxTables ?? 0;
-    $canAdd = $maxTables === -1 || $tables->count() < $maxTables;
+    $canAdd    = $maxTables === -1 || $tables->count() < $maxTables;
+    $__hasKit  = $restaurant->kits()->where('status', 'activado')->exists();
 @endphp
 
 <div class="max-w-[860px]">
@@ -15,7 +16,11 @@
                 <span class="text-[11px] font-semibold text-[#6B7280] bg-[#F3F4F6] rounded-full px-2 py-0.5">{{ $tables->count() }}</span>
                 @endif
             </div>
-            <p class="text-[12.5px] text-[#6B7280] mt-0.5">Cada mesa tiene su propio QR para imprimir y su código NFC para grabar en el chip.</p>
+            @if($__hasKit)
+            <p class="text-[12.5px] text-[#6B7280] mt-0.5">Mesas activadas desde tu kit. Cada chip ya viene grabado — solo imprime los QR si quieres también ese soporte.</p>
+            @else
+            <p class="text-[12.5px] text-[#6B7280] mt-0.5">Cada mesa tiene su propio QR para imprimir. Cuando tengas un kit físico, los chips NFC se vinculan automáticamente.</p>
+            @endif
             @if($maxTables > 0)
             <p class="text-[11.5px] text-[#9CA3AF] mt-0.5">Tu plan permite hasta {{ $maxTables }} mesas · {{ $tables->count() }} creadas</p>
             @elseif($maxTables === -1)
@@ -30,9 +35,9 @@
                 Copiar todos los links NFC
             </button>
             <a href="{{ route('admin.tables.print') }}" target="_blank"
-               class="inline-flex items-center gap-2 bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] text-[#374151] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold shadow-[0_1px_2px_rgba(16,24,40,.04)] transition-colors">
+               class="inline-flex items-center gap-2 {{ $__hasKit ? 'bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] text-[#374151]' : 'bg-[#4F46E5] hover:bg-[#4338CA] text-white shadow-[0_2px_8px_rgba(79,70,229,.35)]' }} rounded-[10px] px-4 py-2.5 text-[13px] font-semibold transition-colors">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                Hoja imprimible
+                Imprimir QR
             </a>
             @endif
         </div>
@@ -106,14 +111,23 @@
     </div>
 
     @if($tables->isEmpty())
-    <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-12 text-center shadow-[0_1px_3px_rgba(16,24,40,.05)]">
+    <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-10 text-center shadow-[0_1px_3px_rgba(16,24,40,.05)]">
         <div class="w-12 h-12 bg-[#F3F4F6] rounded-[14px] flex items-center justify-center mx-auto mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="7" width="18" height="4" rx="1"/><line x1="5" y1="11" x2="5" y2="17"/><line x1="19" y1="11" x2="19" y2="17"/>
             </svg>
         </div>
         <p class="text-[14px] font-semibold text-[#374151] mb-1">Sin mesas configuradas</p>
-        <p class="text-[12.5px] text-[#9CA3AF] mb-5">Usa la creación masiva para generar todas las mesas de tu local de una sola vez.</p>
+        @if($__hasKit)
+        <p class="text-[12.5px] text-[#9CA3AF]">Las mesas de tu kit ya deberían aparecer aquí. Si algo no cuadra, contacta a soporte.</p>
+        @else
+        <p class="text-[12.5px] text-[#9CA3AF] mb-4">Crea tus mesas arriba y luego imprime el QR para pegarlos.</p>
+        <a href="{{ route('admin.qr.show') }}"
+           class="inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-[10px] px-4 py-2 text-[13px] font-semibold transition-colors">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
+            También puedes descargar un QR global
+        </a>
+        @endif
     </div>
 
     @else
@@ -261,6 +275,19 @@
         @endforeach
     </div>
 
+    @endif
+
+    {{-- Upsell kit físico (solo sin kit activado) --}}
+    @if(!$__hasKit && $tables->isNotEmpty())
+    <div class="mt-5 rounded-[16px] px-5 py-4 flex items-start gap-4" style="background:#f8f7ff;border:1px solid #c7d2fe">
+        <div class="w-[38px] h-[38px] rounded-[10px] bg-[#4F46E5] flex items-center justify-center flex-none">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div class="text-[13px] font-bold text-[#111827] mb-0.5">¿Quieres chips NFC en las mesas?</div>
+            <div class="text-[12.5px] text-[#4B5563]">Con el kit físico, tus clientes abren el menú solo acercando el celular — sin escanear. Los chips vienen pregrabados y se vinculan automáticamente a tus mesas.</div>
+        </div>
+    </div>
     @endif
 
     @endif {{-- maxTables !== 0 --}}

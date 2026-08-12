@@ -66,6 +66,11 @@ class Restaurant extends Model
         return $this->hasMany(NfcTag::class);
     }
 
+    public function kits(): HasMany
+    {
+        return $this->hasMany(Kit::class);
+    }
+
     public function tables(): HasMany
     {
         return $this->hasMany(RestaurantTable::class)->orderBy('order')->orderBy('id');
