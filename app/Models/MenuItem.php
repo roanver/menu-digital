@@ -41,4 +41,13 @@ class MenuItem extends Model
     {
         return $this->hasMany(ItemVariant::class)->orderBy('sort_order');
     }
+
+    /**
+     * Precio efectivo: promo_price si el ítem está en promoción, price en caso contrario.
+     * Es el precio base que deben usar todos los templates y el carrito.
+     */
+    public function effectivePrice(): int
+    {
+        return $this->is_promo && $this->promo_price ? $this->promo_price : $this->price;
+    }
 }

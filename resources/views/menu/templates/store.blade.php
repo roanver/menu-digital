@@ -95,7 +95,6 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
                             $stockLow  = $item->stock !== null && $item->stock > 0 && $item->stock <= 5;
                             $stockOut  = $item->stock !== null && $item->stock === 0;
                             $unavail   = !$item->is_available || $stockOut;
-                            $finalPrice = $item->is_promo && $item->promo_price ? $item->promo_price : $item->price;
                         @endphp
 
                         <div class="product-card{{ $unavail ? ' unavailable' : '' }}">
@@ -160,11 +159,11 @@ body{color:#1A1A1A;font-family:'Inter',system-ui,sans-serif}
                                     @if(!$unavail && $restaurant->accepts_orders)
                                         @php $__img = $item->image ? Storage::url($item->image) : ''; @endphp
                                         @if($item->variants->isNotEmpty())
-                                            @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
+                                            @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->effectivePrice(), 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
                                             <button x-on:click="openVariantModal({{ $__vd }})"
                                                     style="width:30px;height:30px;border-radius:10px;background:#1A1A1A;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;line-height:1;">+</button>
                                         @else
-                                            <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $finalPrice }}, '', '{{ $__img }}')"
+                                            <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->effectivePrice() }}, '', '{{ $__img }}')"
                                                     style="width:30px;height:30px;border-radius:10px;background:#1A1A1A;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;line-height:1;">+</button>
                                         @endif
                                     @endif

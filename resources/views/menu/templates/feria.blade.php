@@ -166,11 +166,11 @@ body{font-family:'Bricolage Grotesque',Inter,system-ui,sans-serif;color:#191410}
                                     @if($item->is_available && $restaurant->accepts_orders)
                                         @php $__img = $item->image ? Storage::url($item->image) : ''; @endphp
                                         @if($item->variants->isNotEmpty())
-                                            @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
+                                            @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->effectivePrice(), 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
                                             <button x-on:click="openVariantModal({{ $__vd }})"
                                                     style="width:27px;height:27px;border-radius:9px;background:#191410;display:flex;align-items:center;justify-content:center;flex:0 0 auto;border:none;cursor:pointer;color:#FFD84D;font-size:18px;font-weight:800;line-height:1;">+</button>
                                         @else
-                                            <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }}, '', '{{ $__img }}')"
+                                            <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->effectivePrice() }}, '', '{{ $__img }}')"
                                                     style="width:27px;height:27px;border-radius:9px;background:#191410;display:flex;align-items:center;justify-content:center;flex:0 0 auto;border:none;cursor:pointer;color:#FFD84D;font-size:18px;font-weight:800;line-height:1;">+</button>
                                         @endif
                                     @elseif(!$item->is_available)

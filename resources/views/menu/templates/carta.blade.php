@@ -121,10 +121,10 @@ body{color:#211A12}
                                         @endforeach
                                         @if($item->is_available && $restaurant->accepts_orders)
                                             @if($item->variants->isNotEmpty())
-                                                <button x-on:click="openVariantModal({{ json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]) }})"
+                                                <button x-on:click="openVariantModal({{ json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->effectivePrice(), 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]) }})"
                                                         style="width:24px;height:24px;border-radius:6px;background:#211A12;color:#F6F1E7;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;">+</button>
                                             @else
-                                                <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }})"
+                                                <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->effectivePrice() }})"
                                                         style="width:24px;height:24px;border-radius:6px;background:#211A12;color:#F6F1E7;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;line-height:1;">+</button>
                                             @endif
                                         @endif

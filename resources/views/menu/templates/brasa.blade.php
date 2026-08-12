@@ -167,11 +167,11 @@ body{color:#FAFAF9}
                                 @if($item->is_available && $restaurant->accepts_orders)
                                     @php $__img = $item->image ? Storage::url($item->image) : ''; @endphp
                                     @if($item->variants->isNotEmpty())
-                                        @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->price, 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
+                                        @php $__vd = json_encode(['id' => $item->id, 'name' => $item->name, 'price' => $item->effectivePrice(), 'image' => $__img, 'variants' => $item->variants->map(fn($v) => ['name' => $v->name, 'price_delta' => $v->price_delta])->values()]); @endphp
                                         <button x-on:click="openVariantModal({{ $__vd }})"
                                                 style="width:28px;height:28px;border-radius:8px;background:linear-gradient(120deg,#F59E0B,#DC2626);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0C0A09;font-size:18px;font-weight:700;line-height:1;">+</button>
                                     @else
-                                        <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->is_promo && $item->promo_price ? $item->promo_price : $item->price }}, '', '{{ $__img }}')"
+                                        <button x-on:click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->effectivePrice() }}, '', '{{ $__img }}')"
                                                 style="width:28px;height:28px;border-radius:8px;background:linear-gradient(120deg,#F59E0B,#DC2626);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0C0A09;font-size:18px;font-weight:700;line-height:1;">+</button>
                                     @endif
                                 @endif
